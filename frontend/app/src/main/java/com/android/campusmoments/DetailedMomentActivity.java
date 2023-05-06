@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.net.Uri;
 import android.os.Bundle;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -18,7 +19,7 @@ public class DetailedMomentActivity extends AppCompatActivity {
     private String mMomentUsername;
     private String mMomentTime;
     private String mMomentTitle;
-    private List<Integer> mMomentPicture;
+    private List<Uri> mMomentPicture;
     private String mMomentContent;
     private int mMomentCommentCount;
     private int mMomentLikeCount;
@@ -33,7 +34,6 @@ public class DetailedMomentActivity extends AppCompatActivity {
     private TextView mCommentCountTextView;
     private TextView mLikeCountTextView;
     private TextView mFavoriteCountTextView;
-
 
     @SuppressLint("CutPasteId")
     @Override
@@ -50,7 +50,7 @@ public class DetailedMomentActivity extends AppCompatActivity {
         mMomentUsername = getIntent().getStringExtra("moment_username");
         mMomentTime = getIntent().getStringExtra("moment_time");
         mMomentTitle = getIntent().getStringExtra("moment_title");
-        mMomentPicture = getIntent().getIntegerArrayListExtra("moment_picture");
+        mMomentPicture = getIntent().getParcelableArrayListExtra("moment_pictures");
         mMomentContent = getIntent().getStringExtra("moment_content");
         mMomentCommentCount = getIntent().getIntExtra("moment_comment_count", 0);
         mMomentLikeCount = getIntent().getIntExtra("moment_like_count", 0);
@@ -65,7 +65,7 @@ public class DetailedMomentActivity extends AppCompatActivity {
         mTitleTextView = findViewById(R.id.titleTextView);
         mTitleTextView.setText(mMomentTitle);
         mPictureGridView = findViewById(R.id.pictureGridView);
-        mPictureGridView.setAdapter(new ImageAdapter(mMomentPicture));
+        mPictureGridView.setAdapter(new ImageAdapter(mMomentPicture,2));
 
         mContentTextView = findViewById(R.id.contentTextView);
         mContentTextView.setText(mMomentContent);
@@ -85,7 +85,7 @@ public class DetailedMomentActivity extends AppCompatActivity {
         outState.putString("moment_username", mMomentUsername);
         outState.putString("moment_time", mMomentTime);
         outState.putString("moment_title", mMomentTitle);
-        outState.putIntegerArrayList("moment_picture", (ArrayList<Integer>) mMomentPicture);
+        outState.putParcelableArrayList("moment_pictures", (ArrayList<Uri>) mMomentPicture);
         outState.putString("moment_content", mMomentContent);
         outState.putInt("moment_comment_count", mMomentCommentCount);
         outState.putInt("moment_like_count", mMomentLikeCount);
@@ -100,7 +100,7 @@ public class DetailedMomentActivity extends AppCompatActivity {
         mMomentUsername = savedInstanceState.getString("moment_username");
         mMomentTime = savedInstanceState.getString("moment_time");
         mMomentTitle = savedInstanceState.getString("moment_title");
-        mMomentPicture = savedInstanceState.getIntegerArrayList("moment_picture");
+        mMomentPicture = savedInstanceState.getParcelableArrayList("moment_pictures");
         mMomentContent = savedInstanceState.getString("moment_content");
         mMomentCommentCount = savedInstanceState.getInt("moment_comment_count");
         mMomentLikeCount = savedInstanceState.getInt("moment_like_count");

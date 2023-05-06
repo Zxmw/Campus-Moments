@@ -1,5 +1,6 @@
 package com.android.campusmoments;
 
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -62,14 +63,14 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentView
             mLikeCountTextView.setText(String.valueOf(moment.getLikeCount()));
             mFavoriteCountTextView.setText(String.valueOf(moment.getFavoriteCount()));
 
-            List<Integer> pictures = moment.getPictures();
+            List<Uri> pictures = moment.getPictures();
             if (pictures.size() == 0) {
                 mPictureLinearLayout.setVisibility(View.GONE);
                 mPictureGridView.setVisibility(View.GONE);
             } else {
                 mPictureLinearLayout.setVisibility(View.VISIBLE);
                 mPictureGridView.setVisibility(View.VISIBLE);
-                mPictureGridView.setAdapter(new ImageAdapter(pictures));
+                mPictureGridView.setAdapter(new ImageAdapter(pictures, 1));
             }
         }
     }

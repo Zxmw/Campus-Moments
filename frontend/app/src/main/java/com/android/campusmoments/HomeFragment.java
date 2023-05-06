@@ -2,6 +2,7 @@ package com.android.campusmoments;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class HomeFragment extends Fragment {
     private List<Moment> mMomentList;
@@ -33,13 +35,13 @@ public class HomeFragment extends Fragment {
         super.onCreate(savedInstanceState);
         mMomentList = new ArrayList<>();
         mMomentList.add(new Moment(R.drawable.avatar1, "Sweetnow", "昨天 10:18", "【THU春日足迹】几朵园子里的春花和鸳鸯",
-                List.of(R.drawable.picture5),
+                List.of(Uri.parse("android.resource://" + requireActivity().getPackageName() + "/" + R.drawable.picture5)),
                 "学校里的春天，花还是很多的，荷塘也解冻了，有鸳鸯在游泳。", 2, 9, 5));
         mMomentList.add(new Moment(R.drawable.avatar2, "王政", "昨天 10:08", "【北大北大】",
-                List.of(R.drawable.picture1),
+                List.of(Uri.parse("android.resource://" + requireActivity().getPackageName() + "/" + R.drawable.picture1)),
                 "北大我的北大我真的好想进去看看。", 999, 999, 999));
         mMomentList.add(new Moment(R.drawable.avatar2, "王政19", "昨天 9:08", "【美食美食不辜负】",
-                List.of(R.drawable.picture15),
+                List.of(Uri.parse("android.resource://" + requireActivity().getPackageName() + "/" + R.drawable.picture15)),
                 "学校的好吃的和学校周边的好吃的。",
                 1, 19, 3));
     }
@@ -60,8 +62,8 @@ public class HomeFragment extends Fragment {
                 intent.putExtra("moment_username", mMomentList.get(position).getUsername());
                 intent.putExtra("moment_time", mMomentList.get(position).getTime());
                 intent.putExtra("moment_title", mMomentList.get(position).getTitle());
-                ArrayList<Integer> pictures = new ArrayList<Integer>(mMomentList.get(position).getPictures());
-                intent.putIntegerArrayListExtra("moment_picture", pictures);
+                ArrayList<Uri> pictures = new ArrayList<>(mMomentList.get(position).getPictures());
+                intent.putParcelableArrayListExtra("moment_pictures", pictures);
                 intent.putExtra("moment_content", mMomentList.get(position).getContent());
                 intent.putExtra("moment_comment_count", mMomentList.get(position).getCommentCount());
                 intent.putExtra("moment_like_count", mMomentList.get(position).getLikeCount());
@@ -83,7 +85,7 @@ public class HomeFragment extends Fragment {
             String username = data.getStringExtra("moment_username");
             String time = data.getStringExtra("moment_time");
             String title = data.getStringExtra("moment_title");
-            ArrayList<Integer> pictures = data.getIntegerArrayListExtra("moment_picture");
+            ArrayList<Uri> pictures = data.getParcelableArrayListExtra("moment_pictures");
             String content = data.getStringExtra("moment_content");
             mMomentList.add(0, new Moment(avatar, username, time, title, pictures, content, 0, 0, 0));
             mAdapter.notifyDataSetChanged();

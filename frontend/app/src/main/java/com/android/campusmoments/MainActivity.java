@@ -11,6 +11,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         // 跳转到MainMomentsActivity
         Intent intent = new Intent(MainActivity.this, MainMomentsActivity.class);
         startActivity(intent);

@@ -1,5 +1,7 @@
 package com.android.campusmoments;
 
+import android.net.Uri;
+
 import java.util.List;
 
 public class Moment {
@@ -7,13 +9,13 @@ public class Moment {
     private String mUsername;
     private String mTime;
     private String mTitle;
-    private List<Integer> mPictures;
+    private List<Uri> mPictures;
     private String mContent;
     private int mCommentCount;
     private int mLikeCount;
     private int mFavoriteCount;
 
-    public Moment(int avatar, String username, String time, String title, List<Integer> pictures, String content, int commentCount, int likeCount, int favoriteCount) {
+    public Moment(int avatar, String username, String time, String title, List<Uri> pictures, String content, int commentCount, int likeCount, int favoriteCount) {
         mAvatar = avatar;
         mUsername = username;
         mTime = time;
@@ -57,14 +59,14 @@ public class Moment {
         mTitle = title;
     }
 
-    public List<Integer> getPictures() {
+    public List<Uri> getPictures() {
         if (mPictures == null) {
             return List.of();
         }
         return mPictures;
     }
 
-    public void setPictures(List<Integer> pictures) {
+    public void setPictures(List<Uri> pictures) {
         mPictures = pictures;
     }
 
@@ -101,3 +103,4 @@ public class Moment {
         mFavoriteCount = favoriteCount;
     }
 }
+
