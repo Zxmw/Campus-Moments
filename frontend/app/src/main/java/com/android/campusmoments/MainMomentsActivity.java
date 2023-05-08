@@ -180,9 +180,9 @@ public class MainMomentsActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1 && resultCode == 1) {
             mHomeFragment.onActivityResult(requestCode, resultCode, data);
-            mBottomNavigationView.setSelectedItemId(R.id.navigation_home);
-            Objects.requireNonNull(mTabLayout.getTabAt(0)).select();
         }
+        mBottomNavigationView.setSelectedItemId(R.id.navigation_home);
+        Objects.requireNonNull(mTabLayout.getTabAt(0)).select();
     }
 
     @Override
