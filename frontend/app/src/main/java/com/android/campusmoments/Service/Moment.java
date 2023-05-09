@@ -1,4 +1,4 @@
-package com.android.campusmoments;
+package com.android.campusmoments.Service;
 
 import android.net.Uri;
 

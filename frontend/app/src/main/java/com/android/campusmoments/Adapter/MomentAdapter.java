@@ -1,4 +1,4 @@
-package com.android.campusmoments;
+package com.android.campusmoments.Adapter;
 
 import android.net.Uri;
 import android.view.LayoutInflater;
@@ -10,6 +10,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.android.campusmoments.R;
+import com.android.campusmoments.Service.Moment;
 
 import java.util.List;
 

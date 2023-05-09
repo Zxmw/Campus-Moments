@@ -1,13 +1,11 @@
 package com.android.campusmoments.ui.login;
 
+import android.os.Handler;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import android.content.Intent;
-import android.util.Patterns;
-
-import com.android.campusmoments.MainMomentsActivity;
 import com.android.campusmoments.data.LoginRepository;
 import com.android.campusmoments.data.Result;
 import com.android.campusmoments.data.model.LoggedInUser;
@@ -66,5 +64,13 @@ public class LoginViewModel extends ViewModel {
     // A placeholder password validation check
     private boolean isPasswordValid(String password) {
         return password != null && password.trim().length() > 5;
+    }
+
+    public String getToken() {
+        return loginRepository.getToken();
+    }
+
+    public Handler getHandler() {
+        return loginRepository.getHandler();
     }
 }

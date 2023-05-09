@@ -1,10 +1,13 @@
-package com.android.campusmoments;
+package com.android.campusmoments.Activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import android.os.Bundle;
+
+import com.android.campusmoments.Fragment.AddFragment;
+import com.android.campusmoments.R;
 
 public class PublishMomentActivity extends AppCompatActivity {
 

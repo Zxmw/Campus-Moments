@@ -8,7 +8,9 @@ import androidx.annotation.StringRes;
 import androidx.fragment.app.Fragment;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
@@ -22,12 +24,13 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.campusmoments.MainMomentsActivity;
+import com.android.campusmoments.Activity.MainMomentsActivity;
+import com.android.campusmoments.Service.Services;
 import com.android.campusmoments.databinding.FragmentLoginBinding;
 import com.android.campusmoments.R;
 
 public class LoginFragment extends Fragment {
-
+    private final String sharedPrefFile = "com.android.campusmoments.user";
     private LoginViewModel loginViewModel;
     private FragmentLoginBinding binding;
 
@@ -47,7 +50,7 @@ public class LoginFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         loginViewModel = new ViewModelProvider(this, new LoginViewModelFactory())
                 .get(LoginViewModel.class);
-
+        Services.setLoginHandler(getLoginHandler());
         final EditText usernameEditText = binding.username;
         final EditText passwordEditText = binding.password;
         final Button loginButton = binding.login;
@@ -123,9 +126,17 @@ public class LoginFragment extends Fragment {
                 int loginResult = loginViewModel.login(usernameEditText.getText().toString(),
                         passwordEditText.getText().toString());
                 if (loginResult == 0) {
-                    // login success, goto MainMomentsActivity
+                    // login success, save user info
+                    SharedPreferences mPreferences = requireContext().getSharedPreferences(sharedPrefFile, getContext().MODE_PRIVATE);
+                    SharedPreferences.Editor preferencesEditor = mPreferences.edit();
+//                    preferencesEditor.putString("username", usernameEditText.getText().toString());
+//                    preferencesEditor.putString("password", passwordEditText.getText().toString());
+                    preferencesEditor.putString("token", loginViewModel.getToken());
+                    preferencesEditor.apply();
+                    // jump to main moments activity
                     Intent intent = new Intent(getContext(), MainMomentsActivity.class);
                     startActivity(intent);
+                    requireActivity().finish();
                 } else if (loginResult == 1) {
                 }
             }
@@ -153,5 +164,9 @@ public class LoginFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    public Handler getLoginHandler() {
+        return loginViewModel.getHandler();
     }
 }

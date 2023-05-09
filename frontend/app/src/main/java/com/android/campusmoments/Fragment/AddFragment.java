@@ -1,4 +1,4 @@
-package com.android.campusmoments;
+package com.android.campusmoments.Fragment;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -21,10 +21,12 @@ import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 
+import com.android.campusmoments.Adapter.ImageAdapter;
+import com.android.campusmoments.R;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 public class AddFragment extends Fragment {
     private SharedPreferences mSharedPreferences;
@@ -72,10 +74,6 @@ public class AddFragment extends Fragment {
         mPictureGridView = view.findViewById(R.id.pictureGridView);
         mPublishButton.setOnClickListener(v -> returnMoment());
         mAvatar = R.drawable.avatar_1;
-//        mPictures = new ArrayList<Uri>();
-//        // 将R.drawable.picture11转换成Uri
-//        Uri uri = Uri.parse("android.resource://" + Objects.requireNonNull(getActivity()).getPackageName() + "/" + R.drawable.picture11);
-//        mPictures.add(uri);
         mAvatarImageView.setImageResource(mAvatar);
         mPictureGridView.setAdapter(new ImageAdapter(mPictures, 0));
         mPictureGridView.setOnItemClickListener((parent, view1, position, id) -> {

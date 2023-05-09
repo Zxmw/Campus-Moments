@@ -1,4 +1,4 @@
-package com.android.campusmoments;
+package com.android.campusmoments.Fragment;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -14,9 +14,13 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.campusmoments.Activity.DetailedMomentActivity;
+import com.android.campusmoments.Service.Moment;
+import com.android.campusmoments.Adapter.MomentAdapter;
+import com.android.campusmoments.R;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class HomeFragment extends Fragment {
     private List<Moment> mMomentList;

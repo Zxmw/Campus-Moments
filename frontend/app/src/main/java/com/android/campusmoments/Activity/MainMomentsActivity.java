@@ -1,4 +1,4 @@
-package com.android.campusmoments;
+package com.android.campusmoments.Activity;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -11,8 +11,15 @@ import androidx.fragment.app.FragmentTransaction;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 
+import com.android.campusmoments.Fragment.FollowFragment;
+import com.android.campusmoments.Fragment.GuideFragment;
+import com.android.campusmoments.Fragment.HomeFragment;
+import com.android.campusmoments.Fragment.HotFragment;
+import com.android.campusmoments.Fragment.MyFragment;
+import com.android.campusmoments.Fragment.NewCommentFragment;
+import com.android.campusmoments.R;
+import com.android.campusmoments.Fragment.TopicFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.tabs.TabLayout;
 

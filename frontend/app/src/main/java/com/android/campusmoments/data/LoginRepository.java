@@ -1,5 +1,7 @@
 package com.android.campusmoments.data;
 
+import android.os.Handler;
+
 import com.android.campusmoments.data.model.LoggedInUser;
 
 /**
@@ -50,5 +52,13 @@ public class LoginRepository {
             setLoggedInUser(((Result.Success<LoggedInUser>) result).getData());
         }
         return result;
+    }
+
+    public String getToken() {
+        return user.getToken();
+    }
+
+    public Handler getHandler() {
+        return dataSource.getHandler();
     }
 }

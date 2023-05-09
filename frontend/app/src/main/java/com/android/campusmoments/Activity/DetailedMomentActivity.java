@@ -1,4 +1,4 @@
-package com.android.campusmoments;
+package com.android.campusmoments.Activity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -9,6 +9,9 @@ import android.os.Bundle;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.android.campusmoments.Adapter.ImageAdapter;
+import com.android.campusmoments.R;
 
 import java.util.ArrayList;
 import java.util.List;

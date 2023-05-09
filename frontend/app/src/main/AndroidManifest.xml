@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+
     <uses-feature android:name="android.hardware.camera" />
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -15,16 +18,22 @@
         android:theme="@style/Theme.CampusMoments"
         tools:targetApi="31">
         <activity
-            android:name=".PublishMomentActivity"
+            android:name=".Activity.UsernameConfigActivity"
             android:exported="false" />
         <activity
-            android:name=".DetailedMomentActivity"
+            android:name=".Activity.PersonCenterActivity"
             android:exported="false" />
         <activity
-            android:name=".MainMomentsActivity"
+            android:name=".Activity.PublishMomentActivity"
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
+            android:name=".Activity.DetailedMomentActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Activity.MainMomentsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Activity.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
