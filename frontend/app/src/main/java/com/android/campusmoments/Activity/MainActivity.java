@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 
 import com.android.campusmoments.R;
+import com.android.campusmoments.Service.Services;
 import com.android.campusmoments.ui.login.LoginFragment;
 
 public class MainActivity extends AppCompatActivity {
@@ -35,6 +36,10 @@ public class MainActivity extends AppCompatActivity {
             transaction.commit();
         });
 
+    }
 
+    public void gotoRegister(View view) {
+        Intent intent = new Intent(MainActivity.this, RegisterActivity.class);
+        startActivity(intent);
     }
 }
