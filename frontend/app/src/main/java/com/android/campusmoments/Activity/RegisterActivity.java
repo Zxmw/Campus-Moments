@@ -16,8 +16,8 @@ import com.android.campusmoments.R;
 import com.android.campusmoments.Service.Services;
 
 public class RegisterActivity extends AppCompatActivity {
-    private static final int REGISTER_SUCCESS = 2;
-    private static final int REGISTER_FAIL = 3;
+    public static final int REGISTER_SUCCESS = 0;
+    public static final int REGISTER_FAIL = 1;
     TextView username_register;
     TextView password_register;
     @Override

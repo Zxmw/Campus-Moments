@@ -1,8 +1,9 @@
-package com.android.campusmoments.data;
+package com.android.campusmoments.Fragment.data;
 
 import android.os.Handler;
 
-import com.android.campusmoments.data.model.LoggedInUser;
+import com.android.campusmoments.Fragment.data.model.LoggedInUser;
+import com.android.campusmoments.Service.Services;
 
 /**
  * Class that requests authentication and user information from the remote data source and
@@ -43,6 +44,7 @@ public class LoginRepository {
         this.user = user;
         // If user credentials will be cached in local storage, it is recommended it be encrypted
         // @see https://developer.android.com/training/articles/keystore
+        Services.setLoggedInUser(user);
     }
 
     public Result<LoggedInUser> login(String username, String password) {
@@ -52,10 +54,6 @@ public class LoginRepository {
             setLoggedInUser(((Result.Success<LoggedInUser>) result).getData());
         }
         return result;
-    }
-
-    public String getToken() {
-        return user.getToken();
     }
 
     public Handler getHandler() {

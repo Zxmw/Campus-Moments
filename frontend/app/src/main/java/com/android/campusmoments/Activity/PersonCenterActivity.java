@@ -15,20 +15,22 @@ public class PersonCenterActivity extends AppCompatActivity {
         setContentView(R.layout.activity_person_center);
     }
     public void gotoSetAvatar() {
-
+        Intent intent = new Intent(this, AvatarConfigActivity.class);
+        startActivity(intent);
     }
     public void gotoSetUsername() {
-//      跳转到修改用户名页面
         Intent intent = new Intent(this, UsernameConfigActivity.class);
         startActivity(intent);
     }
 
     public void gotoSetBio() {
-
+        Intent intent = new Intent(this, BioConfigActivity.class);
+        startActivity(intent);
     }
 
     public void gotoSetPassword() {
-
+        Intent intent = new Intent(this, PasswordConfigActivity.class);
+        startActivity(intent);
     }
 
 }
