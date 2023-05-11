@@ -301,14 +301,15 @@ public class PubActivity extends AppCompatActivity {
         // TODO: 添加位置
         // 获取LocationManager对象
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
         // 判断是否有权限访问位置信息
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             // 如果没有权限，请求权限
+            Log.d(TAG, "addLocation: request permission");
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         } else {
             // 如果有权限，获取位置信息
+            Log.d(TAG, "addLocation: get location");
             Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             if (location != null) {
                 // 获取经度和纬度
