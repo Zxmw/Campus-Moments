@@ -3,11 +3,17 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-feature android:name="android.hardware.camera" />
-
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
+
+    <uses-feature android:name="android.hardware.camera" />
+
+    <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -20,7 +26,13 @@
         android:theme="@style/Theme.CampusMoments"
         tools:targetApi="31">
         <activity
-            android:name=".BioConfigActivity"
+            android:name=".Activity.KnifeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Activity.PubActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Activity.BioConfigActivity"
             android:exported="false" />
         <activity
             android:name=".Activity.PasswordConfigActivity"

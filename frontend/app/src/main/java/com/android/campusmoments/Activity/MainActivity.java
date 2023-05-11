@@ -19,22 +19,26 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mPreferences = getSharedPreferences(sharedPrefFile, MODE_PRIVATE);
-        String token = mPreferences.getString("token", null);
-        if (token != null) {
-            // TODO:check if the token is valid
-            Intent intent = new Intent(MainActivity.this, MainMomentsActivity.class);
-            startActivity(intent);
-            finish();
-        }
-        Button loginButton = findViewById(R.id.button_login);
-        loginButton.setOnClickListener(v -> {
-            loginButton.setVisibility(View.GONE);
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.replace(R.id.fragmentContainerView, new LoginFragment());
-            transaction.commit();
-        });
+//        mPreferences = getSharedPreferences(sharedPrefFile, MODE_PRIVATE);
+//        String token = mPreferences.getString("token", null);
+//        if (token != null) {
+//            // TODO:check if the token is valid
+//            Intent intent = new Intent(MainActivity.this, MainMomentsActivity.class);
+//            startActivity(intent);
+//            finish();
+//        }
+//        Button loginButton = findViewById(R.id.button_login);
+//        loginButton.setOnClickListener(v -> {
+//            loginButton.setVisibility(View.GONE);
+//            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+//            transaction.replace(R.id.fragmentContainerView, new LoginFragment());
+//            transaction.commit();
+//        });
 
+        // 直接打开发布页，测试用
+        Intent intent = new Intent(MainActivity.this, PubActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     public void gotoRegister(View view) {
