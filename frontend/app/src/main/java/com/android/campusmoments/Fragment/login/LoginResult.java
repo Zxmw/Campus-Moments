@@ -1,4 +1,4 @@
-package com.android.campusmoments.ui.login;
+package com.android.campusmoments.Fragment.login;
 
 import androidx.annotation.Nullable;
 

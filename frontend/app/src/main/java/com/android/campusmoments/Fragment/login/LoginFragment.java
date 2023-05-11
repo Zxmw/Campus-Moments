@@ -1,4 +1,4 @@
-package com.android.campusmoments.ui.login;
+package com.android.campusmoments.Fragment.login;
 
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -33,7 +33,8 @@ public class LoginFragment extends Fragment {
     private final String sharedPrefFile = "com.android.campusmoments.user";
     private LoginViewModel loginViewModel;
     private FragmentLoginBinding binding;
-
+    private static final int LOGIN_SUCCESS = 1;
+    private static final int LOGIN_FAIL = 0;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -125,19 +126,18 @@ public class LoginFragment extends Fragment {
                 loadingProgressBar.setVisibility(View.VISIBLE);
                 int loginResult = loginViewModel.login(usernameEditText.getText().toString(),
                         passwordEditText.getText().toString());
-                if (loginResult == 0) {
+                if (loginResult == LOGIN_SUCCESS) {
                     // login success, save user info
                     SharedPreferences mPreferences = requireContext().getSharedPreferences(sharedPrefFile, getContext().MODE_PRIVATE);
                     SharedPreferences.Editor preferencesEditor = mPreferences.edit();
 //                    preferencesEditor.putString("username", usernameEditText.getText().toString());
 //                    preferencesEditor.putString("password", passwordEditText.getText().toString());
-                    preferencesEditor.putString("token", loginViewModel.getToken());
                     preferencesEditor.apply();
                     // jump to main moments activity
                     Intent intent = new Intent(getContext(), MainMomentsActivity.class);
                     startActivity(intent);
                     requireActivity().finish();
-                } else if (loginResult == 1) {
+                } else if (loginResult == LOGIN_FAIL) {
                 }
             }
         });
@@ -145,7 +145,6 @@ public class LoginFragment extends Fragment {
 
     private void updateUiWithUser(LoggedInUserView model) {
         String welcome = getString(R.string.welcome) + model.getDisplayName();
-        // TODO : initiate successful logged in experience
         if (getContext() != null && getContext().getApplicationContext() != null) {
             Toast.makeText(getContext().getApplicationContext(), welcome, Toast.LENGTH_LONG).show();
         }

@@ -28,12 +28,12 @@
     <string name="default_moment_text">今天下午去了圆明园，有很多花，湖里有很多鸳鸯天鹅鱼。春天的气息！</string>
     <string name="text_publish">发布</string>
     <string name="tab_layout">tablayout</string>
-    <string name="login_text">登录(注册)</string>
+    <string name="login_text">登录</string>
     <string name="register_text">注册</string>
     <!-- Strings related to login -->
     <string name="prompt_username">用户名</string>
     <string name="prompt_password">密码</string>
-    <string name="action_sign_in">登录(注册)</string>
+    <string name="action_sign_in">登录</string>
     <string name="action_sign_in_short">Sign in</string>
     <string name="welcome">"Welcome!"</string>
     <string name="invalid_username">不合法的用户名</string>

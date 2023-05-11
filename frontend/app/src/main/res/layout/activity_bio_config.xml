@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><!-- 修改用户名，由person_center跳转 -->
+<?xml version="1.0" encoding="utf-8"?><!-- 修改简介，由person_center跳转 -->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -31,7 +31,7 @@
                 android:layout_height="wrap_content"
                 android:paddingHorizontal="10dp"
                 android:paddingVertical="5dp"
-                android:text="修改用户名"
+                android:text="修改简介"
                 android:textColor="@color/black"
                 android:textSize="16sp"
                 android:textStyle="bold"
@@ -46,7 +46,7 @@
                 android:layout_height="37dp"
                 android:layout_marginHorizontal="10dp"
                 android:background="@drawable/bg_purple_corner"
-                android:onClick="setUsername"
+                android:onClick="setBio"
                 android:text="保存"
                 android:textColor="@color/white"
                 android:textSize="14sp"
@@ -76,7 +76,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="30dp"
-                    android:text="用户名"
+                    android:text="简介"
                     android:textColor="@color/black"
                     android:textSize="16sp"
                     android:textStyle="bold" />
@@ -86,7 +86,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:hint="新用户名"
+                    android:hint="新简介！"
                     android:textSize="16sp"
                     tools:ignore="TouchTargetSizeCheck" />
             </LinearLayout>

@@ -15,14 +15,14 @@ import android.widget.Toast;
 import com.android.campusmoments.R;
 import com.android.campusmoments.Service.Services;
 
-public class UsernameConfigActivity extends AppCompatActivity {
-    public static final int SET_USERNAME_SUCCESS = 0;
-    public static final int SET_USERNAME_FAIL = 1;
+public class BioConfigActivity extends AppCompatActivity {
+    public static final int SET_BIO_SUCCESS = 0;
+    public static final int SET_BIO_FAIL = 1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_username_config);
-        Services.setSetUsernameHandler(handler);
+        setContentView(R.layout.activity_bio_config);
+        Services.setSetBioHandler(handler);
     }
 
     @SuppressLint("HandlerLeak")
@@ -30,28 +30,29 @@ public class UsernameConfigActivity extends AppCompatActivity {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
-            if (msg.what == SET_USERNAME_SUCCESS) {
-                successSetUsername();
-            } else if (msg.what == SET_USERNAME_FAIL) {
-                failSetUsername();
+            if (msg.what == SET_BIO_SUCCESS) {
+                successSetBio();
+            } else if (msg.what == SET_BIO_FAIL) {
+                failSetBio();
             }
         }
     };
 
-    public void setUsername(View view) {
-        TextView username_view = findViewById(R.id.bio_set);
-        String username = username_view.getText().toString();
-        Services.setUsername(username);
+    public void setBio(View view) {
+        TextView bio_view = findViewById(R.id.bio_set);
+        String bio = bio_view.getText().toString();
+        Services.setBio(bio);
     }
 
-    private void successSetUsername() {
+    private void successSetBio() {
         Toast.makeText(this.getApplicationContext(), "更新成功", Toast.LENGTH_SHORT).show();
         finish();
     }
 
-    private void failSetUsername() {
+    private void failSetBio() {
         Toast.makeText(this.getApplicationContext(), "更新失败", Toast.LENGTH_SHORT).show();
     }
+
     public void cancel(View view) {
         finish();
     }

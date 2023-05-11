@@ -10,7 +10,7 @@ import android.view.View;
 import android.widget.Button;
 
 import com.android.campusmoments.R;
-import com.android.campusmoments.ui.login.LoginFragment;
+import com.android.campusmoments.Fragment.login.LoginFragment;
 
 public class MainActivity extends AppCompatActivity {
     private SharedPreferences mPreferences;
@@ -39,6 +39,10 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(MainActivity.this, PubActivity.class);
         startActivity(intent);
         finish();
+    }
 
+    public void gotoRegister(View view) {
+        Intent intent = new Intent(MainActivity.this, RegisterActivity.class);
+        startActivity(intent);
     }
 }
