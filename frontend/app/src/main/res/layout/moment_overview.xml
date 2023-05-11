@@ -126,9 +126,11 @@
             android:src="@drawable/ic_moment_thumbup" />
         <TextView
             android:id="@+id/like_textview"
-            android:layout_width="wrap_content"
+            android:layout_width="50dp"
             android:layout_height="wrap_content"
             android:textSize="18sp"
+            android:maxLines="1"
+            android:maxLength="4"
             android:text="0" />
         <Space
             android:layout_width="0dp"
@@ -140,9 +142,11 @@
             android:src="@drawable/ic_moment_comment" />
         <TextView
             android:id="@+id/comment_textview"
-            android:layout_width="wrap_content"
+            android:layout_width="50dp"
             android:layout_height="wrap_content"
             android:textSize="18sp"
+            android:maxLines="1"
+            android:maxLength="4"
             android:text="0" />
         <Space
             android:layout_width="0dp"
@@ -154,10 +158,21 @@
             android:src="@drawable/ic_moment_star" />
         <TextView
             android:id="@+id/star_textview"
-            android:layout_width="wrap_content"
+            android:layout_width="50dp"
             android:layout_height="wrap_content"
             android:textSize="18sp"
+            android:maxLines="1"
+            android:maxLength="4"
             android:text="0" />
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_moment_share" />
         <Space
             android:layout_width="0dp"
             android:layout_height="match_parent"
