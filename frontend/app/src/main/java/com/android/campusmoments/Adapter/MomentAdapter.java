@@ -8,6 +8,7 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.VideoView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -15,6 +16,8 @@ import com.android.campusmoments.R;
 import com.android.campusmoments.Service.Moment;
 
 import java.util.List;
+
+import io.github.mthli.knife.KnifeText;
 
 public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentViewHolder> {
     private List<Moment> mMoments;
@@ -34,54 +37,65 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentView
         private ImageView mAvatarImageView;
         private TextView mUsernameTextView;
         private TextView mTimeTextView;
+        private TextView mTagTextView;
         private TextView mTitleTextView;
 
-        private LinearLayout mPictureLinearLayout;
-        private GridView mPictureGridView;
-        private TextView mContentTextView;
-        private TextView mCommentCountTextView;
-        private TextView mLikeCountTextView;
-        private TextView mFavoriteCountTextView;
+        private KnifeText mContentKnifeText;
+        private ImageView mPictureImageView;
+        private VideoView mVideoView;
+        private TextView mAddressTextView;
+        private TextView mLikeTextView;
+        private TextView mCommentTextView;
+        private TextView mStarTextView;
         public MomentViewHolder(View itemView) {
             super(itemView);
-            mAvatarImageView = itemView.findViewById(R.id.avatarImageView);
-            mUsernameTextView = itemView.findViewById(R.id.usernameTextView);
-            mTimeTextView = itemView.findViewById(R.id.timeTextView);
-            mTitleTextView = itemView.findViewById(R.id.titleTextView);
-            mPictureLinearLayout = itemView.findViewById(R.id.pictureLinearLayout);
-            mPictureGridView = itemView.findViewById(R.id.pictureGridView);
-            mContentTextView = itemView.findViewById(R.id.contentTextView);
-            mCommentCountTextView = itemView.findViewById(R.id.commentCountTextView);
-            mLikeCountTextView = itemView.findViewById(R.id.likeCountTextView);
-            mFavoriteCountTextView = itemView.findViewById(R.id.favoriteCountTextView);
+            mAvatarImageView = itemView.findViewById(R.id.avatar_imageview);
+            mUsernameTextView = itemView.findViewById(R.id.username_textview);
+            mTimeTextView = itemView.findViewById(R.id.time_textview);
+            mTagTextView = itemView.findViewById(R.id.tag_textview);
+            mTitleTextView = itemView.findViewById(R.id.title_textview);
+            mContentKnifeText = itemView.findViewById(R.id.content_knifetext);
+            mPictureImageView = itemView.findViewById(R.id.picture_imageview);
+            mVideoView = itemView.findViewById(R.id.video_videoview);
+            mAddressTextView = itemView.findViewById(R.id.address_textview);
+            mLikeTextView = itemView.findViewById(R.id.like_textview);
+            mCommentTextView = itemView.findViewById(R.id.comment_textview);
+            mStarTextView = itemView.findViewById(R.id.star_textview);
         }
         public void bindData(Moment moment) {
             // 将数据绑定到ViewHolder中的视图中
-            mAvatarImageView.setImageResource(moment.getAvatar());
+            if(moment.getAvatar() != null) {
+                mAvatarImageView.setImageURI(moment.getAvatar());
+            } else {
+                mAvatarImageView.setImageResource(R.drawable.avatar_1); // 默认头像
+            }
             mUsernameTextView.setText(moment.getUsername());
             mTimeTextView.setText(moment.getTime());
+            mTagTextView.setText(moment.getTag());
             mTitleTextView.setText(moment.getTitle());
-            mContentTextView.setText(moment.getContent());
-            mCommentCountTextView.setText(String.valueOf(moment.getCommentCount()));
-            mLikeCountTextView.setText(String.valueOf(moment.getLikeCount()));
-            mFavoriteCountTextView.setText(String.valueOf(moment.getFavoriteCount()));
-
-            List<Uri> pictures = moment.getPictures();
-            if (pictures.size() == 0) {
-                mPictureLinearLayout.setVisibility(View.GONE);
-                mPictureGridView.setVisibility(View.GONE);
+            mContentKnifeText.fromHtml(moment.getContent());
+            if(moment.getPicture() != null) {
+                mPictureImageView.setImageURI(moment.getPicture());
             } else {
-                mPictureLinearLayout.setVisibility(View.VISIBLE);
-                mPictureGridView.setVisibility(View.VISIBLE);
-                mPictureGridView.setAdapter(new ImageAdapter(pictures, 1));
+                mPictureImageView.setVisibility(View.GONE);
             }
+            if(moment.getVideo() != null) {
+                // TODO: VideoController
+                mVideoView.setVideoURI(moment.getVideo());
+            } else {
+                mVideoView.setVisibility(View.GONE);
+            }
+            mAddressTextView.setText(moment.getAddress());
+            mLikeTextView.setText(String.valueOf(moment.getLikeCount()));
+            mCommentTextView.setText(String.valueOf(moment.getCommentCount()));
+            mStarTextView.setText(String.valueOf(moment.getStarCount()));
         }
     }
 
     @Override
     public MomentViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.content_detaied_moment, parent, false);
+                .inflate(R.layout.moment_overview, parent, false);
         final MomentViewHolder viewHolder = new MomentViewHolder(view);
         view.setOnClickListener(new View.OnClickListener() {
             @Override

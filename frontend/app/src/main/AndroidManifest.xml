@@ -24,6 +24,12 @@
         android:theme="@style/Theme.CampusMoments"
         tools:targetApi="31">
         <activity
+            android:name=".Activity.HomeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Activity.DetailedActivity"
+            android:exported="false" />
+        <activity
             android:name=".Activity.KnifeActivity"
             android:exported="false" />
         <activity

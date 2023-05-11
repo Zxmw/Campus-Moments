@@ -2,105 +2,114 @@ package com.android.campusmoments.Service;
 
 import android.net.Uri;
 
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class Moment {
-    private int mAvatar;
+    private Uri mAvatar;
     private String mUsername;
-    private String mTime;
+    private String mTime; // 构造函数中获取当前时间
+    private String mTag;
     private String mTitle;
-    private List<Uri> mPictures;
-    private String mContent;
-    private int mCommentCount;
+    private String mContent;  // KnifeText.toHtml
+    private Uri mPicture;
+    private Uri mVideo;
+    private String mAddress;
     private int mLikeCount;
-    private int mFavoriteCount;
+    private int mCommentCount;
+    private int mStarCount;
 
-    public Moment(int avatar, String username, String time, String title, List<Uri> pictures, String content, int commentCount, int likeCount, int favoriteCount) {
+    private String[] mComments; // TODO: 评论
+
+    // 构造函数
+    public Moment(Uri avatar, String username, String tag, String title, String content, Uri picture, Uri video, String address) {
+
+        // 时间戳 TODO: Day-Month
+        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
+        Date curDate = new Date(System.currentTimeMillis());//获取当前时间
+        mTime = formatter.format(curDate);
+
         mAvatar = avatar;
         mUsername = username;
-        mTime = time;
+        mTag = tag;
         mTitle = title;
-        mPictures = pictures;
         mContent = content;
-        mCommentCount = commentCount;
-        mLikeCount = likeCount;
-        mFavoriteCount = favoriteCount;
+        mPicture = picture;
+        mVideo = video;
+        mAddress = address;
     }
-
-    public int getAvatar() {
+    // get-function
+    public Uri getAvatar() {
         return mAvatar;
     }
-
-    public void setAvatar(int avatar) {
-        mAvatar = avatar;
-    }
-
     public String getUsername() {
         return mUsername;
     }
-
-    public void setUsername(String username) {
-        mUsername = username;
-    }
-
     public String getTime() {
         return mTime;
     }
-
-    public void setTime(String time) {
-        mTime = time;
+    public String getTag() {
+        return mTag;
     }
-
     public String getTitle() {
         return mTitle;
     }
-
-    public void setTitle(String title) {
-        mTitle = title;
-    }
-
-    public List<Uri> getPictures() {
-        if (mPictures == null) {
-            return List.of();
-        }
-        return mPictures;
-    }
-
-    public void setPictures(List<Uri> pictures) {
-        mPictures = pictures;
-    }
-
     public String getContent() {
         return mContent;
     }
-
-    public void setContent(String content) {
-        mContent = content;
+    public Uri getPicture() {
+        return mPicture;
     }
-
-    public int getCommentCount() {
-        return mCommentCount;
+    public Uri getVideo() {
+        return mVideo;
     }
-
-
-    public void setCommentCount(int commentCount) {
-        mCommentCount = commentCount;
+    public String getAddress() {
+        return mAddress;
     }
-
     public int getLikeCount() {
         return mLikeCount;
     }
-
+    public int getCommentCount() {
+        return mCommentCount;
+    }
+    public int getStarCount() {
+        return mStarCount;
+    }
+    // set-function
+    public void setAvatar(Uri avatar) {
+        mAvatar = avatar;
+    }
+    public void setUsername(String username) {
+        mUsername = username;
+    }
+    public void setTime(String time) {
+        mTime = time;
+    }
+    public void setTag(String tag) {
+        mTag = tag;
+    }
+    public void setTitle(String title) {
+        mTitle = title;
+    }
+    public void setContent(String content) {
+        mContent = content;
+    }
+    public void setPicture(Uri picture) {
+        mPicture = picture;
+    }
+    public void setVideo(Uri video) {
+        mVideo = video;
+    }
+    public void setAddress(String address) {
+        mAddress = address;
+    }
     public void setLikeCount(int likeCount) {
         mLikeCount = likeCount;
     }
-
-    public int getFavoriteCount() {
-        return mFavoriteCount;
+    public void setCommentCount(int commentCount) {
+        mCommentCount = commentCount;
     }
-
-    public void setFavoriteCount(int favoriteCount) {
-        mFavoriteCount = favoriteCount;
+    public void setStarCount(int starCount) {
+        mStarCount = starCount;
     }
 }
-

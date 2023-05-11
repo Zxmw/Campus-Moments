@@ -82,13 +82,13 @@
         app:quoteCapWidth="@dimen/quote_gap_width"/>
 
     <ImageView
-        android:id="@+id/picture"
+        android:id="@+id/picture_imageview"
         android:layout_marginTop="5dp"
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:src="@drawable/picture_default" />
     <VideoView
-        android:id="@+id/video"
+        android:id="@+id/video_videoview"
         android:layout_marginTop="5dp"
         android:layout_width="match_parent"
         android:layout_height="200dp" />
@@ -97,6 +97,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:layout_marginTop="5dp"
         android:paddingVertical="3dp">
         <ImageView
             android:layout_width="20dp"
@@ -178,4 +179,9 @@
             android:layout_height="match_parent"
             android:layout_weight="1" />
     </LinearLayout>
+    <com.google.android.material.divider.MaterialDivider
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="15dp"/>
 </LinearLayout>
