@@ -24,8 +24,8 @@ public class RegisterActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
-        username_register = findViewById(R.id.username_register);
-        password_register = findViewById(R.id.password_register);
+        username_register = findViewById(R.id.username_login);
+        password_register = findViewById(R.id.password_login);
         Services.setRegisterHandler(handler);
     }
 
@@ -66,7 +66,7 @@ public class RegisterActivity extends AppCompatActivity {
         Toast.makeText(RegisterActivity.this, "注册失败", Toast.LENGTH_SHORT).show();
     }
 
-    public void returnToLogin(View view) {
+    public void cancel(View view) {
         finish();
     }
 }

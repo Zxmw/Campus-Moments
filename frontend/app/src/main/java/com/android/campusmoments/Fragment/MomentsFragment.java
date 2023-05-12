@@ -27,7 +27,6 @@ public class MomentsFragment extends Fragment {
     private List<Moment> mMomentList;
     private RecyclerView momentsRecyclerView;
     private MomentAdapter momentAdapter;
-
     public MomentsFragment() {
 
     }

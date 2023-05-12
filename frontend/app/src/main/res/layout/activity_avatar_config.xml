@@ -42,7 +42,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <Button
-                android:id="@+id/save_avatar"
+                android:id="@+id/register_button"
                 android:layout_width="80dp"
                 android:layout_height="37dp"
                 android:layout_marginHorizontal="10dp"

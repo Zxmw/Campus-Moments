@@ -10,20 +10,25 @@ import androidx.annotation.NonNull;
 
 import com.android.campusmoments.Activity.AvatarConfigActivity;
 import com.android.campusmoments.Activity.BioConfigActivity;
+import com.android.campusmoments.Activity.LoginActivity;
 import com.android.campusmoments.Activity.PasswordConfigActivity;
 import com.android.campusmoments.Activity.RegisterActivity;
 import com.android.campusmoments.Activity.UsernameConfigActivity;
-import com.android.campusmoments.Fragment.data.LoginDataSource;
-import com.android.campusmoments.Fragment.data.model.LoggedInUser;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Callback;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class Services {
@@ -32,15 +37,15 @@ public class Services {
     private static final String BASE_URL = "http://10.0.2.2:8000/users/api/";
     private static final String LOGIN_URL = BASE_URL + "login";
     private static final String REGISTER_URL = BASE_URL + "register";
-    private static final String SET_AVATAR_URL = BASE_URL + "set_avatar";
-    private static final String SET_USERNAME_URL = BASE_URL + "set_username";
-    private static final String SET_BIO_URL = BASE_URL + "set_bio";
-    private static final String SET_PASSWORD_URL = BASE_URL + "set_password";
+    private static final String SELF_URL = BASE_URL + "self";
+    private static final String PATCH_USER_URL = BASE_URL + "users/";
+    public static String token = null;
     private static final MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
+    private static final MediaType MEDIA_TYPE_FORM_DATA = MediaType.parse("multipart/form-data; charset=utf-8");
     private static final OkHttpClient client = new OkHttpClient.Builder()
-            .connectTimeout(10, TimeUnit.SECONDS)
-            .readTimeout(10, TimeUnit.SECONDS)
-            .writeTimeout(20, TimeUnit.SECONDS)
+            .connectTimeout(5, TimeUnit.SECONDS)
+            .readTimeout(5, TimeUnit.SECONDS)
+            .writeTimeout(10, TimeUnit.SECONDS)
             .retryOnConnectionFailure(true)
             .build();
 
@@ -50,6 +55,7 @@ public class Services {
     private static Handler setUsernameHandler = null;
     private static Handler setBioHandler = null;
     private static Handler setPasswordHandler = null;
+
     public static User mySelf = null;
     public static void setLoginHandler(Handler _loginHandler) {
         loginHandler = _loginHandler;
@@ -69,10 +75,6 @@ public class Services {
     public static void setSetPasswordHandler(Handler _setPasswordHandler) {
         setPasswordHandler = _setPasswordHandler;
     }
-    public static void setLoggedInUser(LoggedInUser user) {
-        mySelf = new User(user);
-    }
-
     public static void login(String username, String password) {
         String params = "{\"username\":\"" + username + "\",\"password\":\"" + password + "\"}";
         Log.d(TAG, "run: " + params);
@@ -85,19 +87,24 @@ public class Services {
             public void onFailure(@NonNull okhttp3.Call call, @NonNull java.io.IOException e) {
                 Log.d(TAG, "onFailure: " + e.getMessage());
                 Message message = new Message();
-                message.what = LoginDataSource.LOGIN_FAIL;
-                // temp
-                message.obj = new LoggedInUser(1, "username", "bio", "token");
+                message.what = LoginActivity.LOGIN_FAIL;
                 loginHandler.sendMessage(message);
             }
 
             @Override
             public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws java.io.IOException {
-                Log.d(TAG, "onResponse: " + response.body().string());
+
+                if (response.code() != 200) {
+                    Message message = new Message();
+                    message.what = LoginActivity.LOGIN_FAIL;
+                    loginHandler.sendMessage(message);
+                    return;
+                }
                 Message message = new Message();
-                message.what = LoginDataSource.LOGIN_SUCCESS;
-                // TODO:convert response.body() to LoggedInUser
-                message.obj = new LoggedInUser(1, "username", "bio", "token");
+                message.what = LoginActivity.LOGIN_SUCCESS;
+                assert response.body() != null;
+                message.obj = response.body().string();
+                Log.d(TAG, "onResponse: " + message.obj);
                 loginHandler.sendMessage(message);
             }
         });
@@ -121,7 +128,13 @@ public class Services {
 
             @Override
             public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws java.io.IOException {
-                Log.d(TAG, "onResponse: " + response.body());
+                Log.d(TAG, "onResponse: " + response.code());
+                if (response.code() != 201) {
+                    Message message = new Message();
+                    message.what = RegisterActivity.REGISTER_FAIL;
+                    registerHandler.sendMessage(message);
+                    return;
+                }
                 Message message = new Message();
                 message.what = RegisterActivity.REGISTER_SUCCESS;
                 message.obj = response.body().string();
@@ -129,13 +142,45 @@ public class Services {
             }
         });
     }
-
-    public static void setAvatar(String base64Avatar) {
-        String params = "{\"userId\":\"" + mySelf.id + "\",\"avatar\":\"" + base64Avatar + "\"}";
-        Log.d(TAG, "run: " + params);
+    public static void getSelf(String token) {
         Request request = new Request.Builder()
-                .url(SET_AVATAR_URL)
-                .post(okhttp3.RequestBody.create(MEDIA_TYPE_JSON, params))
+                .addHeader("Authorization", "Token " + token)
+                .url(SELF_URL)
+                .get()
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NonNull okhttp3.Call call, @NonNull java.io.IOException e) {
+                Log.d(TAG, "onFailure: " + e.getMessage());
+            }
+
+            @Override
+            public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws java.io.IOException {
+                if (response.code() != 200) {
+                    return;
+                }
+                assert response.body() != null;
+                String json = response.body().string();
+                Log.d(TAG, "onResponse: " + json);
+                try {
+                    JSONObject jsonObject = new JSONObject(json);
+                    mySelf = new User(jsonObject);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+    public static void setAvatar(String avatarPath) {
+        MultipartBody.Builder builder = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM);
+        File file = new File(avatarPath);
+        builder.addFormDataPart("avatar", file.getName(), RequestBody.create(MEDIA_TYPE_FORM_DATA, file));
+        RequestBody requestBody = builder.build();
+        Request request = new Request.Builder()
+                .url(PATCH_USER_URL + mySelf.id)
+                .addHeader("Authorization", "Token " + token)
+                .patch(requestBody)
                 .build();
         client.newCall(request).enqueue(new Callback() {
             @Override
@@ -149,21 +194,30 @@ public class Services {
 
             @Override
             public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws java.io.IOException {
-                Log.d(TAG, "onResponse: " + response.body().string());
+                if (response.code() != 200) {
+                    Message message = new Message();
+                    message.what = AvatarConfigActivity.SET_AVATAR_FAIL;
+                    setAvatarHandler.sendMessage(message);
+                    return;
+                }
                 Message message = new Message();
                 message.what = AvatarConfigActivity.SET_AVATAR_SUCCESS;
                 message.obj = response.body().string();
+                Log.d(TAG, "onResponse: " + message.obj);
                 setAvatarHandler.sendMessage(message);
             }
         });
     }
 
     public static void setUsername(String username) {
-        String params = "{\"userId\":\"" + mySelf.id + "\",\"username\":\"" + username + "\"}";
-        Log.d(TAG, "run: " + params);
+        MultipartBody.Builder builder = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM);
+        builder.addFormDataPart("username", username);
+        RequestBody requestBody = builder.build();
         Request request = new Request.Builder()
-                .url(SET_USERNAME_URL)
-                .post(okhttp3.RequestBody.create(MEDIA_TYPE_JSON, params))
+                .addHeader("Authorization", "Token " + token)
+                .url(PATCH_USER_URL + mySelf.id)
+                .patch(requestBody)
                 .build();
         client.newCall(request).enqueue(new Callback() {
             @Override
@@ -176,21 +230,32 @@ public class Services {
 
             @Override
             public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws java.io.IOException {
-                Log.d(TAG, "onResponse: " + response.body().string());
+                if (response.code() != 200) {
+                    Message message = new Message();
+                    message.what = UsernameConfigActivity.SET_USERNAME_FAIL;
+                    setUsernameHandler.sendMessage(message);
+                    return;
+                }
                 Message message = new Message();
                 message.what = UsernameConfigActivity.SET_USERNAME_SUCCESS;
                 message.obj = response.body().string();
+                Log.d(TAG, "onResponse: " + message.obj);
+                setUsernameHandler.sendMessage(message);
             }
         });
     }
 
 
-    public static void setPassword(String old_password, String new_password) {
-        String params = "{\"userId\":\"" + mySelf.id + "\",\"oldPassword\":\"" + old_password + "\",\"newPassword\":\"" + new_password + "\"}";
-        Log.d(TAG, "run: " + params);
+    public static void setPassword(String password, String new_password) {
+        // 这个不对
+        MultipartBody.Builder builder = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM);
+        builder.addFormDataPart("password", password);
+        RequestBody requestBody = builder.build();
         Request request = new Request.Builder()
-                .url(SET_PASSWORD_URL)
-                .post(okhttp3.RequestBody.create(MEDIA_TYPE_JSON, params))
+                .addHeader("Authorization", "Token " + token)
+                .url(PATCH_USER_URL + mySelf.id)
+                .patch(requestBody)
                 .build();
         client.newCall(request).enqueue(new Callback() {
             @Override
@@ -203,21 +268,30 @@ public class Services {
 
             @Override
             public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws java.io.IOException {
-                Log.d(TAG, "onResponse: " + response.body().string());
+                if (response.code() != 200) {
+                    Message message = new Message();
+                    message.what = PasswordConfigActivity.SET_PASSWORD_FAIL;
+                    setPasswordHandler.sendMessage(message);
+                    return;
+                }
                 Message message = new Message();
                 message.what = PasswordConfigActivity.SET_PASSWORD_SUCCESS;
                 message.obj = response.body().string();
+                Log.d(TAG, "onResponse: " + message.obj);
                 setPasswordHandler.sendMessage(message);
             }
         });
     }
 
     public static void setBio(String bio) {
-        String params = "{\"userId\":\"" + mySelf.id + "\",\"bio\":\"" + bio + "\"}";
-        Log.d(TAG, "run: " + params);
+        MultipartBody.Builder builder = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM);
+        builder.addFormDataPart("bio", bio);
+        RequestBody requestBody = builder.build();
         Request request = new Request.Builder()
-                .url(SET_BIO_URL)
-                .post(okhttp3.RequestBody.create(MEDIA_TYPE_JSON, params))
+                .addHeader("Authorization", "Token " + token)
+                .url(PATCH_USER_URL + mySelf.id)
+                .patch(requestBody)
                 .build();
         client.newCall(request).enqueue(new Callback() {
             @Override
@@ -230,10 +304,16 @@ public class Services {
 
             @Override
             public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws java.io.IOException {
-                Log.d(TAG, "onResponse: " + response.body().string());
+                if (response.code() != 200) {
+                    Message message = new Message();
+                    message.what = BioConfigActivity.SET_BIO_FAIL;
+                    setBioHandler.sendMessage(message);
+                    return;
+                }
                 Message message = new Message();
                 message.what = BioConfigActivity.SET_BIO_SUCCESS;
                 message.obj = response.body().string();
+                Log.d(TAG, "onResponse: " + message.obj);
                 setBioHandler.sendMessage(message);
             }
         });

@@ -41,7 +41,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <Button
-                android:id="@+id/save_avatar"
+                android:id="@+id/register_button"
                 android:layout_width="80dp"
                 android:layout_height="37dp"
                 android:layout_marginHorizontal="10dp"
@@ -82,7 +82,7 @@
                     android:textStyle="bold" />
 
                 <EditText
-                    android:id="@+id/id_text"
+                    android:id="@+id/username_person_center"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"

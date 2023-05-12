@@ -1,6 +1,6 @@
 package com.android.campusmoments.Service;
 
-import com.android.campusmoments.Fragment.data.model.LoggedInUser;
+import org.json.JSONObject;
 
 public class User {
     public int id = 1;
@@ -8,15 +8,20 @@ public class User {
     public String bio = "bio";
     public String avatar = null;
 
-    public int followedNum = 0;
     public int followingNum = 0;
 
     public boolean isBlocked = false;
 
-    public User(LoggedInUser user) {
-        this.id = user.getUserId();
-        this.username = user.getUsername();
-        this.bio = user.getBio();
-        this.avatar = user.getAvatar();
+    public User(JSONObject jsonObject) {
+        try {
+            id = jsonObject.getInt("id");
+            username = jsonObject.getString("username");
+            bio = jsonObject.getString("bio");
+            avatar = jsonObject.getString("avatar");
+//            followingNum = jsonObject.getInt("followingNum");
+//            isBlocked = jsonObject.getBoolean("isBlocked");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

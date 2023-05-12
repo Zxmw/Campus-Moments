@@ -1,38 +1,51 @@
 package com.android.campusmoments.Activity;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.android.campusmoments.R;
-import com.android.campusmoments.Fragment.login.LoginFragment;
+import com.android.campusmoments.Service.Services;
 
 public class MainActivity extends AppCompatActivity {
     private SharedPreferences mPreferences;
-    private final String sharedPrefFile = "com.android.campusmoments.user";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mPreferences = getSharedPreferences(sharedPrefFile, MODE_PRIVATE);
+        mPreferences = getSharedPreferences("user_info", MODE_PRIVATE);
         String token = mPreferences.getString("token", null);
-        if (token != null) {
-            // TODO:check if the token is valid
-            Intent intent = new Intent(MainActivity.this, HomeActivity.class);
-            startActivity(intent);
-            finish();
-        }
+//        if (token != null) {
+//            Services.getSelf(token);
+//            if (Services.mySelf == null) {
+//                SharedPreferences.Editor editor = mPreferences.edit();
+//                editor.clear();
+//                editor.apply();
+//                Toast.makeText(MainActivity.this, "登录信息已过期，请重新登录", Toast.LENGTH_SHORT).show();
+//            }
+//            else {
+//            Intent intent = new Intent(MainActivity.this, PersonCenterActivity.class);
+//            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+//            startActivity(intent);
+////            }
+//        }
         Button loginButton = findViewById(R.id.button_login);
         loginButton.setOnClickListener(v -> {
-            loginButton.setVisibility(View.GONE);
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.replace(R.id.fragmentContainerView, new LoginFragment());
-            transaction.commit();
+            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+            startActivity(intent);
         });
 
         // 直接打开发布页，测试用

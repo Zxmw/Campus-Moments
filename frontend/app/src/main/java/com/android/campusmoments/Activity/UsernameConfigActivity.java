@@ -39,7 +39,7 @@ public class UsernameConfigActivity extends AppCompatActivity {
     };
 
     public void setUsername(View view) {
-        TextView username_view = findViewById(R.id.id_text);
+        TextView username_view = findViewById(R.id.username_person_center);
         String username = username_view.getText().toString();
         Services.setUsername(username);
     }
