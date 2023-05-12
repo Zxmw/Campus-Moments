@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
 //        });
 
         // 直接打开发布页，测试用
-        Intent intent = new Intent(MainActivity.this, PubActivity.class);
+        Intent intent = new Intent(MainActivity.this, HomeActivity.class);
         startActivity(intent);
         finish();
     }

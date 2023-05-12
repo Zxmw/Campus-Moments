@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.campusmoments.Activity.DetailedMomentActivity;
-import com.android.campusmoments.Service.Moment;
 import com.android.campusmoments.Adapter.MomentAdapter;
 import com.android.campusmoments.R;
 

@@ -85,6 +85,7 @@ public class PubActivity extends AppCompatActivity {
     // 图片
     private ImageView pictureView;
     private Bitmap selectedPicture;
+    private Uri selectedPictureUri;
 
     private ActivityResultLauncher<Intent> pickPhotoLauncher; // 从相册获取图片
     private ActivityResultLauncher<Intent> takePhotoLauncher; // 拍照获取图片
@@ -164,6 +165,7 @@ public class PubActivity extends AppCompatActivity {
 
                                     // 将选择的图片存储在局部变量中
                                     selectedPicture = bitmap;
+                                    selectedPictureUri = uri;
                                     // TODO: 将图片上传到服务器
                                 } catch (FileNotFoundException e) {
                                     e.printStackTrace();
@@ -207,6 +209,7 @@ public class PubActivity extends AppCompatActivity {
                                 videoView.start(); // 开始播放
                                 // 将选择的视频存储在局部变量中
                                 selectedVideoUri = uri;
+                                Log.d(TAG, "onActivityResult: "+selectedVideoUri);
                                 // TODO: 将视频上传到服务器 SaveVideo(uri)
                             }
                         }
@@ -242,7 +245,17 @@ public class PubActivity extends AppCompatActivity {
 
     public void post(View view) {
         // TODO: 发布
-        // tag, title, contentHtmlString, pictureUri, videoUri, location, timeAt
+        //  tag, title, content, pictureUri, videoUri, address
+        // TODO: username 和 avatar 从用户中心获得
+        Intent replyIntent = new Intent();
+        replyIntent.putExtra("tag", tagView.getText().toString());
+        replyIntent.putExtra("title", titleView.getText().toString());
+        replyIntent.putExtra("content", knife.toHtml());
+        replyIntent.putExtra("pictureUri", selectedPictureUri);
+        replyIntent.putExtra("videoUri", selectedVideoUri);
+        replyIntent.putExtra("address", locationView.getText().toString());
+        setResult(RESULT_OK, replyIntent);
+        finish();
     }
 
     public void addPicture(View view) {
@@ -301,14 +314,15 @@ public class PubActivity extends AppCompatActivity {
         // TODO: 添加位置
         // 获取LocationManager对象
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
         // 判断是否有权限访问位置信息
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             // 如果没有权限，请求权限
+            Log.d(TAG, "addLocation: request permission");
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         } else {
             // 如果有权限，获取位置信息
+            Log.d(TAG, "addLocation: get location");
             Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             if (location != null) {
                 // 获取经度和纬度
