@@ -34,7 +34,7 @@ public class AvatarConfigActivity extends AppCompatActivity {
             avatar.getLayoutParams().height = avatar.getWidth();
         });
 //        avatar.setImageURI(Uri.parse(Services.mySelf.avatar));
-        avatar.setImageURI(Uri.parse("android.resource://" + getPackageName() + "/" + R.drawable.avatar1));
+        avatar.setImageURI(Uri.parse("android.resource://" + getPackageName() + "/" + R.drawable.avatar_1));
         Button selectButton = findViewById(R.id.select_avatar);
         Button saveButton = findViewById(R.id.save_avatar);
         selectButton.setOnClickListener(v -> {
@@ -44,7 +44,7 @@ public class AvatarConfigActivity extends AppCompatActivity {
         });
         saveButton.setOnClickListener(v -> {
             // 获取avatar中的图象
-            Bitmap bitmap = ((BitmapDrawable) avatar.getDrawable()).getBitmap();
+            Bitmap bitmap = Bitmap.createBitmap(avatar.getWidth(), avatar.getHeight(), Bitmap.Config.ARGB_8888);
             // 将bitmap转换为base64
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);

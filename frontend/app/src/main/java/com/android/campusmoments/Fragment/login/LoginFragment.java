@@ -24,7 +24,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.campusmoments.Activity.MainMomentsActivity;
+import com.android.campusmoments.Activity.HomeActivity;
 import com.android.campusmoments.Service.Services;
 import com.android.campusmoments.databinding.FragmentLoginBinding;
 import com.android.campusmoments.R;
@@ -134,7 +134,7 @@ public class LoginFragment extends Fragment {
 //                    preferencesEditor.putString("password", passwordEditText.getText().toString());
                     preferencesEditor.apply();
                     // jump to main moments activity
-                    Intent intent = new Intent(getContext(), MainMomentsActivity.class);
+                    Intent intent = new Intent(getContext(), HomeActivity.class);
                     startActivity(intent);
                     requireActivity().finish();
                 } else if (loginResult == LOGIN_FAIL) {

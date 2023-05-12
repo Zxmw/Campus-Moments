@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-feature android:name="android.hardware.camera" />
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
 
@@ -30,6 +31,9 @@
             android:exported="false" />
         <activity
             android:name=".Activity.DetailedActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Activity.UserHomePageActivity"
             android:exported="false" />
         <activity
             android:name=".Activity.KnifeActivity"

@@ -28,7 +28,6 @@ public class MomentsFragment extends Fragment {
     private RecyclerView momentsRecyclerView;
     private MomentAdapter momentAdapter;
 
-
     public MomentsFragment() {
 
     }
@@ -41,14 +40,13 @@ public class MomentsFragment extends Fragment {
 
         mMomentList = new ArrayList<>();
         mMomentList.add(new Moment(null, "Sweetnow", "二手交易", "THU春日足迹", "几朵园子里的春花和鸳鸯",
-                Uri.parse("https://pics4.baidu.com/feed/0eb30f2442a7d933b1f65b421211f61f73f0010f.jpeg@f_auto?token=4914a109a410fd49d266364470e42677"), null, "THU-102b"));
-        mMomentList.add(new Moment(Uri.parse("android.resource://" + requireActivity().getPackageName() + "/" + R.drawable.picture5),
+                null, null, "THU-102b"));
+        mMomentList.add(new Moment(Uri.parse("android.resource://" + requireActivity().getPackageName() + "/" + R.drawable.picture2),
                 "王政", "校园日常", "北大北大", "北大我的北大我真的好想进去看看。",
                 Uri.parse("android.resource://" + requireActivity().getPackageName() + "/" + R.drawable.picture1), null, "PKU-102a"));
-        mMomentList.add(new Moment(Uri.parse("android.resource://" + requireActivity().getPackageName() + "/" + R.drawable.picture15),
+        mMomentList.add(new Moment(Uri.parse("android.resource://" + requireActivity().getPackageName() + "/" + R.drawable.picture1),
         "geh", "美食", "美食美食不辜负", "学校的好吃的和学校周边的好吃的。",
-                Uri.parse("android.resource://" + requireActivity().getPackageName() + "/" + R.drawable.picture9), null, "PKU"));
-
+                Uri.parse("android.resource://" + requireActivity().getPackageName() + "/" + R.drawable.picture3), null, "PKU"));
     }
 
     @Override

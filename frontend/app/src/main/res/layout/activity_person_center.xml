@@ -36,6 +36,19 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
+                    android:onClick="cancel"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.0"
+                    app:srcCompat="@drawable/ic_return" />
+
                 <androidx.cardview.widget.CardView
                     android:layout_width="65dp"
                     android:layout_height="65dp"
@@ -66,7 +79,7 @@
                             android:cropToPadding="false"
                             android:onClick="gotoSetAvatar"
                             android:scaleType="centerCrop"
-                            app:srcCompat="@drawable/avatar1"
+                            app:srcCompat="@drawable/avatar_1"
                             tools:ignore="SpeakableTextPresentCheck" />
                     </androidx.cardview.widget.CardView>
 
@@ -103,7 +116,7 @@
                         android:textStyle="bold" />
 
                     <TextView
-                        android:id="@+id/bio_set"
+                        android:id="@+id/id_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -133,7 +146,7 @@
                         android:textStyle="bold" />
 
                     <TextView
-                        android:id="@+id/bio_view"
+                        android:id="@+id/bio_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -177,7 +190,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginVertical="10dp"
-                    android:onClick="gotoSetPass"
+                    android:onClick="gotoSetPassword"
                     android:orientation="horizontal"
                     tools:ignore="TouchTargetSizeCheck">
 
@@ -202,7 +215,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginVertical="10dp"
-                    android:onClick="gotoSetting"
+                    android:onClick="gotoSetBio"
                     android:orientation="horizontal"
                     tools:ignore="TouchTargetSizeCheck">
 
@@ -228,7 +241,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginVertical="10dp"
-                    android:onClick="gotoNoti"
+                    android:onClick="gotoNotification"
                     android:orientation="horizontal"
                     tools:ignore="TouchTargetSizeCheck">
 

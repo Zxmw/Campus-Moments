@@ -29,13 +29,13 @@ import okhttp3.Response;
 public class Services {
 
     private static final String TAG = "Services";
-    private static final String BASE_URL = "http://127.0.0.1:8000/";
-    private static final String LOGIN_URL = BASE_URL + "login/";
-    private static final String REGISTER_URL = BASE_URL + "register/";
-    private static final String SET_AVATAR_URL = BASE_URL + "set_avatar/";
-    private static final String SET_USERNAME_URL = BASE_URL + "set_username/";
-    private static final String SET_BIO_URL = BASE_URL + "set_bio/";
-    private static final String SET_PASSWORD_URL = BASE_URL + "set_password/";
+    private static final String BASE_URL = "http://10.0.2.2:8000/users/api/";
+    private static final String LOGIN_URL = BASE_URL + "login";
+    private static final String REGISTER_URL = BASE_URL + "register";
+    private static final String SET_AVATAR_URL = BASE_URL + "set_avatar";
+    private static final String SET_USERNAME_URL = BASE_URL + "set_username";
+    private static final String SET_BIO_URL = BASE_URL + "set_bio";
+    private static final String SET_PASSWORD_URL = BASE_URL + "set_password";
     private static final MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
     private static final OkHttpClient client = new OkHttpClient.Builder()
             .connectTimeout(10, TimeUnit.SECONDS)
@@ -121,7 +121,7 @@ public class Services {
 
             @Override
             public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws java.io.IOException {
-                Log.d(TAG, "onResponse: " + response.body().string());
+                Log.d(TAG, "onResponse: " + response.body());
                 Message message = new Message();
                 message.what = RegisterActivity.REGISTER_SUCCESS;
                 message.obj = response.body().string();

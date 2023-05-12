@@ -39,7 +39,7 @@ public class BioConfigActivity extends AppCompatActivity {
     };
 
     public void setBio(View view) {
-        TextView bio_view = findViewById(R.id.bio_set);
+        TextView bio_view = findViewById(R.id.id_text);
         String bio = bio_view.getText().toString();
         Services.setBio(bio);
     }
