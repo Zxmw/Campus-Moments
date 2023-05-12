@@ -1,11 +1,11 @@
-package com.android.campusmoments.ui.login;
+package com.android.campusmoments.Fragment.login;
 
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.annotation.NonNull;
 
-import com.android.campusmoments.data.LoginDataSource;
-import com.android.campusmoments.data.LoginRepository;
+import com.android.campusmoments.Fragment.data.LoginDataSource;
+import com.android.campusmoments.Fragment.data.LoginRepository;
 
 /**
  * ViewModel provider factory to instantiate LoginViewModel.

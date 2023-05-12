@@ -1,4 +1,4 @@
-package com.android.campusmoments.data;
+package com.android.campusmoments.Fragment.data;
 
 /**
  * A generic class that holds a result success w/ data or an error exception.

@@ -1,4 +1,4 @@
-package com.android.campusmoments.ui.login;
+package com.android.campusmoments.Fragment.login;
 
 import android.os.Handler;
 
@@ -6,13 +6,14 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.android.campusmoments.data.LoginRepository;
-import com.android.campusmoments.data.Result;
-import com.android.campusmoments.data.model.LoggedInUser;
+import com.android.campusmoments.Fragment.data.LoginRepository;
+import com.android.campusmoments.Fragment.data.Result;
+import com.android.campusmoments.Fragment.data.model.LoggedInUser;
 import com.android.campusmoments.R;
 
 public class LoginViewModel extends ViewModel {
-
+    private static final int LOGIN_SUCCESS = 1;
+    private static final int LOGIN_FAIL = 0;
     private MutableLiveData<LoginFormState> loginFormState = new MutableLiveData<>();
     private MutableLiveData<LoginResult> loginResult = new MutableLiveData<>();
     private LoginRepository loginRepository;
@@ -35,12 +36,12 @@ public class LoginViewModel extends ViewModel {
 
         if (result instanceof Result.Success) {
             LoggedInUser data = ((Result.Success<LoggedInUser>) result).getData();
-            loginResult.setValue(new LoginResult(new LoggedInUserView(data.getDisplayName())));
+            loginResult.setValue(new LoginResult(new LoggedInUserView(data.getUsername())));
         } else {
             loginResult.setValue(new LoginResult(R.string.login_failed));
-            return 1;
+            return LOGIN_FAIL;
         }
-        return 0;
+        return LOGIN_SUCCESS;
     }
 
     public void loginDataChanged(String username, String password) {
@@ -64,10 +65,6 @@ public class LoginViewModel extends ViewModel {
     // A placeholder password validation check
     private boolean isPasswordValid(String password) {
         return password != null && password.trim().length() > 5;
-    }
-
-    public String getToken() {
-        return loginRepository.getToken();
     }
 
     public Handler getHandler() {

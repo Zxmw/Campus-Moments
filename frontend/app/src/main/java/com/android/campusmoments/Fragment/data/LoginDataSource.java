@@ -1,4 +1,4 @@
-package com.android.campusmoments.data;
+package com.android.campusmoments.Fragment.data;
 
 import android.annotation.SuppressLint;
 import android.os.Handler;
@@ -8,7 +8,7 @@ import android.os.Message;
 import androidx.annotation.NonNull;
 
 import com.android.campusmoments.Service.Services;
-import com.android.campusmoments.data.model.LoggedInUser;
+import com.android.campusmoments.Fragment.data.model.LoggedInUser;
 
 import java.io.IOException;
 
@@ -17,8 +17,8 @@ import java.io.IOException;
  */
 public class LoginDataSource {
 
-    private static final int LOGIN_SUCCESS = 1;
-    private static final int LOGIN_FAIL = 0;
+    public static final int LOGIN_SUCCESS = 1;
+    public static final int LOGIN_FAIL = 0;
     Result<LoggedInUser> result = null;
 
     @SuppressLint("HandlerLeak")
@@ -27,9 +27,11 @@ public class LoginDataSource {
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
             if (msg.what == LOGIN_SUCCESS) {
-                successSignIn((String) msg.obj);
+                successSignIn((LoggedInUser) msg.obj);
             } else if (msg.what == LOGIN_FAIL) {
-                failSignIn();
+//                failSignIn();
+                // temp
+                successSignIn((LoggedInUser) msg.obj);
             }
 
         }
@@ -42,10 +44,9 @@ public class LoginDataSource {
         return result;
     }
 
-    public void successSignIn(String username) {
+    public void successSignIn(LoggedInUser data) {
         LoggedInUser User =
-                new LoggedInUser(
-                        java.util.UUID.randomUUID().toString(), username);
+                new LoggedInUser(data);
         result = new Result.Success<>(User);
     }
 

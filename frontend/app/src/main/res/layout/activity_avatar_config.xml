@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><!-- 修改用户名，由person_center跳转 -->
+<?xml version="1.0" encoding="utf-8"?><!-- 修改头像，由person_center跳转 -->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -6,14 +6,15 @@
     android:layout_height="match_parent">
 
     <LinearLayout
+        android:id="@+id/linearLayout3"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="50dp">
-
 
             <ImageView
                 android:layout_width="24dp"
@@ -31,7 +32,7 @@
                 android:layout_height="wrap_content"
                 android:paddingHorizontal="10dp"
                 android:paddingVertical="5dp"
-                android:text="修改用户名"
+                android:text="修改头像"
                 android:textColor="@color/black"
                 android:textSize="16sp"
                 android:textStyle="bold"
@@ -46,7 +47,7 @@
                 android:layout_height="37dp"
                 android:layout_marginHorizontal="10dp"
                 android:background="@drawable/bg_purple_corner"
-                android:onClick="setUsername"
+                android:onClick="submit"
                 android:text="保存"
                 android:textColor="@color/white"
                 android:textSize="14sp"
@@ -60,40 +61,31 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginVertical="10dp"
-                android:orientation="horizontal"
-                android:paddingRight="20dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="30dp"
-                    android:text="用户名"
-                    android:textColor="@color/black"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
-
-                <EditText
-                    android:id="@+id/bio_set"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:hint="新用户名"
-                    android:textSize="16sp"
-                    tools:ignore="TouchTargetSizeCheck" />
-            </LinearLayout>
-
-
-        </LinearLayout>
-
     </LinearLayout>
+
+
+    <ImageView
+        android:id="@+id/avatar_config_show"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="50dp"
+        android:adjustViewBounds="true"
+        android:scaleType="centerCrop"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout3"
+        app:srcCompat="@drawable/bg" />
+
+    <Button
+        android:id="@+id/select_avatar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="从相册中选择"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/avatar_config_show" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
