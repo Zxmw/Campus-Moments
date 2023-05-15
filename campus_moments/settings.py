@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'users',
     'moments',
+    'dm',
     'knox',
     'drf_yasg2',
     'rest_framework_swagger',
