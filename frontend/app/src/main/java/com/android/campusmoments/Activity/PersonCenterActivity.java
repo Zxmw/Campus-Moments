@@ -1,23 +1,51 @@
 package com.android.campusmoments.Activity;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.android.campusmoments.R;
 import com.android.campusmoments.Service.Services;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONException;
+
+import java.io.IOException;
+
 public class PersonCenterActivity extends AppCompatActivity {
 //  个人中心页面，从用户主页点击进入
+    public static final int LOGOUT_SUCCESS = 0;
+    public static final int LOGOUT_FAIL = 1;
+    private SharedPreferences mPreferences;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_person_center);
+        Services.setLogoutHandler(handler);
+        ImageView userAvatar = findViewById(R.id.user_avatar);
+        Picasso.get().load(Uri.parse(Services.mySelf.avatar)).into(userAvatar);
+        TextView username = findViewById(R.id.username_person_center);
+        username.setText(Services.mySelf.username);
+        TextView bio = findViewById(R.id.bio_person_center);
+        bio.setText(Services.mySelf.bio);
+        mPreferences = getSharedPreferences("user_info", MODE_PRIVATE);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         ImageView userAvatar = findViewById(R.id.user_avatar);
         Picasso.get().load(Uri.parse(Services.mySelf.avatar)).into(userAvatar);
         TextView username = findViewById(R.id.username_person_center);
@@ -25,6 +53,34 @@ public class PersonCenterActivity extends AppCompatActivity {
         TextView bio = findViewById(R.id.bio_person_center);
         bio.setText(Services.mySelf.bio);
     }
+
+    @SuppressLint("HandlerLeak")
+    private final Handler handler = new Handler(Looper.getMainLooper()) {
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            super.handleMessage(msg);
+            if (msg.what == LOGOUT_SUCCESS) {
+                successLogout();
+            } else if (msg.what == LOGOUT_FAIL) {
+                failLogout();
+            }
+        }
+    };
+
+    private void successLogout() {
+        mPreferences.edit().clear().apply();
+        Services.mySelf = null;
+        Toast.makeText(this, "退出成功", Toast.LENGTH_SHORT).show();
+        // go back to MainActivity
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+    }
+
+    private void failLogout() {
+        Toast.makeText(this, "退出失败", Toast.LENGTH_SHORT).show();
+    }
+
     public void gotoSetAvatar(View view) {
         Intent intent = new Intent(this, AvatarConfigActivity.class);
         startActivity(intent);
@@ -50,6 +106,11 @@ public class PersonCenterActivity extends AppCompatActivity {
     }
 
     public void cancel(View view){
+        finish();
+    }
+
+    public void logout(View view) {
+        Services.logout();
         finish();
     }
 

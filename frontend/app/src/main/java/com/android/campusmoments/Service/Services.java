@@ -1,5 +1,6 @@
 package com.android.campusmoments.Service;
 
+import android.app.Person;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Handler;
@@ -11,7 +12,9 @@ import androidx.annotation.NonNull;
 import com.android.campusmoments.Activity.AvatarConfigActivity;
 import com.android.campusmoments.Activity.BioConfigActivity;
 import com.android.campusmoments.Activity.LoginActivity;
+import com.android.campusmoments.Activity.MainActivity;
 import com.android.campusmoments.Activity.PasswordConfigActivity;
+import com.android.campusmoments.Activity.PersonCenterActivity;
 import com.android.campusmoments.Activity.RegisterActivity;
 import com.android.campusmoments.Activity.UsernameConfigActivity;
 
@@ -23,6 +26,7 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
+import okhttp3.FormBody;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
@@ -39,6 +43,7 @@ public class Services {
     private static final String REGISTER_URL = BASE_URL + "register";
     private static final String SELF_URL = BASE_URL + "self";
     private static final String PATCH_USER_URL = BASE_URL + "users/";
+    private static final String LOGOUT_URL = BASE_URL + "logout";
     public static String token = null;
     private static final MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
     private static final MediaType MEDIA_TYPE_FORM_DATA = MediaType.parse("multipart/form-data; charset=utf-8");
@@ -48,13 +53,14 @@ public class Services {
             .writeTimeout(10, TimeUnit.SECONDS)
             .retryOnConnectionFailure(true)
             .build();
-
+    private static Handler tokenHandler = null;
     private static Handler loginHandler = null;
     private static Handler registerHandler = null;
     private static Handler setAvatarHandler = null;
     private static Handler setUsernameHandler = null;
     private static Handler setBioHandler = null;
     private static Handler setPasswordHandler = null;
+    private static Handler logoutHandler = null;
 
     public static User mySelf = null;
     public static void setLoginHandler(Handler _loginHandler) {
@@ -69,11 +75,54 @@ public class Services {
     public static void setSetUsernameHandler(Handler _setUsernameHandler) {
         setUsernameHandler = _setUsernameHandler;
     }
+    public static void setTokenHandler(Handler _tokenHandler) {
+        tokenHandler = _tokenHandler;
+    }
     public static void setSetBioHandler(Handler _setBioHandler) {
         setBioHandler = _setBioHandler;
     }
     public static void setSetPasswordHandler(Handler _setPasswordHandler) {
         setPasswordHandler = _setPasswordHandler;
+    }
+    public static void setLogoutHandler(Handler _logoutHandler) {
+        logoutHandler = _logoutHandler;
+    }
+
+
+    public static void tokenCheck(String token) {
+        Request request = new Request.Builder()
+                .addHeader("Authorization", "Token " + token)
+                .url(SELF_URL)
+                .get()
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NonNull okhttp3.Call call, @NonNull java.io.IOException e) {
+                Log.d(TAG, "onFailure: " + e.getMessage());
+            }
+
+            @Override
+            public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws java.io.IOException {
+                if (response.code() != 200) {
+                    return;
+                }
+                assert response.body() != null;
+                String json = response.body().string();
+                Log.d(TAG, "onResponse: " + json);
+                try {
+                    JSONObject jsonObject = new JSONObject(json);
+                    mySelf = new User(jsonObject);
+                    Message message = new Message();
+                    message.what = MainActivity.TOKEN_VALID;
+                    tokenHandler.sendMessage(message);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Message message = new Message();
+                    message.what = MainActivity.TOKEN_INVALID;
+                    tokenHandler.sendMessage(message);
+                }
+            }
+        });
     }
     public static void login(String username, String password) {
         String params = "{\"username\":\"" + username + "\",\"password\":\"" + password + "\"}";
@@ -200,6 +249,7 @@ public class Services {
                     setAvatarHandler.sendMessage(message);
                     return;
                 }
+                mySelf.avatar = avatarPath;
                 Message message = new Message();
                 message.what = AvatarConfigActivity.SET_AVATAR_SUCCESS;
                 message.obj = response.body().string();
@@ -236,6 +286,7 @@ public class Services {
                     setUsernameHandler.sendMessage(message);
                     return;
                 }
+                mySelf.username = username;
                 Message message = new Message();
                 message.what = UsernameConfigActivity.SET_USERNAME_SUCCESS;
                 message.obj = response.body().string();
@@ -310,11 +361,42 @@ public class Services {
                     setBioHandler.sendMessage(message);
                     return;
                 }
+                mySelf.bio = bio;
                 Message message = new Message();
                 message.what = BioConfigActivity.SET_BIO_SUCCESS;
                 message.obj = response.body().string();
                 Log.d(TAG, "onResponse: " + message.obj);
                 setBioHandler.sendMessage(message);
+            }
+        });
+    }
+
+    public static void logout() {
+        Request request = new Request.Builder()
+                .addHeader("Authorization", "Token " + token)
+                .url(LOGOUT_URL)
+                .post(okhttp3.RequestBody.create(null, new byte[0]))
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NonNull okhttp3.Call call, @NonNull java.io.IOException e) {
+                Log.d(TAG, "onFailure: " + e.getMessage());
+//                Message message = new Message();
+//                message.what = LogoutActivity.LOGOUT_FAIL;
+//                logoutHandler.sendMessage(message);
+            }
+
+            @Override
+            public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws java.io.IOException {
+                if (response.code() != 204) {
+                    Message message = new Message();
+                    message.what = PersonCenterActivity.LOGOUT_FAIL;
+                    logoutHandler.sendMessage(message);
+                    return;
+                }
+                Message message = new Message();
+                message.what = PersonCenterActivity.LOGOUT_SUCCESS;
+                logoutHandler.sendMessage(message);
             }
         });
     }
