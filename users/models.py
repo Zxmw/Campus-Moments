@@ -79,6 +79,8 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
         ),
     )
     date_joined = models.DateTimeField(_("date joined"), default=timezone.now)
+    follow_list = models.ManyToManyField("self", related_name='followed_by', symmetrical=False, blank=True)
+    block_list = models.ManyToManyField("self", related_name='blocked_by', symmetrical=False, blank=True)
 
     objects = MyUserManager()
 
