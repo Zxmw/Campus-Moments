@@ -7,6 +7,8 @@ from users.models import MyUser
 
 
 class UserSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(required=False)
+
     class Meta:
         model = MyUser
         fields = ['id', 'username', 'avatar', 'bio']

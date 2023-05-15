@@ -20,7 +20,7 @@ class RegisterView(GenericAPIView):
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
-            user = serializer.save()
+            serializer.save()
             return response.Response(status=status.HTTP_201_CREATED)
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -36,7 +36,6 @@ class LoginView(GenericAPIView):
                                       "token": AuthToken.objects.create(user)[1]},
                                      status=status.HTTP_200_OK)
         return response.Response(serializer.errors, status=status.HTTP_401_UNAUTHORIZED)
-
 
 
 class UserView(RetrieveAPIView):

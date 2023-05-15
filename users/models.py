@@ -6,8 +6,8 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 
-def upload_to(instance, filename):
-    return 'avatars/{filename}'.format(filename=filename)
+# def upload_to(instance, dirname, filename):
+#     return '{dirname}/{filename}'.format(filename=filename)
 
 
 class MyUserManager(BaseUserManager):
@@ -63,7 +63,7 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
         },
     )
     email = models.EmailField(_("email address"), blank=True, null=True)
-    avatar = models.ImageField(_("Image"), upload_to=upload_to, null=True, blank=True)
+    avatar = models.ImageField(_("Image"), upload_to='avatars', null=True, blank=True)
     bio = models.TextField(blank=True)
     is_staff = models.BooleanField(
         _("staff status"),
