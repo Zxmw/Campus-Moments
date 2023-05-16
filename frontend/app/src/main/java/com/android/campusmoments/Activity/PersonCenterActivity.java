@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -19,10 +20,6 @@ import android.widget.Toast;
 import com.android.campusmoments.R;
 import com.android.campusmoments.Service.Services;
 import com.squareup.picasso.Picasso;
-
-import org.json.JSONException;
-
-import java.io.IOException;
 
 public class PersonCenterActivity extends AppCompatActivity {
 //  个人中心页面，从用户主页点击进入
@@ -34,26 +31,31 @@ public class PersonCenterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_person_center);
         Services.setLogoutHandler(handler);
-        ImageView userAvatar = findViewById(R.id.user_avatar);
-        Picasso.get().load(Uri.parse(Services.mySelf.avatar)).into(userAvatar);
-        TextView username = findViewById(R.id.username_person_center);
-        username.setText(Services.mySelf.username);
-        TextView bio = findViewById(R.id.bio_person_center);
-        bio.setText(Services.mySelf.bio);
         mPreferences = getSharedPreferences("user_info", MODE_PRIVATE);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        ImageView userAvatar = findViewById(R.id.user_avatar);
-        Picasso.get().load(Uri.parse(Services.mySelf.avatar)).into(userAvatar);
-        TextView username = findViewById(R.id.username_person_center);
-        username.setText(Services.mySelf.username);
-        TextView bio = findViewById(R.id.bio_person_center);
-        bio.setText(Services.mySelf.bio);
+        Log.d("onResume", "onResume");
+        initViews();
     }
 
+    private void initViews() {
+        ImageView userAvatar = findViewById(R.id.user_avatar);
+        Log.d("avatar", Services.mySelf.avatar + "");
+        if (Services.mySelf.avatar == null) {
+            // use R.drawable.default_avatar
+            userAvatar.setImageResource(R.drawable.avatar_default);
+        }
+        else {
+            Picasso.get().load(Uri.parse(Services.mySelf.avatar)).into(userAvatar);
+        }
+        TextView username = findViewById(R.id.user_id_text);
+        username.setText(Services.mySelf.username);
+        TextView bio = findViewById(R.id.user_bio_text);
+        bio.setText(Services.mySelf.bio);
+    }
     @SuppressLint("HandlerLeak")
     private final Handler handler = new Handler(Looper.getMainLooper()) {
         @Override

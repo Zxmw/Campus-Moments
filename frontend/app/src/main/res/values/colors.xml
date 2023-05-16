@@ -8,10 +8,15 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="blue">#FF458ed2</color>
-    <color name="grey">#FF5c6061</color>
+    <color name="gray">#FF5c6061</color>
     <color name="red">#FFE53935</color>
 
     <color name="blue_200">#FF90CAF9</color>
     <color name="blue_500">#FF2196F3</color>
     <color name="blue_700">#FF1976D2</color>
+
+    <color name="myMessageBackground">#FF1976D2</color>
+    <color name="myMessageText">#FFFFFFFF</color>
+    <color name="otherPersonMessageBackground">#FFFFFFFF</color>
+    <color name="otherPersonMessageText">#FF000000</color>
 </resources>

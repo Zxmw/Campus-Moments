@@ -15,6 +15,9 @@ import android.widget.Toast;
 import com.android.campusmoments.R;
 import com.android.campusmoments.Service.Services;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class UsernameConfigActivity extends AppCompatActivity {
     public static final int SET_USERNAME_SUCCESS = 0;
     public static final int SET_USERNAME_FAIL = 1;
@@ -31,7 +34,11 @@ public class UsernameConfigActivity extends AppCompatActivity {
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
             if (msg.what == SET_USERNAME_SUCCESS) {
-                successSetUsername();
+                try {
+                    successSetUsername(msg.obj);
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
             } else if (msg.what == SET_USERNAME_FAIL) {
                 failSetUsername();
             }
@@ -39,12 +46,14 @@ public class UsernameConfigActivity extends AppCompatActivity {
     };
 
     public void setUsername(View view) {
-        TextView username_view = findViewById(R.id.username_person_center);
+        TextView username_view = findViewById(R.id.user_id_text);
         String username = username_view.getText().toString();
         Services.setUsername(username);
     }
 
-    private void successSetUsername() {
+    private void successSetUsername(Object obj) throws JSONException {
+        JSONObject jsonObject = new JSONObject(obj.toString());
+        Services.mySelf.username = jsonObject.getString("username");
         Toast.makeText(this.getApplicationContext(), "更新成功", Toast.LENGTH_SHORT).show();
         finish();
     }

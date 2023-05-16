@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import com.android.campusmoments.R;
 import com.android.campusmoments.Service.Services;
+import com.squareup.picasso.Picasso;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -21,6 +22,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -40,7 +44,13 @@ public class AvatarConfigActivity extends AppCompatActivity {
             avatar.getLayoutParams().height = avatar.getWidth();
         });
 //        avatar.setImageURI(Uri.parse(Services.mySelf.avatar));
-        avatar.setImageURI(Uri.parse("android.resource://" + getPackageName() + "/" + R.drawable.avatar_1));
+        if (Services.mySelf.avatar == null) {
+            // use R.drawable.default_avatar
+            avatar.setImageResource(R.drawable.avatar_default);
+        }
+        else {
+            Picasso.get().load(Uri.parse(Services.mySelf.avatar)).into(avatar);
+        }
         Button selectButton = findViewById(R.id.select_avatar);
         Button saveButton = findViewById(R.id.register_button);
         selectButton.setOnClickListener(v -> {
@@ -65,7 +75,11 @@ public class AvatarConfigActivity extends AppCompatActivity {
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
             if (msg.what == SET_AVATAR_SUCCESS) {
-                successSetAvatar();
+                try {
+                    successSetAvatar(msg.obj);
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
             } else if (msg.what == SET_AVATAR_FAIL) {
                 failSetAvatar();
             }
@@ -84,7 +98,9 @@ public class AvatarConfigActivity extends AppCompatActivity {
         }
     }
 
-    private void successSetAvatar() {
+    private void successSetAvatar(Object obj) throws JSONException {
+        JSONObject jsonObject = new JSONObject(obj.toString());
+        Services.mySelf.avatar = jsonObject.getString("avatar");
         Toast.makeText(AvatarConfigActivity.this, "头像设置成功", Toast.LENGTH_SHORT).show();
         finish();
     }
