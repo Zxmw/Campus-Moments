@@ -5,6 +5,7 @@ from rest_framework import permissions
 from rest_framework.parsers import MultiPartParser, FormParser
 from django_filters.rest_framework import DjangoFilterBackend
 from .utils import *
+from django.db.models import Count
 
 
 # Create your views here.
@@ -16,12 +17,18 @@ class MomentListAPIView(ListCreateAPIView):
     parser_classes = [MultiPartParser, FormParser]
 
     # Explicitly specify which fields the API may be ordered against
-    ordering_fields = ('created_at',)
+    ordering_fields = ('created_at', 'total_likes', 'total_comments')
 
     # This will be used as the default ordering
     ordering = '-created_at'
 
     filterset_fields = ['tag', ]
+
+    def get_queryset(self):
+        queryset = Moment.objects.annotate(total_likes=Count('liked_by', distinct=True)). \
+            annotate(total_stars=Count('stared_by',  distinct=True)). \
+            annotate(total_comments=Count('comments',  distinct=True)).all()
+        return queryset
 
 
 class MomentDetailAPIView(RetrieveUpdateDestroyAPIView):
