@@ -13,7 +13,7 @@ class MomentListAPIView(ListCreateAPIView):
     serializer_class = MomentSerializer
     queryset = Moment.objects.all()
     permission_classes = (permissions.IsAuthenticated,)
-    filter_backends = (OrderingFilterWithSchema, DjangoFilterBackend)
+    filter_backends = (OrderingFilterWithSchema, DjangoFilterBackend, FollowMomentsFilterBackend)
     parser_classes = [MultiPartParser, FormParser]
 
     # Explicitly specify which fields the API may be ordered against
@@ -22,7 +22,7 @@ class MomentListAPIView(ListCreateAPIView):
     # This will be used as the default ordering
     ordering = '-created_at'
 
-    filterset_fields = ['tag', ]
+    filterset_fields = ['tag', 'user__id']
 
     def get_queryset(self):
         queryset = Moment.objects.annotate(total_likes=Count('liked_by', distinct=True)). \
