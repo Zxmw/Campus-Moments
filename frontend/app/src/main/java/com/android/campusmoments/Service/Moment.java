@@ -3,6 +3,7 @@ package com.android.campusmoments.Service;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 
 import org.json.JSONObject;
 
@@ -10,6 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Moment {
+    private static final String TAG = "Moment";
     private int id;
     public int getId() {
         return id;
@@ -50,6 +52,8 @@ public class Moment {
                     JSONObject obj = new JSONObject(msg.obj.toString());
                     mUsername = Services.checkStr(obj, "username");
                     avatarPath = Services.checkStr(obj, "avatar");
+                    Log.d(TAG, "handleMessage: " + mUsername);
+                    Log.d(TAG, "handleMessage: " + avatarPath);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -71,10 +75,10 @@ public class Moment {
             mLikeCount = obj.getInt("total_likes");
             mCommentCount = obj.getInt("total_comments");
             mStarCount = obj.getInt("total_stars");
-            Services.getUser(userId, getUserHandler);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        Services.getUser(userId, getUserHandler); // 放在try里面有可能运行不了
     }
 
 

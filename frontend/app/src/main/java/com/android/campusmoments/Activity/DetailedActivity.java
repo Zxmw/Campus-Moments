@@ -65,6 +65,7 @@ public class DetailedActivity extends AppCompatActivity {
                     Log.d(TAG, "handleMessage: " + moment.getAvatarPath());
                     Log.d(TAG, "handleMessage: " + moment.getUsername());
                     usernameTextView.setText(moment.getUsername());
+                    Log.d(TAG, "handleMessage: " + usernameTextView.getText());
                     timeTextView.setText(moment.getTime());
                     tagTextView.setText(moment.getTag());
                     titleTextView.setText(moment.getTitle());
