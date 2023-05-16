@@ -67,6 +67,12 @@ public class Moment {
         mAddress = address;
     }
     // get-function
+    public int getId() {
+        return id;
+    }
+    public int getUserId() {
+        return userId;
+    }
     public Uri getAvatar() {
         return mAvatar;
     }

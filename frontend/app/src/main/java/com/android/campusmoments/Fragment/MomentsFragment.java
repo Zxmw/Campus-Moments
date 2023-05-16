@@ -15,7 +15,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
 import android.widget.Toast;
 
 
@@ -91,7 +90,7 @@ public class MomentsFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_moments, container, false);
 
-        momentsRecyclerView = view.findViewById(R.id.momentsRecyclerView);
+        momentsRecyclerView = view.findViewById(R.id.user_moments_recycler_view);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         momentsRecyclerView.setLayoutManager(layoutManager);
         momentAdapter = new MomentAdapter(mMomentList, new MomentAdapter.OnItemClickListener() {

@@ -45,7 +45,6 @@ public class MainActivity extends AppCompatActivity {
         Services.setTokenHandler(handler);
         mPreferences = getSharedPreferences("user_info", MODE_PRIVATE);
         String token = mPreferences.getString("token", null);
-        Log.d("token", token);
         if (token != null) {
 
             Services.token = token;

@@ -1,5 +1,6 @@
 package com.android.campusmoments.Adapter;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +13,7 @@ import android.widget.VideoView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.campusmoments.Activity.UserHomePageActivity;
 import com.android.campusmoments.R;
 import com.android.campusmoments.Service.Moment;
 import com.squareup.picasso.Picasso;
@@ -73,7 +75,23 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentView
             } else {
                 mAvatarImageView.setImageResource(R.drawable.avatar_1); // 默认头像
             }
+            mAvatarImageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(v.getContext(), UserHomePageActivity.class);
+                    intent.putExtra("id", moment.getUserId());
+                    v.getContext().startActivity(intent);
+                }
+            });
             mUsernameTextView.setText(moment.getUsername());
+            mUsernameTextView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(v.getContext(), UserHomePageActivity.class);
+                    intent.putExtra("id", moment.getUserId());
+                    v.getContext().startActivity(intent);
+                }
+            });
             mTimeTextView.setText(moment.getTime());
             mTagTextView.setText(moment.getTag());
             mTitleTextView.setText(moment.getTitle());

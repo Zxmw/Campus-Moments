@@ -88,7 +88,7 @@ public class LoginActivity extends AppCompatActivity {
         editor.apply();
         Toast.makeText(LoginActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
         Services.getSelf(Services.token);
-        Intent intent = new Intent(LoginActivity.this, PersonCenterActivity.class);
+        Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
         finish();

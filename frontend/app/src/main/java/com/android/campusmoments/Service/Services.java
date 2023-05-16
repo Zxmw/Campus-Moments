@@ -1,13 +1,8 @@
 package com.android.campusmoments.Service;
 
-import android.app.Person;
-import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.os.FileUtils;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.widget.Adapter;
 
 import androidx.annotation.NonNull;
 
@@ -28,13 +23,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import okhttp3.Call;
 import okhttp3.FormBody;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -42,18 +34,17 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Callback;
 import okhttp3.RequestBody;
-import okhttp3.Response;
 
 public class Services {
 
     private static final String TAG = "Services";
-    private static final String BASE_URL = "http://10.0.2.2:8000/users/api/";
-    private static final String LOGIN_URL = BASE_URL + "login";
-    private static final String REGISTER_URL = BASE_URL + "register";
-    private static final String SELF_URL = BASE_URL + "self";
-    private static final String GET_USER_URL = BASE_URL + "users/";
-    private static final String PATCH_USER_URL = BASE_URL + "users/";
-    private static final String LOGOUT_URL = BASE_URL + "logout";
+    private static final String USER_BASE_URL = "http://10.0.2.2:8000/users/api/";
+    private static final String LOGIN_URL = USER_BASE_URL + "login";
+    private static final String REGISTER_URL = USER_BASE_URL + "register";
+    private static final String SELF_URL = USER_BASE_URL + "self";
+    private static final String GET_USER_URL = USER_BASE_URL + "users/";
+    private static final String PATCH_USER_URL = USER_BASE_URL + "users/";
+    private static final String LOGOUT_URL = USER_BASE_URL + "logout";
 
     private static final String MOMENTS_BASE_URL = "http://10.0.2.2:8000/moments/api/";
     private static final String PUB_MOMENT_URL = MOMENTS_BASE_URL + "moments";
@@ -448,10 +439,9 @@ public class Services {
         FormBody.Builder builder = new FormBody.Builder();
         // to array[integer] (formData)
         Log.d(TAG, "follow: " + new Gson().toJson(newFollowList));
-//        for (int i = 0; i < newFollowList.size(); i++) {
-//            builder.add("follow_list", String.valueOf(newFollowList.get(i)));
-//        }
-        builder.add("follow_list", "[]");
+        for (int i = 0; i < newFollowList.size(); i++) {
+            builder.add("follow_list", String.valueOf(newFollowList.get(i)));
+        }
         // if newFollowList is empty, add a empty array
 //        if(newFollowList.size() == 0) {
 //            builder.add("follow_list", "");
@@ -507,12 +497,11 @@ public class Services {
         FormBody.Builder builder = new FormBody.Builder();
         // to array[integer] (formData)
         Log.d(TAG, "block: " + new Gson().toJson(newBlockList));
-//        for (int i = 0; i < newFollowList.size(); i++) {
-//            builder.add("block_list", String.valueOf(newFollowList.get(i)));
-//        }
-        builder.add("block_list", "[]");
+        for (int i = 0; i < newBlockList.size(); i++) {
+            builder.add("block_list", String.valueOf(newBlockList.get(i)));
+        }
         // if newFollowList is empty, add a empty array
-//        if(newFollowList.size() == 0) {
+//        if(newBlockList.size() == 0) {
 //            builder.add("block_list", "");
 //        }
         RequestBody requestBody = builder.build();
@@ -657,6 +646,38 @@ public class Services {
                 }
                 Log.d(TAG, "onResponse: " + message.obj);
                 handler.sendMessage(message);
+            }
+        });
+    }
+
+    public static void getMomentsByUser(int id) {
+        Request request = new Request.Builder()
+                .addHeader("Authorization", "Token " + token)
+                .url(GET_MOMENTS_URL + "?user__id=" + id)
+                .get()
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NonNull okhttp3.Call call, @NonNull java.io.IOException e) {
+                Log.d(TAG, "onFailure: " + e.getMessage());
+                Message message = new Message();
+                message.what = UserHomePageActivity.GET_USER_MOMENTS_FAIL;
+                userHomePageHandler.sendMessage(message);
+            }
+
+            @Override
+            public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws java.io.IOException {
+                if (response.code() != 200) {
+                    Message message = new Message();
+                    message.what = UserHomePageActivity.GET_USER_MOMENTS_FAIL;
+                    userHomePageHandler.sendMessage(message);
+                    return;
+                }
+                Message message = new Message();
+                message.what = UserHomePageActivity.GET_USER_MOMENTS_SUCCESS;
+                message.obj = response.body().string();
+                Log.d(TAG, "onResponse: " + message.obj);
+                userHomePageHandler.sendMessage(message);
             }
         });
     }
