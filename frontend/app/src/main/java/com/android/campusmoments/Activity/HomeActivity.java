@@ -14,25 +14,36 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.android.campusmoments.Fragment.HomeFragment;
 import com.android.campusmoments.Fragment.MomentsFragment;
 import com.android.campusmoments.R;
+import com.android.campusmoments.Service.Services;
 
 public class HomeActivity extends AppCompatActivity {
 
-    private ImageButton homeButton, messageButton, publishButton, mineButton;
+    private ImageButton homeButton, messageButton, mineButton;
     private ImageButton addMomentButton;
     private ActivityResultLauncher<Intent> pubLauncher;
 
-    MomentsFragment homeFragment;
+    HomeFragment homeFragment;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+
         // home page fragment
         FragmentContainerView fragmentContainerView = findViewById(R.id.fragmentContainerView);
-        homeFragment = new MomentsFragment();
+        homeFragment = new HomeFragment();
         getSupportFragmentManager().beginTransaction().replace(fragmentContainerView.getId(), homeFragment).commit();
+
+        homeButton = findViewById(R.id.homeButton);
+        homeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                homeFragment.refresh();
+            }
+        });
 
         setupPubLauncher();
         addMomentButton = findViewById(R.id.addButton);
@@ -50,11 +61,12 @@ public class HomeActivity extends AppCompatActivity {
                     @Override
                     public void onActivityResult(ActivityResult result) {
                         if (result.getResultCode() == RESULT_OK) {
+                            homeFragment.refresh();
                             // todo : add moment
                             Intent data = result.getData();
                             if (data != null) {
 //                                data.putExtra("username", /*TODO: getUsername*/);
-                                homeFragment.addMoment(data);
+//                                homeFragment.addMoment(data);
                             }
                         }
                     }

@@ -14,6 +14,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -25,6 +26,8 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.Html;
@@ -47,7 +50,11 @@ import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.android.campusmoments.R;
+import com.android.campusmoments.Service.Services;
 
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -71,6 +78,26 @@ public class PubActivity extends AppCompatActivity {
 
 
     private static final String TAG = "PubActivity";
+
+    public static final int PUB_MOMENT_FAIL = 0;
+    public static final int PUB_MOMENT_SUCCESS = 1;
+
+    private final Handler pubMomentHandler = new Handler(Looper.getMainLooper()){
+        @Override
+        public void handleMessage(android.os.Message msg) {
+            switch (msg.what) {
+                case PUB_MOMENT_FAIL:
+                    Toast.makeText(PubActivity.this, "发布失败", Toast.LENGTH_SHORT).show();
+                    break;
+                case PUB_MOMENT_SUCCESS:
+                    Toast.makeText(PubActivity.this, "发布成功", Toast.LENGTH_SHORT).show();
+                    finish();
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
 
     private EditText tagView;
     private EditText titleView;
@@ -105,6 +132,8 @@ public class PubActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pub);
+
+        Services.setPubMomentHandler(pubMomentHandler);
 
 
         // 初始化控件
@@ -255,7 +284,34 @@ public class PubActivity extends AppCompatActivity {
         replyIntent.putExtra("videoUri", selectedVideoUri);
         replyIntent.putExtra("address", locationView.getText().toString());
         setResult(RESULT_OK, replyIntent);
+
+        String tag = tagView.getText().toString();
+        String title = titleView.getText().toString();
+        String content = knife.toHtml();
+        String imagePath = selectedPictureUri == null ? null : getRealPathFromURI(selectedPictureUri);
+        String videoPath = selectedVideoUri == null ? null : getRealPathFromURI(selectedVideoUri);
+        String address = locationView.getText().toString();
+        Services.pubMoment(tag, title, content, imagePath, videoPath, address);
+
         finish();
+    }
+
+    public String getRealPathFromURI(Uri uri) {
+        // 只有从相册中选择的图片才有真实路径，文件管理器中的图片没有真实路径
+        Log.d(TAG, "getRealPathFromURI: " + uri);
+        String realPath = null;
+        String[] projection = {MediaStore.Images.Media.DATA};
+        Cursor cursor = getContentResolver().query(uri, projection, null, null, null);
+        if (cursor != null) {
+            int columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
+            realPath = cursor.getString(columnIndex);
+            cursor.close();
+        } else {
+            realPath = uri.getPath();
+        }
+        Log.d(TAG, "getRealPathFromURI: " + realPath);
+        return realPath;
     }
 
     public void addPicture(View view) {
@@ -310,6 +366,7 @@ public class PubActivity extends AppCompatActivity {
         });
         popupMenu.show();
     }
+
     public void addLocation(View view) {
         // TODO: 添加位置
         // 获取LocationManager对象
