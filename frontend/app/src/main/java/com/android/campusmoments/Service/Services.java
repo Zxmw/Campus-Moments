@@ -53,7 +53,6 @@ public class Services {
     private static final String SELF_URL = BASE_URL + "self";
     private static final String GET_USER_URL = BASE_URL + "users/";
     private static final String PATCH_USER_URL = BASE_URL + "users/";
-    private static final String GET_USER_URL = BASE_URL + "users/";
     private static final String LOGOUT_URL = BASE_URL + "logout";
 
     private static final String MOMENTS_BASE_URL = "http://10.0.2.2:8000/moments/api/";
