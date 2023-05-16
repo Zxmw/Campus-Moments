@@ -82,7 +82,7 @@
                     android:textStyle="bold" />
 
                 <EditText
-                    android:id="@+id/username_person_center"
+                    android:id="@+id/user_id_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"

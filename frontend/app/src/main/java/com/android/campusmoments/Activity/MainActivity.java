@@ -2,7 +2,6 @@ package com.android.campusmoments.Activity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentTransaction;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -19,9 +18,7 @@ import android.widget.Toast;
 import com.android.campusmoments.R;
 import com.android.campusmoments.Service.Services;
 
-import org.json.JSONException;
-
-import java.io.IOException;
+import java.io.Serializable;
 
 public class MainActivity extends AppCompatActivity {
     private SharedPreferences mPreferences;
@@ -48,7 +45,9 @@ public class MainActivity extends AppCompatActivity {
         Services.setTokenHandler(handler);
         mPreferences = getSharedPreferences("user_info", MODE_PRIVATE);
         String token = mPreferences.getString("token", null);
+        Log.d("token", token);
         if (token != null) {
+
             Services.token = token;
             Services.tokenCheck(token);
         }
@@ -58,10 +57,9 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        // 直接打开发布页，测试用
-//        Intent intent = new Intent(MainActivity.this, PersonCenterActivity.class);
+//        Intent intent = new Intent(MainActivity.this, PrivateMessageActivity.class);
+//        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
 //        startActivity(intent);
-//        finish();
     }
 
     public void gotoRegister(View view) {
@@ -70,11 +68,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void gotoHome() {
-
-//        Intent intent = new Intent(MainActivity.this, PersonCenterActivity.class);
-//        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-//        // go to home activity
+        Toast.makeText(MainActivity.this, "欢迎回来，"+Services.mySelf.username, Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+        intent.putExtra("id", 1);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
     }
 

@@ -15,6 +15,9 @@ import android.widget.Toast;
 import com.android.campusmoments.R;
 import com.android.campusmoments.Service.Services;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class BioConfigActivity extends AppCompatActivity {
     public static final int SET_BIO_SUCCESS = 0;
     public static final int SET_BIO_FAIL = 1;
@@ -31,7 +34,11 @@ public class BioConfigActivity extends AppCompatActivity {
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
             if (msg.what == SET_BIO_SUCCESS) {
-                successSetBio();
+                try {
+                    successSetBio(msg.obj);
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
             } else if (msg.what == SET_BIO_FAIL) {
                 failSetBio();
             }
@@ -39,12 +46,14 @@ public class BioConfigActivity extends AppCompatActivity {
     };
 
     public void setBio(View view) {
-        TextView bio_view = findViewById(R.id.username_person_center);
+        TextView bio_view = findViewById(R.id.user_id_text);
         String bio = bio_view.getText().toString();
         Services.setBio(bio);
     }
 
-    private void successSetBio() {
+    private void successSetBio(Object obj) throws JSONException {
+        JSONObject jsonObject = new JSONObject(obj.toString());
+        Services.mySelf.bio = jsonObject.getString("bio");
         Toast.makeText(this.getApplicationContext(), "更新成功", Toast.LENGTH_SHORT).show();
         finish();
     }

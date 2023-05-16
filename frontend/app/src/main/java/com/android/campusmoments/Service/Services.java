@@ -19,7 +19,9 @@ import com.android.campusmoments.Activity.PasswordConfigActivity;
 import com.android.campusmoments.Activity.PersonCenterActivity;
 import com.android.campusmoments.Activity.PubActivity;
 import com.android.campusmoments.Activity.RegisterActivity;
+import com.android.campusmoments.Activity.UserHomePageActivity;
 import com.android.campusmoments.Activity.UsernameConfigActivity;
+import com.google.gson.Gson;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -27,6 +29,9 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
@@ -46,6 +51,7 @@ public class Services {
     private static final String LOGIN_URL = BASE_URL + "login";
     private static final String REGISTER_URL = BASE_URL + "register";
     private static final String SELF_URL = BASE_URL + "self";
+    private static final String GET_USER_URL = BASE_URL + "users/";
     private static final String PATCH_USER_URL = BASE_URL + "users/";
     private static final String GET_USER_URL = BASE_URL + "users/";
     private static final String LOGOUT_URL = BASE_URL + "logout";
@@ -71,6 +77,7 @@ public class Services {
     private static Handler setBioHandler = null;
     private static Handler setPasswordHandler = null;
     private static Handler logoutHandler = null;
+    private static Handler userHomePageHandler = null;
     private static Handler pubMomentHandler = null;
 
     public static User mySelf = null;
@@ -94,6 +101,9 @@ public class Services {
     }
     public static void setSetPasswordHandler(Handler _setPasswordHandler) {
         setPasswordHandler = _setPasswordHandler;
+    }
+    public static void setUserHomePageHandler(Handler _userHomePageHandler) {
+        userHomePageHandler = _userHomePageHandler;
     }
     public static void setLogoutHandler(Handler _logoutHandler) {
         logoutHandler = _logoutHandler;
@@ -234,6 +244,30 @@ public class Services {
             }
         });
     }
+    public static void getUser(int id) {
+        Request request = new Request.Builder()
+                .url(GET_USER_URL + id)
+                .addHeader("Authorization", "Token " + token)
+                .get()
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NonNull okhttp3.Call call, @NonNull java.io.IOException e) {
+                Log.d(TAG, "onFailure: " + e.getMessage());
+            }
+
+            @Override
+            public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws java.io.IOException {
+                if (response.code() != 200) {
+                    return;
+                }
+                Message message = new Message();
+                message.what = UserHomePageActivity.GET_USER_SUCCESS;
+                message.obj = response.body().string();
+                userHomePageHandler.sendMessage(message);
+            }
+        });
+    }
     public static void setAvatar(String avatarPath) {
         MultipartBody.Builder builder = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM);
@@ -263,16 +297,13 @@ public class Services {
                     setAvatarHandler.sendMessage(message);
                     return;
                 }
-                mySelf.avatar = avatarPath;
                 Message message = new Message();
                 message.what = AvatarConfigActivity.SET_AVATAR_SUCCESS;
                 message.obj = response.body().string();
-                Log.d(TAG, "onResponse: " + message.obj);
                 setAvatarHandler.sendMessage(message);
             }
         });
     }
-
     public static void setUsername(String username) {
         MultipartBody.Builder builder = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM);
@@ -300,7 +331,6 @@ public class Services {
                     setUsernameHandler.sendMessage(message);
                     return;
                 }
-                mySelf.username = username;
                 Message message = new Message();
                 message.what = UsernameConfigActivity.SET_USERNAME_SUCCESS;
                 message.obj = response.body().string();
@@ -309,8 +339,6 @@ public class Services {
             }
         });
     }
-
-
     public static void setPassword(String password, String new_password) {
         // 这个不对
         MultipartBody.Builder builder = new MultipartBody.Builder()
@@ -347,7 +375,6 @@ public class Services {
             }
         });
     }
-
     public static void setBio(String bio) {
         MultipartBody.Builder builder = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM);
@@ -375,7 +402,6 @@ public class Services {
                     setBioHandler.sendMessage(message);
                     return;
                 }
-                mySelf.bio = bio;
                 Message message = new Message();
                 message.what = BioConfigActivity.SET_BIO_SUCCESS;
                 message.obj = response.body().string();
@@ -384,7 +410,6 @@ public class Services {
             }
         });
     }
-
     public static void logout() {
         Request request = new Request.Builder()
                 .addHeader("Authorization", "Token " + token)
@@ -414,7 +439,135 @@ public class Services {
             }
         });
     }
+    public static void follow(int id, boolean isFollowed) {
+        List<Integer> newFollowList = new ArrayList<>(mySelf.followList);
+        if (isFollowed) {
+            newFollowList.remove(Integer.valueOf(id));
+        } else {
+            newFollowList.add(id);
+        }
 
+        FormBody.Builder builder = new FormBody.Builder();
+        // to array[integer] (formData)
+        Log.d(TAG, "follow: " + new Gson().toJson(newFollowList));
+//        for (int i = 0; i < newFollowList.size(); i++) {
+//            builder.add("follow_list", String.valueOf(newFollowList.get(i)));
+//        }
+        builder.add("follow_list", "[]");
+        // if newFollowList is empty, add a empty array
+//        if(newFollowList.size() == 0) {
+//            builder.add("follow_list", "");
+//        }
+        RequestBody requestBody = builder.build();
+        Request request = new Request.Builder()
+                .addHeader("Authorization", "Token " + token)
+                .url(PATCH_USER_URL + mySelf.id)
+                .patch(requestBody)
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NonNull okhttp3.Call call, @NonNull java.io.IOException e) {
+                Log.d(TAG, "onFailure: " + e.getMessage());
+                Message message = new Message();
+                if (isFollowed)
+                    message.what = UserHomePageActivity.UNFOLLOW_FAIL;
+                else
+                    message.what = UserHomePageActivity.FOLLOW_FAIL;
+                userHomePageHandler.sendMessage(message);
+            }
+
+            @Override
+            public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws java.io.IOException {
+                if (response.code() != 200) {
+                    Message message = new Message();
+                    if (isFollowed)
+                        message.what = UserHomePageActivity.UNFOLLOW_FAIL;
+                    else
+                        message.what = UserHomePageActivity.FOLLOW_FAIL;
+                    userHomePageHandler.sendMessage(message);
+                    return;
+                }
+                Message message = new Message();
+                if (isFollowed)
+                    message.what = UserHomePageActivity.UNFOLLOW_SUCCESS;
+                else
+                    message.what = UserHomePageActivity.FOLLOW_SUCCESS;
+                message.obj = response.body().string();
+                Log.d(TAG, "onResponse: " + message.obj);
+                userHomePageHandler.sendMessage(message);
+            }
+        });
+    }
+    public static void block(int id, boolean isBlocked) {
+        List<Integer> newBlockList = new ArrayList<>(mySelf.blockList);
+        if (isBlocked) {
+            newBlockList.remove(Integer.valueOf(id));
+        } else {
+            newBlockList.add(id);
+        }
+
+        FormBody.Builder builder = new FormBody.Builder();
+        // to array[integer] (formData)
+        Log.d(TAG, "block: " + new Gson().toJson(newBlockList));
+//        for (int i = 0; i < newFollowList.size(); i++) {
+//            builder.add("block_list", String.valueOf(newFollowList.get(i)));
+//        }
+        builder.add("block_list", "[]");
+        // if newFollowList is empty, add a empty array
+//        if(newFollowList.size() == 0) {
+//            builder.add("block_list", "");
+//        }
+        RequestBody requestBody = builder.build();
+        Request request = new Request.Builder()
+                .addHeader("Authorization", "Token " + token)
+                .url(PATCH_USER_URL + mySelf.id)
+                .patch(requestBody)
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NonNull okhttp3.Call call, @NonNull java.io.IOException e) {
+                Log.d(TAG, "onFailure: " + e.getMessage());
+                Message message = new Message();
+                if (isBlocked)
+                    message.what = UserHomePageActivity.UNBLOCK_FAIL;
+                else
+                    message.what = UserHomePageActivity.BLOCK_FAIL;
+                userHomePageHandler.sendMessage(message);
+            }
+
+            @Override
+            public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws java.io.IOException {
+                if (response.code() != 200) {
+                    Message message = new Message();
+                    if (isBlocked)
+                        message.what = UserHomePageActivity.UNBLOCK_FAIL;
+                    else
+                        message.what = UserHomePageActivity.BLOCK_FAIL;
+                    userHomePageHandler.sendMessage(message);
+                    return;
+                }
+                Message message = new Message();
+                if (isBlocked)
+                    message.what = UserHomePageActivity.UNBLOCK_SUCCESS;
+                else
+                    message.what = UserHomePageActivity.BLOCK_SUCCESS;
+                message.obj = response.body().string();
+                Log.d(TAG, "onResponse: " + message.obj);
+                userHomePageHandler.sendMessage(message);
+            }
+        });
+    }
+    public static List<Integer> jsonArrayToList(JSONArray array) {
+        List<Integer> list = new ArrayList<>();
+        for (int i = 0; i < array.length(); i++) {
+            try {
+                list.add(array.getInt(i));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return list;
+    }
     public static void pubMoment(String tag, String title, String content, String imagePath, String videoPath, String address) {
         MultipartBody.Builder builder = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM);
