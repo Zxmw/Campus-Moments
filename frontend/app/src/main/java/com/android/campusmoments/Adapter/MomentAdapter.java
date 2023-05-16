@@ -1,17 +1,21 @@
 package com.android.campusmoments.Adapter;
 
+import android.content.Context;
 import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.VideoView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.campusmoments.Activity.DetailedActivity;
 import com.android.campusmoments.R;
 import com.android.campusmoments.Service.Moment;
 import com.squareup.picasso.Picasso;
@@ -21,10 +25,16 @@ import java.util.List;
 import io.github.mthli.knife.KnifeText;
 
 public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentViewHolder> {
+    private static final String TAG = "MomentAdapter";
     private List<Moment> mMoments;
     private OnItemClickListener mOnItemClickListener;
-
+    private Context mContext;
     public MomentAdapter(List<Moment> moments, OnItemClickListener onItemClickListener) {
+        mMoments = moments;
+        mOnItemClickListener = onItemClickListener;
+    }
+    public MomentAdapter(Context context, List<Moment> moments, OnItemClickListener onItemClickListener) {
+        mContext = context;
         mMoments = moments;
         mOnItemClickListener = onItemClickListener;
     }
@@ -68,9 +78,11 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentView
         }
         public void bindData(Moment moment) {
             // 将数据绑定到ViewHolder中的视图中
-            if(moment.getAvatar() != null) {
-                mAvatarImageView.setImageURI(moment.getAvatar());
+            if(moment.getAvatarPath() != null) {
+                Picasso.get().load(Uri.parse(moment.getAvatarPath())).into(mAvatarImageView);
+                mAvatarImageView.setVisibility(View.VISIBLE);
             } else {
+                Log.d(TAG, "bindData: avatarPath is null");
                 mAvatarImageView.setImageResource(R.drawable.avatar_1); // 默认头像
             }
             mUsernameTextView.setText(moment.getUsername());
@@ -78,22 +90,21 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentView
             mTagTextView.setText(moment.getTag());
             mTitleTextView.setText(moment.getTitle());
             mContentKnifeText.fromHtml(moment.getContent());
-            if(moment.getPicture() != null) {
-                mPictureImageView.setImageURI(moment.getPicture());
+            if(moment.getImagePath() != null) {
+                Picasso.get().load(Uri.parse(moment.getImagePath())).into(mPictureImageView);
+                mPictureImageView.setVisibility(View.VISIBLE);
             } else {
                 mPictureImageView.setVisibility(View.GONE);
             }
-            if(moment.imagePath != null) {
-                Picasso.get().load(moment.imagePath).into(mPictureImageView);
-            } else {
-                mPictureImageView.setVisibility(View.GONE);
-            }
-            if(moment.getVideo() != null) {
-                // TODO: VideoController
-                mVideoView.setVideoURI(moment.getVideo());
+            if(moment.getVideoPath() != null) {
+                mVideoView.setVideoURI(Uri.parse(moment.getVideoPath()));
+//                mVideoView.setMediaController(new MediaController(mContext));
+//                mVideoView.start();
+                mVideoView.setVisibility(View.VISIBLE);
             } else {
                 mVideoView.setVisibility(View.GONE);
             }
+
             mAddressTextView.setText(moment.getAddress());
             mLikeTextView.setText(String.valueOf(moment.getLikeCount()));
             mCommentTextView.setText(String.valueOf(moment.getCommentCount()));

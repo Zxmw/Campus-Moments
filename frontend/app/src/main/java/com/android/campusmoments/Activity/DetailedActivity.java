@@ -10,19 +10,30 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.MediaController;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.android.campusmoments.R;
+import com.android.campusmoments.Service.Moment;
+import com.android.campusmoments.Service.Services;
+import com.squareup.picasso.Picasso;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import io.github.mthli.knife.KnifeText;
 
 public class DetailedActivity extends AppCompatActivity {
 
+    private static final String TAG = "DetailedActivity";
     private ImageView avatarImageView;
     private TextView usernameTextView;
     private TextView timeTextView;
@@ -39,6 +50,57 @@ public class DetailedActivity extends AppCompatActivity {
     private RecyclerView commentsRecyclerView;
     private EditText commentEditText;
     private Button sendCommentButton;
+    private Moment moment;
+
+    private Handler handler = new Handler(Looper.getMainLooper()) {
+        @Override
+        public void handleMessage(android.os.Message msg) {
+            if(msg.what == 0) {
+                Toast.makeText(DetailedActivity.this, "网络错误", Toast.LENGTH_SHORT).show();
+                finish();
+            } else if(msg.what == 1) {
+                try {
+                    JSONObject obj = new JSONObject(msg.obj.toString());
+                    moment = new Moment(obj);
+                    Log.d(TAG, "handleMessage: " + moment.getAvatarPath());
+                    Log.d(TAG, "handleMessage: " + moment.getUsername());
+                    usernameTextView.setText(moment.getUsername());
+                    timeTextView.setText(moment.getTime());
+                    tagTextView.setText(moment.getTag());
+                    titleTextView.setText(moment.getTitle());
+                    contentKnifeText.fromHtml(moment.getContent());
+                    if(moment.getAvatarPath() != null) {
+                        Picasso.get().load(Uri.parse(moment.getAvatarPath())).into(avatarImageView);
+                    } else {
+                        avatarImageView.setImageResource(R.drawable.avatar_1);
+                    }
+                    if(moment.getImagePath() != null) {
+                        Picasso.get().load(Uri.parse(moment.getImagePath())).into(pictureView);
+                        Log.d(TAG, "handleMessage: imagePath: " + moment.getImagePath());
+//                        pictureView.setImageURI(Uri.parse(moment.getImagePath()));
+                    } else {
+                        Log.d(TAG, "handleMessage: imagePath is null");
+                        pictureView.setVisibility(ImageView.GONE);
+                    }
+                    if(moment.getVideoPath() != null) {
+                        videoView.setVideoURI(Uri.parse(moment.getVideoPath()));
+                        videoView.setMediaController(new MediaController(DetailedActivity.this));
+                        videoView.start();
+                    } else {
+                        videoView.setVisibility(VideoView.GONE);
+                    }
+                    addressTextView.setText(moment.getAddress());
+                    likeTextView.setText(String.valueOf(moment.getLikeCount()));
+                    commentTextView.setText(String.valueOf(moment.getCommentCount()));
+                    starTextView.setText(String.valueOf(moment.getStarCount()));
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,7 +114,7 @@ public class DetailedActivity extends AppCompatActivity {
         titleTextView = findViewById(R.id.title_textview);
         contentKnifeText = findViewById(R.id.content_knifetext);
         pictureView = findViewById(R.id.picture_imageview);
-        videoView = findViewById(R.id.video_videoview);
+        videoView = findViewById(R.id.videoView);
         addressTextView = findViewById(R.id.address_textview);
         likeTextView = findViewById(R.id.like_textview);
         commentTextView = findViewById(R.id.comment_textview);
@@ -72,6 +134,16 @@ public class DetailedActivity extends AppCompatActivity {
     private void setData() {
         // get intent
         Intent intent = getIntent();
+        int id = intent.getIntExtra("id", -1);
+        if(id == -1) {
+            Toast.makeText(this, "网络错误", Toast.LENGTH_SHORT).show();
+            finish();
+        } else {
+            Services.getDetailedMoment(id, handler);
+            return;
+        }
+
+        // 老方法
         int position = intent.getIntExtra("position", -1);
         Uri avatarUri = intent.getParcelableExtra("avatarUri");
         String username = intent.getStringExtra("username");

@@ -1,6 +1,8 @@
 package com.android.campusmoments.Service;
 
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
 
 import org.json.JSONObject;
 
@@ -9,17 +11,30 @@ import java.util.Date;
 
 public class Moment {
     private int id;
+    public int getId() {
+        return id;
+    }
     private int userId;
     private Uri mAvatar;
+    private String avatarPath;
+    public String getAvatarPath() {
+        return avatarPath;
+    }
     private String mUsername;
     private String mTime; // 构造函数中获取当前时间
     private String mTag;
     private String mTitle;
     private String mContent;  // KnifeText.toHtml
     private Uri mPicture;
-    public String imagePath;
+    private String imagePath;
+    public String getImagePath() {
+        return imagePath;
+    }
     private Uri mVideo;
     private String videoPath;
+    public String getVideoPath() {
+        return videoPath;
+    }
     private String mAddress;
     private int mLikeCount;
     private int mCommentCount;
@@ -27,22 +42,36 @@ public class Moment {
 
     private String[] mComments; // TODO: 评论
 
+    private Handler getUserHandler = new Handler(Looper.getMainLooper()) {
+        @Override
+        public void handleMessage(android.os.Message msg) {
+            if(msg.what == 1) {
+                try {
+                    JSONObject obj = new JSONObject(msg.obj.toString());
+                    mUsername = Services.checkStr(obj, "username");
+                    avatarPath = Services.checkStr(obj, "avatar");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    };
     public Moment(JSONObject obj) {
         try {
             // 返回值不为空时，赋值
-
             id = obj.getInt("id");
             userId = obj.getInt("user");
             mTime = Services.checkStr(obj, "created_at");
             mTag = Services.checkStr(obj, "tag");
             mTitle = Services.checkStr(obj, "title");
             mContent = Services.checkStr(obj, "content");
-            imagePath = Services.checkStr(obj, "imagePath");
-            videoPath = Services.checkStr(obj, "videoPath");
+            imagePath = Services.checkStr(obj, "image");
+            videoPath = Services.checkStr(obj, "video");
             mAddress = Services.checkStr(obj, "address");
             mLikeCount = obj.getInt("total_likes");
             mCommentCount = obj.getInt("total_comments");
             mStarCount = obj.getInt("total_stars");
+            Services.getUser(userId, getUserHandler);
         } catch (Exception e) {
             e.printStackTrace();
         }
