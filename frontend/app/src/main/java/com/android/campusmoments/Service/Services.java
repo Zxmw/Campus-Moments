@@ -49,6 +49,7 @@ public class Services {
     private static final String MOMENTS_BASE_URL = "http://10.0.2.2:8000/moments/api/";
     private static final String PUB_MOMENT_URL = MOMENTS_BASE_URL + "moments";
     private static final String GET_MOMENTS_URL = MOMENTS_BASE_URL + "moments";
+    private static final String GET_MOMENT_URL = MOMENTS_BASE_URL + "moments/";
     public static String token = null;
     private static final MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
     private static final MediaType MEDIA_TYPE_FORM_DATA = MediaType.parse("multipart/form-data; charset=utf-8");
@@ -681,6 +682,73 @@ public class Services {
             }
         });
     }
+    // 按照id获取动态
+    public static void getDetailedMoment(int id, Handler handler) {
+        Request request = new Request.Builder()
+                .addHeader("Authorization", "Token " + token)
+                .url(GET_MOMENT_URL + id)
+                .get()
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NonNull okhttp3.Call call, @NonNull java.io.IOException e) {
+                Log.d(TAG, "onFailure: " + e.getMessage());
+                Message message = new Message();
+                message.what = 0;
+                handler.sendMessage(message);
+            }
+
+            @Override
+            public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws java.io.IOException {
+                if (response.code() != 200) {
+                    Message message = new Message();
+                    message.what = 0;
+                    handler.sendMessage(message);
+                    return;
+                }
+                Message message = new Message();
+                message.what = 1;
+                message.obj = response.body().string();
+                Log.d(TAG, "onResponse: " + message.obj);
+                handler.sendMessage(message);
+            }
+        });
+    }
+    // 按照userId获取User
+    public static void getUser(int id, Handler handler) {
+        Request request = new Request.Builder()
+                .addHeader("Authorization", "Token " + token)
+                .url(GET_USER_URL + id)
+                .get()
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NonNull okhttp3.Call call, @NonNull java.io.IOException e) {
+                Log.d(TAG, "onFailure: " + e.getMessage());
+                Message message = new Message();
+                message.what = 0;
+                handler.sendMessage(message);
+            }
+
+            @Override
+            public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws java.io.IOException {
+                if (response.code() != 200) {
+                    Message message = new Message();
+                    message.what = 0;
+                    handler.sendMessage(message);
+                    return;
+                }
+                Message message = new Message();
+                message.what = 1;
+                message.obj = response.body().string();
+                Log.d(TAG, "onResponse: " + message.obj);
+                handler.sendMessage(message);
+            }
+        });
+    }
+
+
+
     /* 网络工具 */
     public static String checkStr(JSONObject obj, String name) {
         try {
@@ -691,4 +759,13 @@ public class Services {
         }
         return null;
     }
+//    public static String checkObjInt(JSONObject obj, String name) {
+//        try {
+//            if (obj.isNull(name)) return null;
+//            return obj.getInt(name);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return null;
+//    }
 }

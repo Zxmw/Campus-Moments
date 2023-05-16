@@ -98,6 +98,7 @@ public class MomentsFragment extends Fragment {
             public void onItemClick(int position) {
 //                Toast.makeText(getContext(), "clicked: "+position, Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(getActivity(), DetailedActivity.class);
+                intent.putExtra("id", mMomentList.get(position).getId());
                 intent.putExtra("position", position);
                 intent.putExtra("avatarUri", mMomentList.get(position).getAvatar());
                 intent.putExtra("username", mMomentList.get(position).getUsername());
