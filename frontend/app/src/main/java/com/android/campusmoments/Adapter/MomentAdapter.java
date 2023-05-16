@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.campusmoments.R;
 import com.android.campusmoments.Service.Moment;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -26,6 +27,9 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentView
     public MomentAdapter(List<Moment> moments, OnItemClickListener onItemClickListener) {
         mMoments = moments;
         mOnItemClickListener = onItemClickListener;
+    }
+    public void setMoments(List<Moment> moments) {
+        mMoments = moments;
     }
 
     public interface OnItemClickListener {
@@ -76,6 +80,11 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentView
             mContentKnifeText.fromHtml(moment.getContent());
             if(moment.getPicture() != null) {
                 mPictureImageView.setImageURI(moment.getPicture());
+            } else {
+                mPictureImageView.setVisibility(View.GONE);
+            }
+            if(moment.imagePath != null) {
+                Picasso.get().load(moment.imagePath).into(mPictureImageView);
             } else {
                 mPictureImageView.setVisibility(View.GONE);
             }

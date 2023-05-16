@@ -3,9 +3,11 @@ package com.android.campusmoments.Service;
 import android.app.Person;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.os.FileUtils;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.widget.Adapter;
 
 import androidx.annotation.NonNull;
 
@@ -15,9 +17,11 @@ import com.android.campusmoments.Activity.LoginActivity;
 import com.android.campusmoments.Activity.MainActivity;
 import com.android.campusmoments.Activity.PasswordConfigActivity;
 import com.android.campusmoments.Activity.PersonCenterActivity;
+import com.android.campusmoments.Activity.PubActivity;
 import com.android.campusmoments.Activity.RegisterActivity;
 import com.android.campusmoments.Activity.UsernameConfigActivity;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -44,6 +48,10 @@ public class Services {
     private static final String SELF_URL = BASE_URL + "self";
     private static final String PATCH_USER_URL = BASE_URL + "users/";
     private static final String LOGOUT_URL = BASE_URL + "logout";
+
+    private static final String MOMENTS_BASE_URL = "http://10.0.2.2:8000/moments/api/";
+    private static final String PUB_MOMENT_URL = MOMENTS_BASE_URL + "moments";
+    private static final String GET_MOMENTS_URL = MOMENTS_BASE_URL + "moments";
     public static String token = null;
     private static final MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
     private static final MediaType MEDIA_TYPE_FORM_DATA = MediaType.parse("multipart/form-data; charset=utf-8");
@@ -61,6 +69,7 @@ public class Services {
     private static Handler setBioHandler = null;
     private static Handler setPasswordHandler = null;
     private static Handler logoutHandler = null;
+    private static Handler pubMomentHandler = null;
 
     public static User mySelf = null;
     public static void setLoginHandler(Handler _loginHandler) {
@@ -88,6 +97,9 @@ public class Services {
         logoutHandler = _logoutHandler;
     }
 
+    public static void setPubMomentHandler(Handler _pubMomentHandler) {
+        pubMomentHandler = _pubMomentHandler;
+    }
 
     public static void tokenCheck(String token) {
         Request request = new Request.Builder()
@@ -399,5 +411,110 @@ public class Services {
                 logoutHandler.sendMessage(message);
             }
         });
+    }
+
+    public static void pubMoment(String tag, String title, String content, String imagePath, String videoPath, String address) {
+        MultipartBody.Builder builder = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM);
+        builder.addFormDataPart("tag", tag);
+        builder.addFormDataPart("title", title);
+        builder.addFormDataPart("content", content);
+        if (imagePath != null) {
+            try {
+                File file = new File(imagePath);
+                builder.addFormDataPart("image", file.getName(), RequestBody.create(MEDIA_TYPE_FORM_DATA, file));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        if (videoPath != null) {
+            try {
+                File file = new File(videoPath);
+                builder.addFormDataPart("video", file.getName(), RequestBody.create(MediaType.parse("video/*"), file));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        builder.addFormDataPart("address", address);
+        builder.addFormDataPart("user", String.valueOf(mySelf.id));
+        RequestBody requestBody = builder.build();
+        Request request = new Request.Builder()
+                .addHeader("Authorization", "Token " + token)
+                .url(PUB_MOMENT_URL)
+                .post(requestBody)
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NonNull okhttp3.Call call, @NonNull java.io.IOException e) {
+                Log.d(TAG, "onFailure: " + e.getMessage());
+                Message message = new Message();
+                message.what = PubActivity.PUB_MOMENT_FAIL;
+                pubMomentHandler.sendMessage(message);
+            }
+
+            @Override
+            public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws java.io.IOException {
+                if (response.code() != 201) {
+                    Message message = new Message();
+                    message.what = PubActivity.PUB_MOMENT_FAIL;
+                    pubMomentHandler.sendMessage(message);
+                    return;
+                }
+                Message message = new Message();
+                message.what = PubActivity.PUB_MOMENT_SUCCESS;
+                message.obj = response.body().string();
+                Log.d(TAG, "onResponse: " + message.obj);
+                pubMomentHandler.sendMessage(message);
+            }
+        });
+    }
+
+    // 获取所有动态
+    public static void getMoments(Handler handler) {
+        Request request = new Request.Builder()
+                .addHeader("Authorization", "Token " + token)
+                .url(GET_MOMENTS_URL)
+                .get()
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NonNull okhttp3.Call call, @NonNull java.io.IOException e) {
+                Log.d(TAG, "onFailure: " + e.getMessage());
+                Message message = new Message();
+                message.what = 0;
+                handler.sendMessage(message);
+            }
+
+            @Override
+            public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws java.io.IOException {
+                if (response.code() != 200) {
+                    Message message = new Message();
+                    message.what = 0;
+                    handler.sendMessage(message);
+                    return;
+                }
+                Message message = new Message();
+                message.what = 1;
+                message.obj = response.body().string();
+                try {
+                    JSONArray arr = new JSONArray(message.obj.toString());
+                    Log.d(TAG, "onResponse: " + arr.length());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                Log.d(TAG, "onResponse: " + message.obj);
+                handler.sendMessage(message);
+            }
+        });
+    }
+    /* 网络工具 */
+    public static String checkStr(JSONObject obj, String name) {
+        try {
+            if (obj.isNull(name)) return null;
+            return obj.getString(name);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

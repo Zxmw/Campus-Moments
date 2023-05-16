@@ -9,9 +9,13 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Adapter;
 import android.widget.Toast;
 
 
@@ -19,19 +23,51 @@ import com.android.campusmoments.Activity.DetailedActivity;
 import com.android.campusmoments.Adapter.MomentAdapter;
 import com.android.campusmoments.R;
 import com.android.campusmoments.Service.Moment;
+import com.android.campusmoments.Service.Services;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MomentsFragment extends Fragment {
+    private static final String TAG = "MomentsFragment";
     private List<Moment> mMomentList;
     private RecyclerView momentsRecyclerView;
     private MomentAdapter momentAdapter;
+    private Handler getAllMomentsHandler = new Handler(Looper.getMainLooper()) {
+        @Override
+        public void handleMessage(@NonNull android.os.Message msg) {
+            super.handleMessage(msg);
+            if (msg.what == 1) {
+                try {
+                    JSONArray arr = new JSONArray(msg.obj.toString());
+                    Log.d(TAG, "onResponse: " + arr.length());
+                    mMomentList.clear();
+                    for (int i = 0; i < arr.length(); i++) {
+                        mMomentList.add(new Moment(arr.getJSONObject(i)));
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                momentAdapter.setMoments(mMomentList);
+                momentAdapter.notifyDataSetChanged();
+                Log.d(TAG, "handleMessage: " + mMomentList.size());
+                Log.d(TAG, "handleMessage: " + mMomentList.get(0).getTime());
+
+            } else {
+                Toast.makeText(requireActivity(), "获取动态失败", Toast.LENGTH_SHORT).show();
+            }
+        }
+    };
     public MomentsFragment() {
 
     }
 
-
+    public void refresh() {
+        Services.getMoments(getAllMomentsHandler);
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -46,6 +82,7 @@ public class MomentsFragment extends Fragment {
         mMomentList.add(new Moment(Uri.parse("android.resource://" + requireActivity().getPackageName() + "/" + R.drawable.picture1),
         "geh", "美食", "美食美食不辜负", "学校的好吃的和学校周边的好吃的。",
                 Uri.parse("android.resource://" + requireActivity().getPackageName() + "/" + R.drawable.picture3), null, "PKU"));
+
     }
 
     @Override
@@ -60,7 +97,7 @@ public class MomentsFragment extends Fragment {
         momentAdapter = new MomentAdapter(mMomentList, new MomentAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                Toast.makeText(getContext(), "clicked: "+position, Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getContext(), "clicked: "+position, Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(getActivity(), DetailedActivity.class);
                 intent.putExtra("position", position);
                 intent.putExtra("avatarUri", mMomentList.get(position).getAvatar());
@@ -80,6 +117,9 @@ public class MomentsFragment extends Fragment {
             }
         });
         momentsRecyclerView.setAdapter(momentAdapter);
+
+        Services.getMoments(getAllMomentsHandler);
+
         return view;
     }
 

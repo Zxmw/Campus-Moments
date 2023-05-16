@@ -2,10 +2,14 @@ package com.android.campusmoments.Service;
 
 import android.net.Uri;
 
+import org.json.JSONObject;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Moment {
+    private int id;
+    private int userId;
     private Uri mAvatar;
     private String mUsername;
     private String mTime; // 构造函数中获取当前时间
@@ -13,13 +17,37 @@ public class Moment {
     private String mTitle;
     private String mContent;  // KnifeText.toHtml
     private Uri mPicture;
+    public String imagePath;
     private Uri mVideo;
+    private String videoPath;
     private String mAddress;
     private int mLikeCount;
     private int mCommentCount;
     private int mStarCount;
 
     private String[] mComments; // TODO: 评论
+
+    public Moment(JSONObject obj) {
+        try {
+            // 返回值不为空时，赋值
+
+            id = obj.getInt("id");
+            userId = obj.getInt("user");
+            mTime = Services.checkStr(obj, "created_at");
+            mTag = Services.checkStr(obj, "tag");
+            mTitle = Services.checkStr(obj, "title");
+            mContent = Services.checkStr(obj, "content");
+            imagePath = Services.checkStr(obj, "imagePath");
+            videoPath = Services.checkStr(obj, "videoPath");
+            mAddress = Services.checkStr(obj, "address");
+            mLikeCount = obj.getInt("total_likes");
+            mCommentCount = obj.getInt("total_comments");
+            mStarCount = obj.getInt("total_stars");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     // 构造函数
     public Moment(Uri avatar, String username, String tag, String title, String content, Uri picture, Uri video, String address) {

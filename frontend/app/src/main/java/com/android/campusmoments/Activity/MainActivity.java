@@ -71,8 +71,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void gotoHome() {
 
-        Intent intent = new Intent(MainActivity.this, PersonCenterActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+//        Intent intent = new Intent(MainActivity.this, PersonCenterActivity.class);
+//        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+//        // go to home activity
+        Intent intent = new Intent(MainActivity.this, HomeActivity.class);
         startActivity(intent);
     }
 
