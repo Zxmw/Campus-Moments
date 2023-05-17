@@ -14,9 +14,6 @@ public class Moment {
     private static final String TAG = "Moment";
     private int id;
     private int userId;
-    public int getUserId() {
-        return userId;
-    }
     private Uri mAvatar;
     private String avatarPath;
     public String getAvatarPath() {
