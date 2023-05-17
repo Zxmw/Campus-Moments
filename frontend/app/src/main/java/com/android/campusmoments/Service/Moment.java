@@ -41,22 +41,6 @@ public class Moment {
 
     private String[] mComments; // TODO: 评论
 
-    private Handler getUserHandler = new Handler(Looper.getMainLooper()) {
-        @Override
-        public void handleMessage(android.os.Message msg) {
-            if(msg.what == 1) {
-                try {
-                    JSONObject obj = new JSONObject(msg.obj.toString());
-                    mUsername = Services.checkStr(obj, "username");
-                    avatarPath = Services.checkStr(obj, "avatar");
-                    Log.d(TAG, "handleMessage: " + mUsername);
-                    Log.d(TAG, "handleMessage: " + avatarPath);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    };
     public void setUserInfo(JSONObject obj) {
         try {
             mUsername = Services.checkStr(obj, "username");
@@ -85,8 +69,6 @@ public class Moment {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        // TODO: Wait getUserHandler to finish
-        Services.getUser(userId, getUserHandler); // 放在try里面有可能运行不了
     }
 
 

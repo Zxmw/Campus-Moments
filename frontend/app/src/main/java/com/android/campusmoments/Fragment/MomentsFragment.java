@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,8 +34,22 @@ import java.util.List;
 public class MomentsFragment extends Fragment {
     private static final String TAG = "MomentsFragment";
     private List<Moment> mMomentList;
+    private int cnt = 0;
     private RecyclerView momentsRecyclerView;
     private MomentAdapter momentAdapter;
+    private Handler getUserHandler = new Handler(Looper.getMainLooper()) {
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            super.handleMessage(msg);
+            if(msg.what == 1) {
+                cnt++;
+                if(cnt == mMomentList.size()) {
+                    momentAdapter.setMoments(mMomentList);
+                    momentAdapter.notifyDataSetChanged();
+                }
+            }
+        }
+    };
     private Handler getAllMomentsHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(@NonNull android.os.Message msg) {
@@ -44,17 +59,16 @@ public class MomentsFragment extends Fragment {
                     JSONArray arr = new JSONArray(msg.obj.toString());
                     Log.d(TAG, "onResponse: " + arr.length());
                     mMomentList.clear();
+                    cnt = 0;
                     for (int i = 0; i < arr.length(); i++) {
                         mMomentList.add(new Moment(arr.getJSONObject(i)));
+                        Services.setMomentUser(mMomentList.get(i), getUserHandler);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                momentAdapter.setMoments(mMomentList);
-                momentAdapter.notifyDataSetChanged();
-                Log.d(TAG, "handleMessage: " + mMomentList.size());
-                Log.d(TAG, "handleMessage: " + mMomentList.get(0).getTime());
-
+//                momentAdapter.setMoments(mMomentList);
+//                momentAdapter.notifyDataSetChanged();
             } else {
                 Toast.makeText(requireActivity(), "获取动态失败", Toast.LENGTH_SHORT).show();
             }

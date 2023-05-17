@@ -761,12 +761,13 @@ public class Services {
                         moment.setUserInfo(obj);
                         Message message = new Message();
                         message.what = 1;
-                        message.obj = moment;
                         handler.sendMessage(message);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 } else {
+                    Message message = new Message();
+                    message.what = 0;
                     handler.sendMessage(msg);
                 }
             }
@@ -784,13 +785,4 @@ public class Services {
         }
         return null;
     }
-//    public static String checkObjInt(JSONObject obj, String name) {
-//        try {
-//            if (obj.isNull(name)) return null;
-//            return obj.getInt(name);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return null;
-//    }
 }
