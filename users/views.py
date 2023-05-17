@@ -9,7 +9,7 @@ from rest_framework import response, status, permissions
 from rest_framework.generics import GenericAPIView, RetrieveAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.parsers import MultiPartParser, FormParser
 
-from users.serializers import (RegisterSerializer, LoginSerializer, UserSerializer, )
+from users.serializers import *
 from .models import MyUser
 
 
@@ -63,3 +63,26 @@ class UserDetailAPIView(RetrieveUpdateDestroyAPIView):
     parser_classes = [MultiPartParser, FormParser]
     serializer_class = UserSerializer
     queryset = MyUser.objects.all()
+
+
+class FollowBlockAPIView(GenericAPIView):
+    serializer_class = FollowBlockSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            if serializer.validated_data[1] == 'follow':
+                if serializer.validated_data[2] == 'add':
+                    request.user.follow_list.add(serializer.validated_data[0])
+                else:
+                    request.user.follow_list.remove(serializer.validated_data[0])
+            else:
+                if serializer.validated_data[2] == 'add':
+                    request.user.block_list.add(serializer.validated_data[0])
+                else:
+                    request.user.block_list.remove(serializer.validated_data[0])
+            request.user.save()
+            return response.Response({"follow_list": request.user.follow_list.all().values_list('id', flat=True),
+                                      "block_list": request.user.block_list.all().values_list('id', flat=True)},
+                                     status=status.HTTP_200_OK)
+        return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

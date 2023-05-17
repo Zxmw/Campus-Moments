@@ -11,5 +11,6 @@ urlpatterns = [
     path('api/comments', CommentListAPIView.as_view(),
          name='comments'),
     path('api/comments/<int:pk>', CommentDetailAPIView.as_view(),
-         name='comments='),
+         name='comment'),
+    path('api/like-star', LikeStarAPIView.as_view(), name='like-star'),
 ]

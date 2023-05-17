@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import (RegisterView, LoginView, UserView, UserDetailAPIView, UserListAPIView)
+from .views import *
 from knox import views as knox_views
 from drf_yasg2.utils import swagger_auto_schema
 from .utils import token_param_config
@@ -18,7 +18,9 @@ urlpatterns = [
     path('api/logout', knox_views.LogoutView.as_view(), name="logout"),
     path('api/users', UserListAPIView.as_view(),
          name='users'),
-    path('api/users/<int:pk>', UserDetailAPIView.as_view(),
-         name='user'),
+    path('api/users/<int:pk>', UserDetailAPIView.as_view()),
+    path('api/follow-block', FollowBlockAPIView.as_view(),
+         name='follow-block'),
+    #path('api/logout', decorated_logout_view, name="logout"),
 ]
 

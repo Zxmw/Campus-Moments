@@ -12,24 +12,24 @@ from django.utils.translation import gettext_lazy as _
 
 class MyUserManager(BaseUserManager):
 
-    def _create_user(self, username, password, **extra_fields):
+    def _create_user(self, username, password, email, **extra_fields):
 
         if not username:
             raise ValueError("The given username must be set")
-        #email = self.normalize_email(email)
-        # if not email:
-        #     raise ValueError('User should have a email')
+        email = self.normalize_email(email)
+        if not email:
+            raise ValueError('User should have a email')
         user = self.model(username=username, **extra_fields)
         user.password = make_password(password)
         user.save(using=self._db)
         return user
 
-    def create_user(self, username, password, **extra_fields):
+    def create_user(self, username, password, email, **extra_fields):
         extra_fields.setdefault('is_staff', False)
         extra_fields.setdefault('is_superuser', False)
-        return self._create_user(username, password, **extra_fields)
+        return self._create_user(username, password, email, **extra_fields)
 
-    def create_superuser(self, username, password, **extra_fields):
+    def create_superuser(self, username, password, email, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
 
@@ -38,7 +38,7 @@ class MyUserManager(BaseUserManager):
         if extra_fields.get('is_superuser') is not True:
             raise ValueError('Superuser must have is_superuser=True.')
 
-        return self._create_user(username, password, **extra_fields)
+        return self._create_user(username, password, email, **extra_fields)
 
 
 class MyUser(AbstractBaseUser, PermissionsMixin):
@@ -62,7 +62,7 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
             "unique": _("A user with that username already exists."),
         },
     )
-    email = models.EmailField(_("email address"), blank=True, null=True)
+    email = models.EmailField(_("email address"), null=True, blank=True)
     avatar = models.ImageField(_("Image"), upload_to='avatars', null=True, blank=True)
     bio = models.TextField(blank=True)
     is_staff = models.BooleanField(
