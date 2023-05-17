@@ -2,19 +2,31 @@ package com.android.campusmoments.Adapter;
 
 import android.content.Intent;
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
+import android.media.MediaMetadataRetriever;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.VideoView;
+
+import androidx.annotation.NonNull;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import com.android.campusmoments.Activity.UserHomePageActivity;
 import com.android.campusmoments.R;
 import com.android.campusmoments.Service.Moment;
+import com.android.campusmoments.Service.Services;
 import com.squareup.picasso.Picasso;
+
+import java.util.HashMap;
 import java.util.List;
 import io.github.mthli.knife.KnifeText;
 
@@ -50,6 +62,7 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentView
 
         private KnifeText mContentKnifeText;
         private ImageView mPictureImageView;
+        private ImageView mVideoFrameView;
         private VideoView mVideoView;
         private TextView mAddressTextView;
         private TextView mLikeTextView;
@@ -65,6 +78,7 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentView
             mContentKnifeText = itemView.findViewById(R.id.content_knifetext);
             mPictureImageView = itemView.findViewById(R.id.picture_imageview);
             mVideoView = itemView.findViewById(R.id.videoView);
+            mVideoFrameView = itemView.findViewById(R.id.videoFrameView);
             mAddressTextView = itemView.findViewById(R.id.address_textview);
             mLikeTextView = itemView.findViewById(R.id.like_textview);
             mCommentTextView = itemView.findViewById(R.id.comment_textview);
@@ -113,14 +127,14 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentView
             } else {
                 mPictureImageView.setVisibility(View.GONE);
             }
+            //TODO: 直接放一个图标表示存在视频，或者放一个视频的第一帧
             if(moment.getVideoPath() != null) {
                 mVideoView.setVideoURI(Uri.parse(moment.getVideoPath()));
-                // TODO: MediaController
                 mVideoView.setVisibility(View.VISIBLE);
+                mVideoView.start();
             } else {
                 mVideoView.setVisibility(View.GONE);
             }
-
             mAddressTextView.setText(moment.getAddress());
             mLikeTextView.setText(String.valueOf(moment.getLikeCount()));
             mCommentTextView.setText(String.valueOf(moment.getCommentCount()));
@@ -156,4 +170,5 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentView
         }
         return mMoments.size();
     }
+
 }

@@ -17,6 +17,7 @@
             android:id="@+id/avatar_imageview"
             android:layout_width="50dp"
             android:layout_height="50dp"
+            android:scaleType="centerCrop"
             android:src="@drawable/avatar_1"/>
         <LinearLayout
             android:layout_width="match_parent"
@@ -94,8 +95,10 @@
             <ImageView
                 android:id="@+id/picture_imageview"
                 android:layout_marginTop="5dp"
-                android:layout_width="match_parent"
+                android:layout_gravity="left"
+                android:layout_width="200dp"
                 android:layout_height="200dp"
+                android:scaleType="centerCrop"
                 android:src="@drawable/picture_default" />
             <FrameLayout
                 android:layout_width="match_parent"

@@ -17,44 +17,33 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.graphics.Typeface;
-import android.graphics.fonts.FontStyle;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.MediaStore;
-import android.text.Editable;
-import android.text.Html;
-import android.text.SpannableStringBuilder;
-import android.text.Spanned;
-import android.text.TextWatcher;
-import android.text.style.AbsoluteSizeSpan;
-import android.text.style.ForegroundColorSpan;
-import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
+import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.MediaController;
 import android.widget.PopupMenu;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.android.campusmoments.R;
 import com.android.campusmoments.Service.Services;
+import com.squareup.picasso.Picasso;
 
-import org.apache.commons.io.FileUtils;
-
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -64,17 +53,6 @@ import java.util.Locale;
 import io.github.mthli.knife.KnifeText;
 
 public class PubActivity extends AppCompatActivity {
-
-    // knifedemo
-    private static final String BOLD = "<b>Bold</b><br><br>";
-    private static final String ITALIT = "<i>Italic</i><br><br>";
-    private static final String UNDERLINE = "<u>Underline</u><br><br>";
-    private static final String STRIKETHROUGH = "<s>Strikethrough</s><br><br>"; // <s> or <strike> or <del>
-    private static final String BULLET = "<ul><li>asdfg</li></ul>";
-    private static final String QUOTE = "<blockquote>Quote</blockquote>";
-    private static final String LINK = "<a href=\"https://github.com/mthli/Knife\">Link</a><br><br>";
-    private static final String EXAMPLE = BOLD + ITALIT + UNDERLINE + STRIKETHROUGH + BULLET + QUOTE + LINK;
-
 
 
     private static final String TAG = "PubActivity";
@@ -111,22 +89,26 @@ public class PubActivity extends AppCompatActivity {
 
     // 图片
     private ImageView pictureView;
-    private Bitmap selectedPicture;
-    private Uri selectedPictureUri;
+    private String imagePath;
 
     private ActivityResultLauncher<Intent> pickPhotoLauncher; // 从相册获取图片
     private ActivityResultLauncher<Intent> takePhotoLauncher; // 拍照获取图片
 
     // 视频
     private VideoView videoView;
-    private ImageView videoBtn;
-    private Uri selectedVideoUri;
+    private String videoPath;
+
     private ActivityResultLauncher<Intent> pickVideoLauncher; // 从相册获取视频
     private ActivityResultLauncher<Intent> takeVideoLauncher; // 拍摄获取视频
 
     // 定位
-    private TextView locationView;
-    private String addressStr;
+    private TextView positionTextView;
+    private LinearLayout positionLayout;
+    private ImageView positionImageView;
+
+    private ImageButton photoBtn;
+    private ImageButton videoBtn;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,14 +117,25 @@ public class PubActivity extends AppCompatActivity {
 
         Services.setPubMomentHandler(pubMomentHandler);
 
+        ImageView avatarView = findViewById(R.id.avatarImageView);
+        if(Services.mySelf.avatar != null){
+            Picasso.get().load(Uri.parse(Services.mySelf.avatar)).into(avatarView);
+        } else {
+            avatarView.setImageResource(R.drawable.avatar_1);
+        }
 
         // 初始化控件
         tagView = findViewById(R.id.tag_view);
         titleView = findViewById(R.id.title_view);
         pictureView = findViewById(R.id.picture_view);
         videoView = findViewById(R.id.video_view);
-        videoBtn = findViewById(R.id.video_button);
-        locationView = findViewById(R.id.locationTextView);
+        // 定位
+        positionTextView = findViewById(R.id.positionTextView);
+        positionLayout = findViewById(R.id.positionLayout);
+        positionImageView = findViewById(R.id.positionImageView);
+
+        photoBtn = findViewById(R.id.photoBtn);
+        videoBtn = findViewById(R.id.videoBtn);
 
         // KnifeText - 富文本相关
         knife = (KnifeText) findViewById(R.id.knifeText);
@@ -172,10 +165,7 @@ public class PubActivity extends AppCompatActivity {
         });
 
 
-        // MediaController - videoView - 播放/暂停/快进
-        MediaController mediaController = new MediaController(this);
-        mediaController.setAnchorView(videoView);
-        videoView.setMediaController(mediaController);
+
 
         // 初始化图片获取 - 从相册获取图片
         pickPhotoLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
@@ -186,19 +176,7 @@ public class PubActivity extends AppCompatActivity {
                             Intent data = result.getData();
                             if (data != null) {
                                 Uri uri = data.getData();
-                                try {
-                                    // 获取选择的图片
-                                    InputStream inputStream = getContentResolver().openInputStream(uri);
-                                    Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                                    pictureView.setImageBitmap(bitmap);
-
-                                    // 将选择的图片存储在局部变量中
-                                    selectedPicture = bitmap;
-                                    selectedPictureUri = uri;
-                                    // TODO: 将图片上传到服务器
-                                } catch (FileNotFoundException e) {
-                                    e.printStackTrace();
-                                }
+                                handleSelectedPicture(uri);
                             }
                         }
                     }
@@ -216,9 +194,6 @@ public class PubActivity extends AppCompatActivity {
                                 Bitmap bitmap = (Bitmap) extras.get("data");
                                 pictureView.setImageBitmap(bitmap);
 
-                                // 将拍摄的照片存储在局部变量中
-                                selectedPicture = bitmap;
-                                // TODO: 将图片上传到服务器
                             }
                         }
                     }
@@ -233,13 +208,7 @@ public class PubActivity extends AppCompatActivity {
                             Intent data = result.getData();
                             if (data != null) {
                                 Uri uri = data.getData();
-                                // 获取选择的视频
-                                videoView.setVideoURI(uri);
-                                videoView.start(); // 开始播放
-                                // 将选择的视频存储在局部变量中
-                                selectedVideoUri = uri;
-                                Log.d(TAG, "onActivityResult: "+selectedVideoUri);
-                                // TODO: 将视频上传到服务器 SaveVideo(uri)
+                                handleSelectedVideo(uri);
                             }
                         }
                     }
@@ -255,9 +224,6 @@ public class PubActivity extends AppCompatActivity {
                                 Uri uri = data.getData();
                                 videoView.setVideoURI(uri);
                                 videoView.start();  // 开始播放
-                                // 将拍摄的视频存储在局部变量中
-                                selectedVideoUri = uri;
-                                // TODO: 将视频上传到服务器 SaveVideo(uri)
                             } else {
                                 Log.e(TAG, "onActivityResult: data is null");
                             }
@@ -269,33 +235,45 @@ public class PubActivity extends AppCompatActivity {
 
     // 事件处理
     public void cancel(View view) {
-        // TODO: 取消发布
-    }
-
-    public void post(View view) {
-        // TODO: 发布
-        //  tag, title, content, pictureUri, videoUri, address
-        // TODO: username 和 avatar 从用户中心获得
-        Intent replyIntent = new Intent();
-        replyIntent.putExtra("tag", tagView.getText().toString());
-        replyIntent.putExtra("title", titleView.getText().toString());
-        replyIntent.putExtra("content", knife.toHtml());
-        replyIntent.putExtra("pictureUri", selectedPictureUri);
-        replyIntent.putExtra("videoUri", selectedVideoUri);
-        replyIntent.putExtra("address", locationView.getText().toString());
-        setResult(RESULT_OK, replyIntent);
-
-        String tag = tagView.getText().toString();
-        String title = titleView.getText().toString();
-        String content = knife.toHtml();
-        String imagePath = selectedPictureUri == null ? null : getRealPathFromURI(selectedPictureUri);
-        String videoPath = selectedVideoUri == null ? null : getRealPathFromURI(selectedVideoUri);
-        String address = locationView.getText().toString();
-        Services.pubMoment(tag, title, content, imagePath, videoPath, address);
-
         finish();
     }
 
+    public void post(View view) {
+        String tag = tagView.getText().toString();
+        String title = titleView.getText().toString();
+        String content = knife.toHtml();
+        String address = positionTextView.getText().toString();
+        Services.pubMoment(tag, title, content, imagePath, videoPath, address);
+        finish();
+    }
+
+    public void handleSelectedPicture(Uri uri) {
+        pictureView.setImageURI(uri);
+        pictureView.setVisibility(View.VISIBLE);
+        imagePath = getRealPathFromURI(uri);
+    }
+    public void handleSelectedVideo(Uri uri) {
+        videoView.setVideoURI(uri);
+        videoView.setVisibility(View.VISIBLE);
+        videoView.start();
+        videoPath = getRealPathFromURI(uri);
+        // 获取视频的宽度和高度
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+        retriever.setDataSource(videoPath);
+        String widthString = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH);
+        String heightString = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT);
+        int videoWidth = Integer.parseInt(widthString);
+        int videoHeight = Integer.parseInt(heightString);
+        // 计算视频的宽高比
+        float aspectRatio = (float) videoWidth / videoHeight;
+        // 根据视频的宽高比，设置视频的宽度和高度
+        ViewGroup.LayoutParams layoutParams = videoView.getLayoutParams();
+        layoutParams.width = videoView.getWidth();
+        layoutParams.height = (int) (layoutParams.width / aspectRatio);
+        videoView.setLayoutParams(layoutParams);
+        // MediaController 播放/暂停/快进/快退
+        videoView.setMediaController(new MediaController(this));
+    }
     public String getRealPathFromURI(Uri uri) {
         // 只有从相册中选择的图片才有真实路径，文件管理器中的图片没有真实路径
         Log.d(TAG, "getRealPathFromURI: " + uri);
@@ -314,27 +292,31 @@ public class PubActivity extends AppCompatActivity {
         return realPath;
     }
 
-    public void addPicture(View view) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(PubActivity.this);
-        builder.setItems(new String[]{"从相册中选择", "拍照"}, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which) {
-                    case 0:
-                        // 从相册中选择图片
-                        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                        intent.setType("image/*");
-                        pickPhotoLauncher.launch(intent);
-                        break;
-                    case 1:
-                        // 调用相机拍照 - ACTION_IMAGE_CAPTURE 很难用，加Secure 就很好用
-                        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE_SECURE);
-                        takePhotoLauncher.launch(takePictureIntent);
-                        break;
-                }
+    public void addPhoto(View view) {
+        PopupMenu popupMenu = new PopupMenu(PubActivity.this, photoBtn);
+        popupMenu.getMenuInflater().inflate(R.menu.photo_source_menu, popupMenu.getMenu());
+        popupMenu.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.pick_photo:
+                    // 两种选择方式，第一种只能从相册图片选择，第2种可以打开文件管理器
+                    Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+//                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+//                    intent.setType("image/*");
+                    pickPhotoLauncher.launch(intent);
+                    return true;
+                case R.id.take_photo:
+                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                        Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                        takePhotoLauncher.launch(takePhotoIntent);
+                    } else {
+                        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 1);
+                    }
+                    return true;
+                default:
+                    return false;
             }
         });
-        builder.show();
+        popupMenu.show();
     }
 
     public void addVideo(View view) {
@@ -344,9 +326,9 @@ public class PubActivity extends AppCompatActivity {
             switch (item.getItemId()) {
                 case R.id.pick_video:
                     // 两种选择方式，第一种只能从相册视频选择，第2种可以打开文件管理器
-                    //Intent pickVideoIntent = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
-                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                    intent.setType("video/*");
+                    Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
+//                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+//                    intent.setType("video/*");
                     pickVideoLauncher.launch(intent);
                     return true;
                 case R.id.record_video:
@@ -359,7 +341,6 @@ public class PubActivity extends AppCompatActivity {
                         // 未授权，需要向用户请求相机权限
                         ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.CAMERA }, 101);
                     }
-
                 default:
                     return false;
             }
@@ -387,7 +368,7 @@ public class PubActivity extends AppCompatActivity {
                 double longitude = location.getLongitude();
                 Log.d(TAG, "addLocation: latitude="+latitude+" longitude="+longitude);
                 // 将经度和纬度设置到TextView中, 保留1位小数， 这里是为了调试
-                locationView.setText(String.format("latitude=%.1f, longitude=%.1f", latitude, longitude));
+                positionTextView.setText(String.format("latitude=%.1f, longitude=%.1f", latitude, longitude));
                 // 将经度和纬度转换为地址信息
                 // TODO: Google Service 需要翻墙
                 Geocoder geocoder = new Geocoder(this, Locale.getDefault());
@@ -403,8 +384,11 @@ public class PubActivity extends AppCompatActivity {
                     Address address = addresses.get(0);
                     String addressLine = address.getAddressLine(0);
                     // 将获取到的地址信息设置到TextView中
-                    locationView.setText(addressLine);
-                    addressStr = addressLine;
+                    positionTextView.setText(addressLine);
+                    // 将地址信息的TextView设置为可见
+                    positionLayout.setVisibility(View.VISIBLE);
+                    positionImageView.setVisibility(View.VISIBLE);
+                    positionTextView.setVisibility(View.VISIBLE);
                 } else {
                     // 如果没有获取到地址信息，可以给出提示信息
                     Toast.makeText(this, "Unable to get the address.", Toast.LENGTH_SHORT).show();

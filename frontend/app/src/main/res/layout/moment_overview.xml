@@ -27,6 +27,7 @@
             android:id="@+id/avatar_imageview"
             android:layout_width="50dp"
             android:layout_height="50dp"
+            android:scaleType="centerCrop"
             android:src="@drawable/avatar_1" />
         <LinearLayout
             android:layout_width="match_parent"
@@ -93,11 +94,18 @@
 
         <ImageView
             android:id="@+id/picture_imageview"
-            android:layout_width="wrap_content"
+            android:layout_width="200dp"
             android:layout_height="200dp"
+            android:scaleType="centerCrop"
             android:layout_marginTop="5dp"
-            android:layout_gravity="center"
+            android:layout_gravity="start"
             android:src="@drawable/picture_default" />
+        <ImageView
+            android:id="@+id/videoFrameView"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:layout_marginTop="5dp"/>
 
         <FrameLayout
             android:id="@+id/videoContainer"
@@ -107,7 +115,7 @@
             <VideoView
                 android:id="@+id/videoView"
                 android:layout_width="match_parent"
-                android:layout_height="400dp"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center" />
         </FrameLayout>

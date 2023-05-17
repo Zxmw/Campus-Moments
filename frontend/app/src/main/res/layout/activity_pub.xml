@@ -46,9 +46,10 @@
 
 
         <ImageView
-            android:id="@+id/avatar"
+            android:id="@+id/avatarImageView"
             android:layout_width="50dp"
             android:layout_height="50dp"
+            android:scaleType="centerCrop"
             android:src="@drawable/avatar_1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.01"
@@ -68,7 +69,7 @@
             android:scrollbars="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/avatar"
+            app:layout_constraintStart_toEndOf="@id/avatarImageView"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="SpeakableTextPresentCheck">
 
@@ -101,7 +102,7 @@
                     android:id="@+id/title_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="标题"
+                    android:hint="标题必须填写"
                     android:maxLength="15"
                     android:maxLines="1"
                     android:textColor="@color/black"
@@ -136,34 +137,47 @@
                     android:layout_marginLeft="5dp"
                     android:layout_marginRight="5dp"/>
                 <ImageView
+                    android:layout_marginTop="5dp"
                     android:id="@+id/picture_view"
-                    android:layout_width="match_parent"
+                    android:layout_gravity="left"
+                    android:layout_marginLeft="5dp"
+                    android:layout_width="200dp"
                     android:layout_height="200dp"
-                    android:src="@drawable/picture_default" />
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/picture_default"
+                    android:visibility="gone"/>
+
 
                 <VideoView
                     android:id="@+id/video_view"
+                    android:layout_gravity="left"
                     android:layout_marginTop="5dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="200dp" />
+                    android:layout_marginLeft="5dp"
+                    android:layout_width="200dp"
+                    android:layout_height="wrap_content" />
+
 
                 <LinearLayout
+                    android:id="@+id/positionLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:paddingVertical="3dp">
+                    android:paddingVertical="3dp"
+                    android:visibility="gone">
                     <ImageView
+                        android:id="@+id/positionImageView"
                         android:layout_width="20dp"
                         android:layout_height="20dp"
-                        android:src="@drawable/ic_location_blue" />
+                        android:src="@drawable/ic_location_blue"
+                        android:visibility="gone"/>
                     <TextView
-                        android:id="@+id/locationTextView"
+                        android:id="@+id/positionTextView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="5dp"
-                        android:text="THU-紫荆公寓1号楼"
                         android:textSize="13sp"
-                        android:textColor="@color/blue" />
+                        android:textColor="@color/blue"
+                        android:visibility="gone"/>
                 </LinearLayout>
 
             </LinearLayout>
@@ -186,29 +200,33 @@
         android:paddingTop="7dp"
         android:paddingBottom="7dp">
 
-        <ImageView
+        <ImageButton
+            android:id="@+id/photoBtn"
             android:layout_width="0dp"
             android:layout_height="25dp"
             android:layout_weight="1"
-            android:onClick="addPicture"
-            android:src="@drawable/ic_camera_grey" />
+            android:onClick="addPhoto"
+            android:src="@drawable/ic_camera_grey"
+            android:background="?android:selectableItemBackground"/>
 
-        <ImageView
-            android:id="@+id/video_button"
+        <ImageButton
+            android:id="@+id/videoBtn"
             android:layout_width="0dp"
             android:layout_height="25dp"
             android:layout_weight="1"
             android:onClick="addVideo"
-            android:src="@drawable/ic_video_grey" />
+            android:src="@drawable/ic_video_grey"
+            android:background="?android:selectableItemBackground"/>
 
-        <ImageView
+        <ImageButton
             android:layout_width="0dp"
             android:layout_height="25dp"
             android:layout_weight="1"
             android:onClick="addLocation"
-            android:src="@drawable/ic_location_grey" />
-    </LinearLayout>
+            android:src="@drawable/ic_location_grey"
+            android:background="?android:selectableItemBackground" />
 
+    </LinearLayout>
 
 </LinearLayout>
 

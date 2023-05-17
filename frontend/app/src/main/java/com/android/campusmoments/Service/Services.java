@@ -1,11 +1,13 @@
 package com.android.campusmoments.Service;
 
+import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 
 import com.android.campusmoments.Activity.AvatarConfigActivity;
 import com.android.campusmoments.Activity.BioConfigActivity;
@@ -804,6 +806,7 @@ public class Services {
             }
         });
     }
+
 
     /* 网络工具 */
     public static String checkObjStr(JSONObject obj, String name) {
