@@ -235,7 +235,7 @@ public class Services {
             }
         });
     }
-    public static void getUser(int id) {
+    public static void getUserById(int id) {
         Request request = new Request.Builder()
                 .url(GET_USER_URL + id)
                 .addHeader("Authorization", "Token " + token)
@@ -614,7 +614,7 @@ public class Services {
     }
 
     // 获取所有动态
-    public static void getMoments(Handler handler) {
+    public static void getMomentsAll(Handler handler) {
         Request request = new Request.Builder()
                 .addHeader("Authorization", "Token " + token)
                 .url(GET_MOMENTS_URL)
@@ -628,7 +628,6 @@ public class Services {
                 message.what = 0;
                 handler.sendMessage(message);
             }
-
             @Override
             public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws java.io.IOException {
                 if (response.code() != 200) {
@@ -683,8 +682,40 @@ public class Services {
             }
         });
     }
+    // 获取指定用户的动态
+    public static void getMomentsByUser(int id, Handler handler) {
+        Request request = new Request.Builder()
+                .addHeader("Authorization", "Token " + token)
+                .url(GET_MOMENTS_URL + id)
+                .get()
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NonNull okhttp3.Call call, @NonNull java.io.IOException e) {
+                Log.d(TAG, "onFailure: " + e.getMessage());
+                Message message = new Message();
+                message.what = 0;
+                handler.sendMessage(message);
+            }
+
+            @Override
+            public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws java.io.IOException {
+                if (response.code() != 200) {
+                    Message message = new Message();
+                    message.what = 0;
+                    handler.sendMessage(message);
+                    return;
+                }
+                Message message = new Message();
+                message.what = 1;
+                message.obj = response.body().string();
+                Log.d(TAG, "onResponse: " + message.obj);
+                handler.sendMessage(message);
+            }
+        });
+    }
     // 按照id获取动态
-    public static void getDetailedMoment(int id, Handler handler) {
+    public static void getMomentById(int id, Handler handler) {
         Request request = new Request.Builder()
                 .addHeader("Authorization", "Token " + token)
                 .url(GET_MOMENT_URL + id)
@@ -717,7 +748,7 @@ public class Services {
         });
     }
     // 按照userId获取User
-    public static void getUser(int id, Handler handler) {
+    public static void getUserById(int id, Handler handler) {
         Request request = new Request.Builder()
                 .addHeader("Authorization", "Token " + token)
                 .url(GET_USER_URL + id)
@@ -748,9 +779,9 @@ public class Services {
             }
         });
     }
-    // 从moment中获取user
+    // 为动态设置用户信息
     public static void setMomentUser(Moment moment, Handler handler) {
-        getUser(moment.getUserId(), new Handler(Looper.getMainLooper()) {
+        getUserById(moment.getUserId(), new Handler(Looper.getMainLooper()) {
             @Override
             public void handleMessage(@NonNull Message msg) {
                 super.handleMessage(msg);
@@ -774,9 +805,8 @@ public class Services {
         });
     }
 
-
     /* 网络工具 */
-    public static String checkStr(JSONObject obj, String name) {
+    public static String checkObjStr(JSONObject obj, String name) {
         try {
             if (obj.isNull(name)) return null;
             return obj.getString(name);

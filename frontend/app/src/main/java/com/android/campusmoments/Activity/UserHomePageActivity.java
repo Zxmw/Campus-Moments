@@ -70,7 +70,7 @@ public class UserHomePageActivity extends AppCompatActivity {
         //get user id from intent
         id = getIntent().getIntExtra("id", 0);
         // get user info from server
-        Services.getUser(id);
+        Services.getUserById(id);
         Services.getMomentsByUser(id);
     }
 
@@ -198,19 +198,6 @@ public class UserHomePageActivity extends AppCompatActivity {
 //                Toast.makeText(getContext(), "clicked: "+position, Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(UserHomePageActivity.this, DetailedActivity.class);
                 intent.putExtra("id", mMomentList.get(position).getId());
-                intent.putExtra("position", position);
-                intent.putExtra("avatarUri", mMomentList.get(position).getAvatar());
-                intent.putExtra("username", mMomentList.get(position).getUsername());
-                intent.putExtra("time", mMomentList.get(position).getTime());
-                intent.putExtra("tag", mMomentList.get(position).getTag());
-                intent.putExtra("title", mMomentList.get(position).getTitle());
-                intent.putExtra("content", mMomentList.get(position).getContent());
-                intent.putExtra("pictureUri", mMomentList.get(position).getPicture());
-                intent.putExtra("videoUri", mMomentList.get(position).getVideo());
-                intent.putExtra("address", mMomentList.get(position).getAddress());
-                intent.putExtra("likeCount", mMomentList.get(position).getLikeCount());
-                intent.putExtra("commentCount", mMomentList.get(position).getCommentCount());
-                intent.putExtra("starCount", mMomentList.get(position).getStarCount());
                 startActivity(intent);
                 // TODO: adapter.notifyDataSetChanged(); 评论后刷新
             }

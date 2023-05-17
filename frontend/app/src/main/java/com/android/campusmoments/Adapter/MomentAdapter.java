@@ -7,23 +7,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.VideoView;
-
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.android.campusmoments.Activity.UserHomePageActivity;
-import com.android.campusmoments.Activity.DetailedActivity;
 import com.android.campusmoments.R;
 import com.android.campusmoments.Service.Moment;
 import com.squareup.picasso.Picasso;
-
 import java.util.List;
-
 import io.github.mthli.knife.KnifeText;
 
 public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentViewHolder> {
@@ -72,7 +64,7 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentView
             mTitleTextView = itemView.findViewById(R.id.title_textview);
             mContentKnifeText = itemView.findViewById(R.id.content_knifetext);
             mPictureImageView = itemView.findViewById(R.id.picture_imageview);
-            mVideoView = itemView.findViewById(R.id.video_videoview);
+            mVideoView = itemView.findViewById(R.id.videoView);
             mAddressTextView = itemView.findViewById(R.id.address_textview);
             mLikeTextView = itemView.findViewById(R.id.like_textview);
             mCommentTextView = itemView.findViewById(R.id.comment_textview);
@@ -109,7 +101,12 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentView
             mTimeTextView.setText(moment.getTime());
             mTagTextView.setText(moment.getTag());
             mTitleTextView.setText(moment.getTitle());
-            mContentKnifeText.fromHtml(moment.getContent());
+            if (moment.getContent() != null && !moment.getContent().equals("")) {
+                mContentKnifeText.setVisibility(View.VISIBLE);
+                mContentKnifeText.fromHtml(moment.getContent());
+            } else {
+                mContentKnifeText.setVisibility(View.GONE);
+            }
             if(moment.getImagePath() != null) {
                 Picasso.get().load(Uri.parse(moment.getImagePath())).into(mPictureImageView);
                 mPictureImageView.setVisibility(View.VISIBLE);
@@ -118,8 +115,7 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentView
             }
             if(moment.getVideoPath() != null) {
                 mVideoView.setVideoURI(Uri.parse(moment.getVideoPath()));
-//                mVideoView.setMediaController(new MediaController(mContext));
-//                mVideoView.start();
+                // TODO: MediaController
                 mVideoView.setVisibility(View.VISIBLE);
             } else {
                 mVideoView.setVisibility(View.GONE);

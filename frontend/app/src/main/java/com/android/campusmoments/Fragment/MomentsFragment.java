@@ -1,7 +1,6 @@
 package com.android.campusmoments.Fragment;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -33,6 +32,10 @@ import java.util.List;
 
 public class MomentsFragment extends Fragment {
     private static final String TAG = "MomentsFragment";
+    public static final int TYPE_ALL = 0;
+    public static final int TYPE_PERSON = 1;
+    private int type;
+    private int userId = -1;
     private List<Moment> mMomentList;
     private int cnt = 0;
     private RecyclerView momentsRecyclerView;
@@ -50,7 +53,7 @@ public class MomentsFragment extends Fragment {
             }
         }
     };
-    private Handler getAllMomentsHandler = new Handler(Looper.getMainLooper()) {
+    private Handler getMomentsHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(@NonNull android.os.Message msg) {
             super.handleMessage(msg);
@@ -67,35 +70,26 @@ public class MomentsFragment extends Fragment {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-//                momentAdapter.setMoments(mMomentList);
-//                momentAdapter.notifyDataSetChanged();
             } else {
                 Toast.makeText(requireActivity(), "获取动态失败", Toast.LENGTH_SHORT).show();
             }
         }
     };
-    public MomentsFragment() {
-
+    public MomentsFragment(int type, int userId) {
+        this.type = type;
+        this.userId = userId;
     }
-
+    public MomentsFragment() {
+        this.type = TYPE_ALL;
+    }
     public void refresh() {
-        Services.getMoments(getAllMomentsHandler);
+        Services.getMomentsAll(getMomentsHandler);
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         mMomentList = new ArrayList<>();
-//        mMomentList.add(new Moment(null, "Sweetnow", "二手交易", "THU春日足迹", "几朵园子里的春花和鸳鸯",
-//                null, null, "THU-102b"));
-//        mMomentList.add(new Moment(Uri.parse("android.resource://" + requireActivity().getPackageName() + "/" + R.drawable.picture2),
-//                "王政", "校园日常", "北大北大", "北大我的北大我真的好想进去看看。",
-//                Uri.parse("android.resource://" + requireActivity().getPackageName() + "/" + R.drawable.picture1), null, "PKU-102a"));
-//        mMomentList.add(new Moment(Uri.parse("android.resource://" + requireActivity().getPackageName() + "/" + R.drawable.picture1),
-//        "geh", "美食", "美食美食不辜负", "学校的好吃的和学校周边的好吃的。",
-//                Uri.parse("android.resource://" + requireActivity().getPackageName() + "/" + R.drawable.picture3), null, "PKU"));
-
     }
 
     @Override
@@ -113,40 +107,15 @@ public class MomentsFragment extends Fragment {
 //                Toast.makeText(getContext(), "clicked: "+position, Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(getActivity(), DetailedActivity.class);
                 intent.putExtra("id", mMomentList.get(position).getId());
-                intent.putExtra("position", position);
-                intent.putExtra("avatarUri", mMomentList.get(position).getAvatar());
-                intent.putExtra("username", mMomentList.get(position).getUsername());
-                intent.putExtra("time", mMomentList.get(position).getTime());
-                intent.putExtra("tag", mMomentList.get(position).getTag());
-                intent.putExtra("title", mMomentList.get(position).getTitle());
-                intent.putExtra("content", mMomentList.get(position).getContent());
-                intent.putExtra("pictureUri", mMomentList.get(position).getPicture());
-                intent.putExtra("videoUri", mMomentList.get(position).getVideo());
-                intent.putExtra("address", mMomentList.get(position).getAddress());
-                intent.putExtra("likeCount", mMomentList.get(position).getLikeCount());
-                intent.putExtra("commentCount", mMomentList.get(position).getCommentCount());
-                intent.putExtra("starCount", mMomentList.get(position).getStarCount());
                 startActivity(intent);
-                // TODO: adapter.notifyDataSetChanged(); 评论后刷新
             }
         });
         momentsRecyclerView.setAdapter(momentAdapter);
-
-        Services.getMoments(getAllMomentsHandler);
-
+        if (type == TYPE_ALL) {
+            Services.getMomentsAll(getMomentsHandler);
+        } else if(type == TYPE_PERSON) {
+            Services.getMomentsByUser(userId, getMomentsHandler);
+        }
         return view;
-    }
-
-    public void addMoment(@NonNull Intent data){
-        // tag, title, content, pictureUri, videoUri, address
-        String username = "guo";
-        String tag = data.getStringExtra("tag");
-        String title = data.getStringExtra("title");
-        String content = data.getStringExtra("content");
-        Uri pictureUri = data.getParcelableExtra("pictureUri");
-        Uri videoUri = data.getParcelableExtra("videoUri");
-        String address = data.getStringExtra("address");
-        mMomentList.add(0, new Moment(null, username, tag, title, content, pictureUri, videoUri, address));
-        momentAdapter.notifyDataSetChanged();
     }
 }
