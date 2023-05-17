@@ -15,7 +15,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
 import android.widget.Toast;
 
 
@@ -74,14 +73,14 @@ public class MomentsFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         mMomentList = new ArrayList<>();
-        mMomentList.add(new Moment(null, "Sweetnow", "二手交易", "THU春日足迹", "几朵园子里的春花和鸳鸯",
-                null, null, "THU-102b"));
-        mMomentList.add(new Moment(Uri.parse("android.resource://" + requireActivity().getPackageName() + "/" + R.drawable.picture2),
-                "王政", "校园日常", "北大北大", "北大我的北大我真的好想进去看看。",
-                Uri.parse("android.resource://" + requireActivity().getPackageName() + "/" + R.drawable.picture1), null, "PKU-102a"));
-        mMomentList.add(new Moment(Uri.parse("android.resource://" + requireActivity().getPackageName() + "/" + R.drawable.picture1),
-        "geh", "美食", "美食美食不辜负", "学校的好吃的和学校周边的好吃的。",
-                Uri.parse("android.resource://" + requireActivity().getPackageName() + "/" + R.drawable.picture3), null, "PKU"));
+//        mMomentList.add(new Moment(null, "Sweetnow", "二手交易", "THU春日足迹", "几朵园子里的春花和鸳鸯",
+//                null, null, "THU-102b"));
+//        mMomentList.add(new Moment(Uri.parse("android.resource://" + requireActivity().getPackageName() + "/" + R.drawable.picture2),
+//                "王政", "校园日常", "北大北大", "北大我的北大我真的好想进去看看。",
+//                Uri.parse("android.resource://" + requireActivity().getPackageName() + "/" + R.drawable.picture1), null, "PKU-102a"));
+//        mMomentList.add(new Moment(Uri.parse("android.resource://" + requireActivity().getPackageName() + "/" + R.drawable.picture1),
+//        "geh", "美食", "美食美食不辜负", "学校的好吃的和学校周边的好吃的。",
+//                Uri.parse("android.resource://" + requireActivity().getPackageName() + "/" + R.drawable.picture3), null, "PKU"));
 
     }
 
@@ -91,7 +90,7 @@ public class MomentsFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_moments, container, false);
 
-        momentsRecyclerView = view.findViewById(R.id.momentsRecyclerView);
+        momentsRecyclerView = view.findViewById(R.id.user_moments_recycler_view);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         momentsRecyclerView.setLayoutManager(layoutManager);
         momentAdapter = new MomentAdapter(mMomentList, new MomentAdapter.OnItemClickListener() {

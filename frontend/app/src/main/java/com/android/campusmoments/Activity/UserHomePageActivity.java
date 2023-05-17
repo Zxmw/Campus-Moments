@@ -2,7 +2,12 @@ package com.android.campusmoments.Activity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.android.campusmoments.Adapter.MomentAdapter;
 import com.android.campusmoments.R;
+import com.android.campusmoments.Service.Moment;
 import com.android.campusmoments.Service.Services;
 import com.android.campusmoments.Service.User;
 import com.squareup.picasso.Picasso;
@@ -21,8 +26,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserHomePageActivity extends AppCompatActivity {
     public static final int FOLLOW_FAIL = 0;
@@ -35,6 +44,8 @@ public class UserHomePageActivity extends AppCompatActivity {
     public static final int UNBLOCK_SUCCESS = 7;
     public static final int GET_USER_SUCCESS = 8;
     public static final int GET_USER_FAIL = 9;
+    public static final int GET_USER_MOMENTS_SUCCESS = 10;
+    public static final int GET_USER_MOMENTS_FAIL = 11;
     private static int id;
     private User user;
     private boolean isFollowed = false;
@@ -46,19 +57,24 @@ public class UserHomePageActivity extends AppCompatActivity {
     private Button followButton;
     private Button privateMessageButton;
     private Button blockButton;
+    private RecyclerView userMomentsRecyclerView;
+    private MomentAdapter momentAdapter;
+    private List<Moment> mMomentList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_home_page);
+        mMomentList = new ArrayList<>();
         Services.setUserHomePageHandler(handler);
         //get user id from intent
         id = getIntent().getIntExtra("id", 0);
         // get user info from server
         Services.getUser(id);
+        Services.getMomentsByUser(id);
     }
 
-    private void init() {
+    private void initUserInfo() {
         avatar = findViewById(R.id.user_avatar);
         userName = findViewById(R.id.username_text);
         userId = findViewById(R.id.user_id_text);
@@ -70,7 +86,7 @@ public class UserHomePageActivity extends AppCompatActivity {
         privateMessageButton = findViewById(R.id.private_message_button);
         blockButton = findViewById(R.id.block_button);
         if (user.avatar == null){
-            avatar.setImageResource(R.drawable.avatar_default);
+            avatar.setImageResource(R.drawable.avatar_1);
         }
         else {
             Picasso.get().load(Uri.parse(user.avatar)).into(avatar);
@@ -82,6 +98,7 @@ public class UserHomePageActivity extends AppCompatActivity {
             blockButton.setVisibility(View.GONE);
         }
         if (Services.mySelf.blockList.contains(user.id)) {
+            isBlocked = true;
             blockButton.setText("取消屏蔽");
             followButton.setVisibility(View.GONE);
         }
@@ -138,9 +155,68 @@ public class UserHomePageActivity extends AppCompatActivity {
                 case GET_USER_FAIL:
                     getUserFail();
                     break;
+                case GET_USER_MOMENTS_SUCCESS:
+                    try {
+                        getUserMomentsSuccess(msg.obj);
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+                    break;
+                case GET_USER_MOMENTS_FAIL:
+                    getUserMomentsFail();
+                    break;
             }
         }
     };
+
+    private void getUserMomentsFail() {
+        Toast.makeText(this, "获取用户动态失败", Toast.LENGTH_SHORT).show();
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private void getUserMomentsSuccess(Object obj) throws JSONException {
+        initMomentsRecyclerView();
+        JSONArray arr = new JSONArray(obj.toString());
+        mMomentList.clear();
+        for (int i = 0; i < arr.length(); i++) {
+            Log.d("moment", arr.getJSONObject(i).toString());
+            mMomentList.add(new Moment(arr.getJSONObject(i)));
+        }
+
+        momentAdapter.setMoments(mMomentList);
+        momentAdapter.notifyDataSetChanged();
+
+    }
+
+    private void initMomentsRecyclerView() {
+        userMomentsRecyclerView = findViewById(R.id.user_moments_recycler_view);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        userMomentsRecyclerView.setLayoutManager(layoutManager);
+        momentAdapter = new MomentAdapter(mMomentList, new MomentAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+//                Toast.makeText(getContext(), "clicked: "+position, Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(UserHomePageActivity.this, DetailedActivity.class);
+                intent.putExtra("id", mMomentList.get(position).getId());
+                intent.putExtra("position", position);
+                intent.putExtra("avatarUri", mMomentList.get(position).getAvatar());
+                intent.putExtra("username", mMomentList.get(position).getUsername());
+                intent.putExtra("time", mMomentList.get(position).getTime());
+                intent.putExtra("tag", mMomentList.get(position).getTag());
+                intent.putExtra("title", mMomentList.get(position).getTitle());
+                intent.putExtra("content", mMomentList.get(position).getContent());
+                intent.putExtra("pictureUri", mMomentList.get(position).getPicture());
+                intent.putExtra("videoUri", mMomentList.get(position).getVideo());
+                intent.putExtra("address", mMomentList.get(position).getAddress());
+                intent.putExtra("likeCount", mMomentList.get(position).getLikeCount());
+                intent.putExtra("commentCount", mMomentList.get(position).getCommentCount());
+                intent.putExtra("starCount", mMomentList.get(position).getStarCount());
+                startActivity(intent);
+                // TODO: adapter.notifyDataSetChanged(); 评论后刷新
+            }
+        });
+        userMomentsRecyclerView.setAdapter(momentAdapter);
+    }
 
     private void getUserFail() {
         Toast.makeText(this, "获取用户信息失败", Toast.LENGTH_SHORT).show();
@@ -152,7 +228,7 @@ public class UserHomePageActivity extends AppCompatActivity {
         try {
             jsonObject = new JSONObject(obj.toString());
             user = new User(jsonObject);
-            init();
+            initUserInfo();
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }

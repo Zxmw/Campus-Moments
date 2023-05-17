@@ -1,5 +1,6 @@
 package com.android.campusmoments.Adapter;
 
+import android.content.Intent;
 import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
@@ -15,6 +16,7 @@ import android.widget.VideoView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.campusmoments.Activity.UserHomePageActivity;
 import com.android.campusmoments.Activity.DetailedActivity;
 import com.android.campusmoments.R;
 import com.android.campusmoments.Service.Moment;
@@ -79,13 +81,31 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentView
         public void bindData(Moment moment) {
             // 将数据绑定到ViewHolder中的视图中
             if(moment.getAvatarPath() != null) {
+                Log.d(TAG, moment.getAvatarPath());
                 Picasso.get().load(Uri.parse(moment.getAvatarPath())).into(mAvatarImageView);
+
                 mAvatarImageView.setVisibility(View.VISIBLE);
             } else {
                 Log.d(TAG, "bindData: avatarPath is null");
                 mAvatarImageView.setImageResource(R.drawable.avatar_1); // 默认头像
             }
+            mAvatarImageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(v.getContext(), UserHomePageActivity.class);
+                    intent.putExtra("id", moment.getUserId());
+                    v.getContext().startActivity(intent);
+                }
+            });
             mUsernameTextView.setText(moment.getUsername());
+            mUsernameTextView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(v.getContext(), UserHomePageActivity.class);
+                    intent.putExtra("id", moment.getUserId());
+                    v.getContext().startActivity(intent);
+                }
+            });
             mTimeTextView.setText(moment.getTime());
             mTagTextView.setText(moment.getTag());
             mTitleTextView.setText(moment.getTitle());

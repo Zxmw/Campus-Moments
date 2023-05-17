@@ -13,9 +13,6 @@ import java.util.Date;
 public class Moment {
     private static final String TAG = "Moment";
     private int id;
-    public int getId() {
-        return id;
-    }
     private int userId;
     public int getUserId() {
         return userId;
@@ -114,6 +111,12 @@ public class Moment {
         mAddress = address;
     }
     // get-function
+    public int getId() {
+        return id;
+    }
+    public int getUserId() {
+        return userId;
+    }
     public Uri getAvatar() {
         return mAvatar;
     }
