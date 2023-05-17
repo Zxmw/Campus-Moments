@@ -12,21 +12,21 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import static com.android.campusmoments.Service.Config.*;
 import com.android.campusmoments.R;
 import com.android.campusmoments.Service.Services;
 
 public class RegisterActivity extends AppCompatActivity {
-    public static final int REGISTER_SUCCESS = 0;
-    public static final int REGISTER_FAIL = 1;
+    TextView email_register;
     TextView username_register;
     TextView password_register;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+        email_register = findViewById(R.id.email_login);
         username_register = findViewById(R.id.username_login);
         password_register = findViewById(R.id.password_login);
-        Services.setRegisterHandler(handler);
     }
 
     @SuppressLint("HandlerLeak")
@@ -43,17 +43,22 @@ public class RegisterActivity extends AppCompatActivity {
     };
 
     public void register(View view) {
+        String email = email_register.getText().toString();
         String username = username_register.getText().toString();
         String password = password_register.getText().toString();
         // 如果用户名或密码为空
-        if (username.equals("") || password.equals("")) {
+        if (email.equals("")) {
+            Toast.makeText(RegisterActivity.this, "邮箱不能为空", Toast.LENGTH_SHORT).show();
+        } else if (!email.contains("@")) {
+            Toast.makeText(RegisterActivity.this, "邮箱格式不正确", Toast.LENGTH_SHORT).show();
+        } else if (username.equals("") || password.equals("")) {
             Toast.makeText(RegisterActivity.this, "用户名或密码不能为空", Toast.LENGTH_SHORT).show();
         } else if (username.length() < 4 || username.length() > 20) {
             Toast.makeText(RegisterActivity.this, "用户名长度应为4-20位", Toast.LENGTH_SHORT).show();
         } else if (password.length() < 6 || password.length() > 20) {
             Toast.makeText(RegisterActivity.this, "密码长度应为6-20位", Toast.LENGTH_SHORT).show();
         } else {
-            Services.register(username, password);
+            Services.register(email, username, password, handler);
         }
     }
 

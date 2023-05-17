@@ -42,12 +42,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Services.setTokenHandler(handler);
         mPreferences = getSharedPreferences("user_info", MODE_PRIVATE);
         String token = mPreferences.getString("token", null);
+        Log.d("token111", token);
         if (token != null) {
             Services.token = token;
-            Services.tokenCheck(token);
+            Services.tokenCheck(token, handler);
         }
         Button loginButton = findViewById(R.id.button_login);
         loginButton.setOnClickListener(v -> {
@@ -66,7 +66,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void gotoHome() {
-        Toast.makeText(MainActivity.this, "欢迎回来，"+Services.mySelf.username, Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(MainActivity.this, HomeActivity.class);
         intent.putExtra("id", 1);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);

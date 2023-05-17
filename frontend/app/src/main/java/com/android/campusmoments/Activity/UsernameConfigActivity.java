@@ -11,7 +11,7 @@ import android.os.Message;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import static com.android.campusmoments.Service.Config.*;
 import com.android.campusmoments.R;
 import com.android.campusmoments.Service.Services;
 
@@ -19,13 +19,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class UsernameConfigActivity extends AppCompatActivity {
-    public static final int SET_USERNAME_SUCCESS = 0;
-    public static final int SET_USERNAME_FAIL = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_username_config);
-        Services.setSetUsernameHandler(handler);
     }
 
     @SuppressLint("HandlerLeak")
@@ -48,7 +46,7 @@ public class UsernameConfigActivity extends AppCompatActivity {
     public void setUsername(View view) {
         TextView username_view = findViewById(R.id.user_id_text);
         String username = username_view.getText().toString();
-        Services.setUsername(username);
+        Services.setUsername(username, handler);
     }
 
     private void successSetUsername(Object obj) throws JSONException {

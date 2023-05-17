@@ -1,5 +1,4 @@
 package com.android.campusmoments.Service;
-
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -7,6 +6,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import static com.android.campusmoments.Service.Config.*;
 import com.android.campusmoments.Activity.AvatarConfigActivity;
 import com.android.campusmoments.Activity.BioConfigActivity;
 import com.android.campusmoments.Activity.LoginActivity;
@@ -39,72 +39,17 @@ import okhttp3.RequestBody;
 public class Services {
 
     private static final String TAG = "Services";
-    private static final String USER_BASE_URL = "http://10.0.2.2:8000/users/api/";
-    private static final String LOGIN_URL = USER_BASE_URL + "login";
-    private static final String REGISTER_URL = USER_BASE_URL + "register";
-    private static final String SELF_URL = USER_BASE_URL + "self";
-    private static final String GET_USER_URL = USER_BASE_URL + "users/";
-    private static final String PATCH_USER_URL = USER_BASE_URL + "users/";
-    private static final String LOGOUT_URL = USER_BASE_URL + "logout";
-
-    private static final String MOMENTS_BASE_URL = "http://10.0.2.2:8000/moments/api/";
-    private static final String PUB_MOMENT_URL = MOMENTS_BASE_URL + "moments";
-    private static final String GET_MOMENTS_URL = MOMENTS_BASE_URL + "moments";
-    private static final String GET_MOMENT_URL = MOMENTS_BASE_URL + "moments/";
     public static String token = null;
-    private static final MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
-    private static final MediaType MEDIA_TYPE_FORM_DATA = MediaType.parse("multipart/form-data; charset=utf-8");
+
     private static final OkHttpClient client = new OkHttpClient.Builder()
             .connectTimeout(5, TimeUnit.SECONDS)
             .readTimeout(5, TimeUnit.SECONDS)
             .writeTimeout(10, TimeUnit.SECONDS)
-            .retryOnConnectionFailure(true)
+            .retryOnConnectionFailure(false)
             .build();
-    private static Handler tokenHandler = null;
-    private static Handler loginHandler = null;
-    private static Handler registerHandler = null;
-    private static Handler setAvatarHandler = null;
-    private static Handler setUsernameHandler = null;
-    private static Handler setBioHandler = null;
-    private static Handler setPasswordHandler = null;
-    private static Handler logoutHandler = null;
-    private static Handler userHomePageHandler = null;
-    private static Handler pubMomentHandler = null;
 
     public static User mySelf = null;
-    public static void setLoginHandler(Handler _loginHandler) {
-        loginHandler = _loginHandler;
-    }
-    public static void setRegisterHandler(Handler _registerHandler) {
-        registerHandler = _registerHandler;
-    }
-    public static void setSetAvatarHandler(Handler _setAvatarHandler) {
-        setAvatarHandler = _setAvatarHandler;
-    }
-    public static void setSetUsernameHandler(Handler _setUsernameHandler) {
-        setUsernameHandler = _setUsernameHandler;
-    }
-    public static void setTokenHandler(Handler _tokenHandler) {
-        tokenHandler = _tokenHandler;
-    }
-    public static void setSetBioHandler(Handler _setBioHandler) {
-        setBioHandler = _setBioHandler;
-    }
-    public static void setSetPasswordHandler(Handler _setPasswordHandler) {
-        setPasswordHandler = _setPasswordHandler;
-    }
-    public static void setUserHomePageHandler(Handler _userHomePageHandler) {
-        userHomePageHandler = _userHomePageHandler;
-    }
-    public static void setLogoutHandler(Handler _logoutHandler) {
-        logoutHandler = _logoutHandler;
-    }
-
-    public static void setPubMomentHandler(Handler _pubMomentHandler) {
-        pubMomentHandler = _pubMomentHandler;
-    }
-
-    public static void tokenCheck(String token) {
+    public static void tokenCheck(String token, Handler handler) {
         Request request = new Request.Builder()
                 .addHeader("Authorization", "Token " + token)
                 .url(SELF_URL)
@@ -129,17 +74,17 @@ public class Services {
                     mySelf = new User(jsonObject);
                     Message message = new Message();
                     message.what = MainActivity.TOKEN_VALID;
-                    tokenHandler.sendMessage(message);
+                    handler.sendMessage(message);
                 } catch (JSONException e) {
                     e.printStackTrace();
                     Message message = new Message();
                     message.what = MainActivity.TOKEN_INVALID;
-                    tokenHandler.sendMessage(message);
+                    handler.sendMessage(message);
                 }
             }
         });
     }
-    public static void login(String username, String password) {
+    public static void login(String username, String password, Handler handler) {
         String params = "{\"username\":\"" + username + "\",\"password\":\"" + password + "\"}";
         Log.d(TAG, "run: " + params);
         Request request = new Request.Builder()
@@ -152,7 +97,7 @@ public class Services {
                 Log.d(TAG, "onFailure: " + e.getMessage());
                 Message message = new Message();
                 message.what = LoginActivity.LOGIN_FAIL;
-                loginHandler.sendMessage(message);
+                handler.sendMessage(message);
             }
 
             @Override
@@ -161,7 +106,7 @@ public class Services {
                 if (response.code() != 200) {
                     Message message = new Message();
                     message.what = LoginActivity.LOGIN_FAIL;
-                    loginHandler.sendMessage(message);
+                    handler.sendMessage(message);
                     return;
                 }
                 Message message = new Message();
@@ -169,13 +114,13 @@ public class Services {
                 assert response.body() != null;
                 message.obj = response.body().string();
                 Log.d(TAG, "onResponse: " + message.obj);
-                loginHandler.sendMessage(message);
+                handler.sendMessage(message);
             }
         });
     }
 
-    public static void register(String username, String password) {
-        String params = "{\"username\":\"" + username + "\",\"password\":\"" + password + "\"}";
+    public static void register(String email, String username, String password, Handler handler) {
+        String params = "{\"email\":\"" + email + "\",\"username\":\"" + username + "\",\"password\":\"" + password + "\"}";
         Log.d(TAG, "run: " + params);
         Request request = new Request.Builder()
                 .url(REGISTER_URL)
@@ -186,8 +131,8 @@ public class Services {
             public void onFailure(@NonNull okhttp3.Call call, @NonNull java.io.IOException e) {
                 Log.d(TAG, "onFailure: " + e.getMessage());
                 Message message = new Message();
-                message.what = RegisterActivity.REGISTER_FAIL;
-                registerHandler.sendMessage(message);
+                message.what = REGISTER_FAIL;
+                handler.sendMessage(message);
             }
 
             @Override
@@ -195,14 +140,14 @@ public class Services {
                 Log.d(TAG, "onResponse: " + response.code());
                 if (response.code() != 201) {
                     Message message = new Message();
-                    message.what = RegisterActivity.REGISTER_FAIL;
-                    registerHandler.sendMessage(message);
+                    message.what = REGISTER_FAIL;
+                    handler.sendMessage(message);
                     return;
                 }
                 Message message = new Message();
-                message.what = RegisterActivity.REGISTER_SUCCESS;
+                message.what = REGISTER_SUCCESS;
                 message.obj = response.body().string();
-                registerHandler.sendMessage(message);
+                handler.sendMessage(message);
             }
         });
     }
@@ -235,31 +180,8 @@ public class Services {
             }
         });
     }
-    public static void getUserById(int id) {
-        Request request = new Request.Builder()
-                .url(GET_USER_URL + id)
-                .addHeader("Authorization", "Token " + token)
-                .get()
-                .build();
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(@NonNull okhttp3.Call call, @NonNull java.io.IOException e) {
-                Log.d(TAG, "onFailure: " + e.getMessage());
-            }
 
-            @Override
-            public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws java.io.IOException {
-                if (response.code() != 200) {
-                    return;
-                }
-                Message message = new Message();
-                message.what = UserHomePageActivity.GET_USER_SUCCESS;
-                message.obj = response.body().string();
-                userHomePageHandler.sendMessage(message);
-            }
-        });
-    }
-    public static void setAvatar(String avatarPath) {
+    public static void setAvatar(String avatarPath, Handler handler) {
         MultipartBody.Builder builder = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM);
         File file = new File(avatarPath);
@@ -275,8 +197,8 @@ public class Services {
             public void onFailure(@NonNull okhttp3.Call call, @NonNull java.io.IOException e) {
                 Log.d(TAG, "onFailure: " + e.getMessage());
                 Message message = new Message();
-                message.what = AvatarConfigActivity.SET_AVATAR_FAIL;
-                setAvatarHandler.sendMessage(message);
+                message.what = SET_AVATAR_FAIL;
+                handler.sendMessage(message);
 
             }
 
@@ -284,18 +206,18 @@ public class Services {
             public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws java.io.IOException {
                 if (response.code() != 200) {
                     Message message = new Message();
-                    message.what = AvatarConfigActivity.SET_AVATAR_FAIL;
-                    setAvatarHandler.sendMessage(message);
+                    message.what = SET_AVATAR_FAIL;
+                    handler.sendMessage(message);
                     return;
                 }
                 Message message = new Message();
-                message.what = AvatarConfigActivity.SET_AVATAR_SUCCESS;
+                message.what = SET_AVATAR_SUCCESS;
                 message.obj = response.body().string();
-                setAvatarHandler.sendMessage(message);
+                handler.sendMessage(message);
             }
         });
     }
-    public static void setUsername(String username) {
+    public static void setUsername(String username, Handler handler) {
         MultipartBody.Builder builder = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM);
         builder.addFormDataPart("username", username);
@@ -310,27 +232,27 @@ public class Services {
             public void onFailure(@NonNull okhttp3.Call call, @NonNull java.io.IOException e) {
                 Log.d(TAG, "onFailure: " + e.getMessage());
                 Message message = new Message();
-                message.what = UsernameConfigActivity.SET_USERNAME_FAIL;
-                setUsernameHandler.sendMessage(message);
+                message.what = SET_USERNAME_FAIL;
+                handler.sendMessage(message);
             }
 
             @Override
             public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws java.io.IOException {
                 if (response.code() != 200) {
                     Message message = new Message();
-                    message.what = UsernameConfigActivity.SET_USERNAME_FAIL;
-                    setUsernameHandler.sendMessage(message);
+                    message.what = SET_USERNAME_FAIL;
+                    handler.sendMessage(message);
                     return;
                 }
                 Message message = new Message();
-                message.what = UsernameConfigActivity.SET_USERNAME_SUCCESS;
+                message.what = SET_USERNAME_SUCCESS;
                 message.obj = response.body().string();
                 Log.d(TAG, "onResponse: " + message.obj);
-                setUsernameHandler.sendMessage(message);
+                handler.sendMessage(message);
             }
         });
     }
-    public static void setPassword(String password, String new_password) {
+    public static void setPassword(String password, String new_password, Handler handler) {
         // 这个不对
         MultipartBody.Builder builder = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM);
@@ -346,27 +268,27 @@ public class Services {
             public void onFailure(@NonNull okhttp3.Call call, @NonNull java.io.IOException e) {
                 Log.d(TAG, "onFailure: " + e.getMessage());
                 Message message = new Message();
-                message.what = PasswordConfigActivity.SET_PASSWORD_FAIL;
-                setPasswordHandler.sendMessage(message);
+                message.what = SET_PASSWORD_FAIL;
+                handler.sendMessage(message);
             }
 
             @Override
             public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws java.io.IOException {
                 if (response.code() != 200) {
                     Message message = new Message();
-                    message.what = PasswordConfigActivity.SET_PASSWORD_FAIL;
-                    setPasswordHandler.sendMessage(message);
+                    message.what = SET_PASSWORD_FAIL;
+                    handler.sendMessage(message);
                     return;
                 }
                 Message message = new Message();
-                message.what = PasswordConfigActivity.SET_PASSWORD_SUCCESS;
+                message.what = SET_PASSWORD_SUCCESS;
                 message.obj = response.body().string();
                 Log.d(TAG, "onResponse: " + message.obj);
-                setPasswordHandler.sendMessage(message);
+                handler.sendMessage(message);
             }
         });
     }
-    public static void setBio(String bio) {
+    public static void setBio(String bio, Handler handler) {
         MultipartBody.Builder builder = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM);
         builder.addFormDataPart("bio", bio);
@@ -381,27 +303,27 @@ public class Services {
             public void onFailure(@NonNull okhttp3.Call call, @NonNull java.io.IOException e) {
                 Log.d(TAG, "onFailure: " + e.getMessage());
                 Message message = new Message();
-                message.what = BioConfigActivity.SET_BIO_FAIL;
-                setBioHandler.sendMessage(message);
+                message.what = SET_BIO_FAIL;
+                handler.sendMessage(message);
             }
 
             @Override
             public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws java.io.IOException {
                 if (response.code() != 200) {
                     Message message = new Message();
-                    message.what = BioConfigActivity.SET_BIO_FAIL;
-                    setBioHandler.sendMessage(message);
+                    message.what = SET_BIO_FAIL;
+                    handler.sendMessage(message);
                     return;
                 }
                 Message message = new Message();
-                message.what = BioConfigActivity.SET_BIO_SUCCESS;
+                message.what = SET_BIO_SUCCESS;
                 message.obj = response.body().string();
                 Log.d(TAG, "onResponse: " + message.obj);
-                setBioHandler.sendMessage(message);
+                handler.sendMessage(message);
             }
         });
     }
-    public static void logout() {
+    public static void logout(Handler handler) {
         Request request = new Request.Builder()
                 .addHeader("Authorization", "Token " + token)
                 .url(LOGOUT_URL)
@@ -411,48 +333,39 @@ public class Services {
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull java.io.IOException e) {
                 Log.d(TAG, "onFailure: " + e.getMessage());
-//                Message message = new Message();
-//                message.what = LogoutActivity.LOGOUT_FAIL;
-//                logoutHandler.sendMessage(message);
+                Message message = new Message();
+                message.what = LOGOUT_FAIL;
+                handler.sendMessage(message);
             }
 
             @Override
             public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws java.io.IOException {
                 if (response.code() != 204) {
                     Message message = new Message();
-                    message.what = PersonCenterActivity.LOGOUT_FAIL;
-                    logoutHandler.sendMessage(message);
+                    message.what = LOGOUT_FAIL;
+                    handler.sendMessage(message);
                     return;
                 }
                 Message message = new Message();
-                message.what = PersonCenterActivity.LOGOUT_SUCCESS;
-                logoutHandler.sendMessage(message);
+                message.what = LOGOUT_SUCCESS;
+                handler.sendMessage(message);
             }
         });
     }
-    public static void follow(int id, boolean isFollowed) {
-        List<Integer> newFollowList = new ArrayList<>(mySelf.followList);
-        if (isFollowed) {
-            newFollowList.remove(Integer.valueOf(id));
-        } else {
-            newFollowList.add(id);
-        }
-
+    public static void follow(int id, boolean isFollowed, Handler handler) {
         FormBody.Builder builder = new FormBody.Builder();
-        // to array[integer] (formData)
-        Log.d(TAG, "follow: " + new Gson().toJson(newFollowList));
-        for (int i = 0; i < newFollowList.size(); i++) {
-            builder.add("follow_list", String.valueOf(newFollowList.get(i)));
+        builder.add("id", String.valueOf(id));
+        builder.add("list", "follow");
+        if(isFollowed) {
+            builder.add("action", "remove");
+        } else {
+            builder.add("action", "add");
         }
-        // if newFollowList is empty, add a empty array
-//        if(newFollowList.size() == 0) {
-//            builder.add("follow_list", "");
-//        }
         RequestBody requestBody = builder.build();
         Request request = new Request.Builder()
                 .addHeader("Authorization", "Token " + token)
-                .url(PATCH_USER_URL + mySelf.id)
-                .patch(requestBody)
+                .url(FOLLOW_BLOCK_URL)
+                .post(requestBody)
                 .build();
         client.newCall(request).enqueue(new Callback() {
             @Override
@@ -460,10 +373,10 @@ public class Services {
                 Log.d(TAG, "onFailure: " + e.getMessage());
                 Message message = new Message();
                 if (isFollowed)
-                    message.what = UserHomePageActivity.UNFOLLOW_FAIL;
+                    message.what = UNFOLLOW_FAIL;
                 else
-                    message.what = UserHomePageActivity.FOLLOW_FAIL;
-                userHomePageHandler.sendMessage(message);
+                    message.what = FOLLOW_FAIL;
+                handler.sendMessage(message);
             }
 
             @Override
@@ -471,46 +384,37 @@ public class Services {
                 if (response.code() != 200) {
                     Message message = new Message();
                     if (isFollowed)
-                        message.what = UserHomePageActivity.UNFOLLOW_FAIL;
+                        message.what = UNFOLLOW_FAIL;
                     else
-                        message.what = UserHomePageActivity.FOLLOW_FAIL;
-                    userHomePageHandler.sendMessage(message);
+                        message.what = FOLLOW_FAIL;
+                    handler.sendMessage(message);
                     return;
                 }
                 Message message = new Message();
                 if (isFollowed)
-                    message.what = UserHomePageActivity.UNFOLLOW_SUCCESS;
+                    message.what = UNFOLLOW_SUCCESS;
                 else
-                    message.what = UserHomePageActivity.FOLLOW_SUCCESS;
+                    message.what = FOLLOW_SUCCESS;
                 message.obj = response.body().string();
                 Log.d(TAG, "onResponse: " + message.obj);
-                userHomePageHandler.sendMessage(message);
+                handler.sendMessage(message);
             }
         });
     }
-    public static void block(int id, boolean isBlocked) {
-        List<Integer> newBlockList = new ArrayList<>(mySelf.blockList);
-        if (isBlocked) {
-            newBlockList.remove(Integer.valueOf(id));
-        } else {
-            newBlockList.add(id);
-        }
-
+    public static void block(int id, boolean isBlocked, Handler handler) {
         FormBody.Builder builder = new FormBody.Builder();
-        // to array[integer] (formData)
-        Log.d(TAG, "block: " + new Gson().toJson(newBlockList));
-        for (int i = 0; i < newBlockList.size(); i++) {
-            builder.add("block_list", String.valueOf(newBlockList.get(i)));
+        builder.add("id", String.valueOf(id));
+        builder.add("list", "block");
+        if(isBlocked) {
+            builder.add("action", "remove");
+        } else {
+            builder.add("action", "add");
         }
-        // if newFollowList is empty, add a empty array
-//        if(newBlockList.size() == 0) {
-//            builder.add("block_list", "");
-//        }
         RequestBody requestBody = builder.build();
         Request request = new Request.Builder()
                 .addHeader("Authorization", "Token " + token)
-                .url(PATCH_USER_URL + mySelf.id)
-                .patch(requestBody)
+                .url(FOLLOW_BLOCK_URL)
+                .post(requestBody)
                 .build();
         client.newCall(request).enqueue(new Callback() {
             @Override
@@ -518,10 +422,10 @@ public class Services {
                 Log.d(TAG, "onFailure: " + e.getMessage());
                 Message message = new Message();
                 if (isBlocked)
-                    message.what = UserHomePageActivity.UNBLOCK_FAIL;
+                    message.what = UNBLOCK_FAIL;
                 else
-                    message.what = UserHomePageActivity.BLOCK_FAIL;
-                userHomePageHandler.sendMessage(message);
+                    message.what = BLOCK_FAIL;
+                handler.sendMessage(message);
             }
 
             @Override
@@ -529,20 +433,20 @@ public class Services {
                 if (response.code() != 200) {
                     Message message = new Message();
                     if (isBlocked)
-                        message.what = UserHomePageActivity.UNBLOCK_FAIL;
+                        message.what = UNBLOCK_FAIL;
                     else
-                        message.what = UserHomePageActivity.BLOCK_FAIL;
-                    userHomePageHandler.sendMessage(message);
+                        message.what = BLOCK_FAIL;
+                    handler.sendMessage(message);
                     return;
                 }
                 Message message = new Message();
                 if (isBlocked)
-                    message.what = UserHomePageActivity.UNBLOCK_SUCCESS;
+                    message.what = UNBLOCK_SUCCESS;
                 else
-                    message.what = UserHomePageActivity.BLOCK_SUCCESS;
+                    message.what = BLOCK_SUCCESS;
                 message.obj = response.body().string();
                 Log.d(TAG, "onResponse: " + message.obj);
-                userHomePageHandler.sendMessage(message);
+                handler.sendMessage(message);
             }
         });
     }
@@ -557,7 +461,7 @@ public class Services {
         }
         return list;
     }
-    public static void pubMoment(String tag, String title, String content, String imagePath, String videoPath, String address) {
+    public static void pubMoment(String tag, String title, String content, String imagePath, String videoPath, String address, Handler handler) {
         MultipartBody.Builder builder = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM);
         builder.addFormDataPart("tag", tag);
@@ -592,23 +496,23 @@ public class Services {
             public void onFailure(@NonNull okhttp3.Call call, @NonNull java.io.IOException e) {
                 Log.d(TAG, "onFailure: " + e.getMessage());
                 Message message = new Message();
-                message.what = PubActivity.PUB_MOMENT_FAIL;
-                pubMomentHandler.sendMessage(message);
+                message.what = PUB_MOMENT_FAIL;
+                handler.sendMessage(message);
             }
 
             @Override
             public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws java.io.IOException {
                 if (response.code() != 201) {
                     Message message = new Message();
-                    message.what = PubActivity.PUB_MOMENT_FAIL;
-                    pubMomentHandler.sendMessage(message);
+                    message.what = PUB_MOMENT_FAIL;
+                    handler.sendMessage(message);
                     return;
                 }
                 Message message = new Message();
-                message.what = PubActivity.PUB_MOMENT_SUCCESS;
+                message.what = PUB_MOMENT_SUCCESS;
                 message.obj = response.body().string();
                 Log.d(TAG, "onResponse: " + message.obj);
-                pubMomentHandler.sendMessage(message);
+                handler.sendMessage(message);
             }
         });
     }
@@ -625,19 +529,19 @@ public class Services {
             public void onFailure(@NonNull okhttp3.Call call, @NonNull java.io.IOException e) {
                 Log.d(TAG, "onFailure: " + e.getMessage());
                 Message message = new Message();
-                message.what = 0;
+                message.what = GET_MOMENTS_FAIL;
                 handler.sendMessage(message);
             }
             @Override
             public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws java.io.IOException {
                 if (response.code() != 200) {
                     Message message = new Message();
-                    message.what = 0;
+                    message.what = GET_MOMENTS_FAIL;
                     handler.sendMessage(message);
                     return;
                 }
                 Message message = new Message();
-                message.what = 1;
+                message.what = GET_MOMENTS_SUCCESS;
                 message.obj = response.body().string();
                 try {
                     JSONArray arr = new JSONArray(message.obj.toString());
@@ -651,7 +555,8 @@ public class Services {
         });
     }
 
-    public static void getMomentsByUser(int id) {
+    // 获取指定用户的动态
+    public static void getMomentsByUser(int id, Handler handler) {
         Request request = new Request.Builder()
                 .addHeader("Authorization", "Token " + token)
                 .url(GET_MOMENTS_URL + "?user__id=" + id)
@@ -662,39 +567,7 @@ public class Services {
             public void onFailure(@NonNull okhttp3.Call call, @NonNull java.io.IOException e) {
                 Log.d(TAG, "onFailure: " + e.getMessage());
                 Message message = new Message();
-                message.what = UserHomePageActivity.GET_USER_MOMENTS_FAIL;
-                userHomePageHandler.sendMessage(message);
-            }
-
-            @Override
-            public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws java.io.IOException {
-                if (response.code() != 200) {
-                    Message message = new Message();
-                    message.what = UserHomePageActivity.GET_USER_MOMENTS_FAIL;
-                    userHomePageHandler.sendMessage(message);
-                    return;
-                }
-                Message message = new Message();
-                message.what = UserHomePageActivity.GET_USER_MOMENTS_SUCCESS;
-                message.obj = response.body().string();
-                Log.d(TAG, "onResponse: " + message.obj);
-                userHomePageHandler.sendMessage(message);
-            }
-        });
-    }
-    // 获取指定用户的动态
-    public static void getMomentsByUser(int id, Handler handler) {
-        Request request = new Request.Builder()
-                .addHeader("Authorization", "Token " + token)
-                .url(GET_MOMENTS_URL + id)
-                .get()
-                .build();
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(@NonNull okhttp3.Call call, @NonNull java.io.IOException e) {
-                Log.d(TAG, "onFailure: " + e.getMessage());
-                Message message = new Message();
-                message.what = 0;
+                message.what = GET_MOMENTS_FAIL;
                 handler.sendMessage(message);
             }
 
@@ -702,12 +575,12 @@ public class Services {
             public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws java.io.IOException {
                 if (response.code() != 200) {
                     Message message = new Message();
-                    message.what = 0;
+                    message.what = GET_MOMENTS_FAIL;
                     handler.sendMessage(message);
                     return;
                 }
                 Message message = new Message();
-                message.what = 1;
+                message.what = GET_MOMENTS_SUCCESS;
                 message.obj = response.body().string();
                 Log.d(TAG, "onResponse: " + message.obj);
                 handler.sendMessage(message);
@@ -727,7 +600,7 @@ public class Services {
             public void onFailure(@NonNull okhttp3.Call call, @NonNull java.io.IOException e) {
                 Log.d(TAG, "onFailure: " + e.getMessage());
                 Message message = new Message();
-                message.what = 0;
+                message.what = GET_MOMENT_FAIL;
                 handler.sendMessage(message);
             }
 
@@ -735,12 +608,12 @@ public class Services {
             public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws java.io.IOException {
                 if (response.code() != 200) {
                     Message message = new Message();
-                    message.what = 0;
+                    message.what = GET_MOMENT_FAIL;
                     handler.sendMessage(message);
                     return;
                 }
                 Message message = new Message();
-                message.what = 1;
+                message.what = GET_MOMENT_SUCCESS;
                 message.obj = response.body().string();
                 Log.d(TAG, "onResponse: " + message.obj);
                 handler.sendMessage(message);
@@ -759,7 +632,7 @@ public class Services {
             public void onFailure(@NonNull okhttp3.Call call, @NonNull java.io.IOException e) {
                 Log.d(TAG, "onFailure: " + e.getMessage());
                 Message message = new Message();
-                message.what = 0;
+                message.what = GET_USER_FAIL;
                 handler.sendMessage(message);
             }
 
@@ -767,12 +640,12 @@ public class Services {
             public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws java.io.IOException {
                 if (response.code() != 200) {
                     Message message = new Message();
-                    message.what = 0;
+                    message.what = GET_USER_FAIL;
                     handler.sendMessage(message);
                     return;
                 }
                 Message message = new Message();
-                message.what = 1;
+                message.what = GET_USER_SUCCESS;
                 message.obj = response.body().string();
                 Log.d(TAG, "onResponse: " + message.obj);
                 handler.sendMessage(message);
@@ -785,20 +658,20 @@ public class Services {
             @Override
             public void handleMessage(@NonNull Message msg) {
                 super.handleMessage(msg);
-                if (msg.what == 1) {
+                if (msg.what == GET_USER_SUCCESS) {
                     JSONObject obj = null;
                     try {
                         obj = new JSONObject(msg.obj.toString());
                         moment.setUserInfo(obj);
                         Message message = new Message();
-                        message.what = 1;
+                        message.what = SET_MOMENT_USER_SUCCESS;
                         handler.sendMessage(message);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                } else {
+                } else if (msg.what == GET_USER_FAIL) {
                     Message message = new Message();
-                    message.what = 0;
+                    message.what = SET_MOMENT_USER_FAIL;
                     handler.sendMessage(msg);
                 }
             }
