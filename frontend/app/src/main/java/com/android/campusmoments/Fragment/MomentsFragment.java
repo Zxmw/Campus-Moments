@@ -17,7 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-
+import static com.android.campusmoments.Service.Config.*;
 import com.android.campusmoments.Activity.DetailedActivity;
 import com.android.campusmoments.Adapter.MomentAdapter;
 import com.android.campusmoments.R;
@@ -40,11 +40,11 @@ public class MomentsFragment extends Fragment {
     private int cnt = 0;
     private RecyclerView momentsRecyclerView;
     private MomentAdapter momentAdapter;
-    private Handler getUserHandler = new Handler(Looper.getMainLooper()) {
+    private Handler setMomentUserHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
-            if(msg.what == 1) {
+            if(msg.what == SET_MOMENT_USER_SUCCESS) {
                 cnt++;
                 if(cnt == mMomentList.size()) {
                     momentAdapter.setMoments(mMomentList);
@@ -57,7 +57,7 @@ public class MomentsFragment extends Fragment {
         @Override
         public void handleMessage(@NonNull android.os.Message msg) {
             super.handleMessage(msg);
-            if (msg.what == 1) {
+            if (msg.what == GET_MOMENTS_SUCCESS) {
                 try {
                     JSONArray arr = new JSONArray(msg.obj.toString());
                     Log.d(TAG, "onResponse: " + arr.length());
@@ -65,12 +65,12 @@ public class MomentsFragment extends Fragment {
                     cnt = 0;
                     for (int i = 0; i < arr.length(); i++) {
                         mMomentList.add(new Moment(arr.getJSONObject(i)));
-                        Services.setMomentUser(mMomentList.get(i), getUserHandler);
+                        Services.setMomentUser(mMomentList.get(i), setMomentUserHandler);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-            } else {
+            } else if (msg.what == GET_MOMENTS_FAIL) {
                 Toast.makeText(requireActivity(), "获取动态失败", Toast.LENGTH_SHORT).show();
             }
         }
@@ -83,7 +83,11 @@ public class MomentsFragment extends Fragment {
         this.type = TYPE_ALL;
     }
     public void refresh() {
-        Services.getMomentsAll(getMomentsHandler);
+        if (type == TYPE_PERSON) {
+            Services.getMomentsByUser(userId, getMomentsHandler);
+        } else if(type == TYPE_ALL) {
+            Services.getMomentsAll(getMomentsHandler);
+        }
     }
 
     @Override

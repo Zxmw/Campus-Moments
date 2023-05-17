@@ -64,6 +64,33 @@
                     android:layout_width="60dp"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="30dp"
+                    android:text="邮箱"
+                    android:textColor="@color/black"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/email_login"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="邮箱"
+                    android:singleLine="true"
+                    android:textSize="16sp"
+                    tools:ignore="TouchTargetSizeCheck" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginVertical="10dp"
+                android:orientation="horizontal"
+                android:paddingRight="20dp">
+
+                <TextView
+                    android:layout_width="60dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="30dp"
                     android:text="用户名"
                     android:textColor="@color/black"
                     android:textSize="16sp"

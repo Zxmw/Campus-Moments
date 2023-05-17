@@ -17,20 +17,19 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import static com.android.campusmoments.Service.Config.*;
 import com.android.campusmoments.R;
 import com.android.campusmoments.Service.Services;
 import com.squareup.picasso.Picasso;
 
 public class PersonCenterActivity extends AppCompatActivity {
 //  个人中心页面，从用户主页点击进入
-    public static final int LOGOUT_SUCCESS = 0;
-    public static final int LOGOUT_FAIL = 1;
+
     private SharedPreferences mPreferences;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_person_center);
-        Services.setLogoutHandler(handler);
         mPreferences = getSharedPreferences("user_info", MODE_PRIVATE);
     }
 
@@ -112,7 +111,7 @@ public class PersonCenterActivity extends AppCompatActivity {
     }
 
     public void logout(View view) {
-        Services.logout();
+        Services.logout(handler);
         finish();
     }
 

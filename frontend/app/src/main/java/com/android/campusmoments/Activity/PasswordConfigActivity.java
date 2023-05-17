@@ -2,6 +2,7 @@ package com.android.campusmoments.Activity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import static com.android.campusmoments.Service.Config.*;
 import com.android.campusmoments.R;
 import com.android.campusmoments.Service.Services;
 
@@ -15,13 +16,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class PasswordConfigActivity extends AppCompatActivity {
-    public static final int SET_PASSWORD_SUCCESS = 0;
-    public static final int SET_PASSWORD_FAIL = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_password_config);
-        Services.setSetPasswordHandler(handler);
     }
 
     @SuppressLint("HandlerLeak")
@@ -43,7 +42,7 @@ public class PasswordConfigActivity extends AppCompatActivity {
         TextView new_password_view = findViewById(R.id.new_password);
         String old_password = old_password_view.getText().toString();
         String new_password = new_password_view.getText().toString();
-        Services.setPassword(old_password, new_password);
+        Services.setPassword(old_password, new_password, handler);
     }
     private void successSetPassword() {
         Toast.makeText(this.getApplicationContext(), "更新成功", Toast.LENGTH_SHORT).show();

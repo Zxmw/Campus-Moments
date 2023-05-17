@@ -1,15 +1,20 @@
 package com.android.campusmoments.Activity;
 
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentContainerView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import static com.android.campusmoments.Service.Config.*;
 import com.android.campusmoments.Adapter.MomentAdapter;
+import com.android.campusmoments.Fragment.MomentsFragment;
 import com.android.campusmoments.R;
 import com.android.campusmoments.Service.Moment;
 import com.android.campusmoments.Service.Services;
 import com.android.campusmoments.Service.User;
+
 import com.squareup.picasso.Picasso;
 
 import android.annotation.SuppressLint;
@@ -32,20 +37,9 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class UserHomePageActivity extends AppCompatActivity {
-    public static final int FOLLOW_FAIL = 0;
-    public static final int FOLLOW_SUCCESS = 1;
-    public static final int UNFOLLOW_FAIL = 2;
-    public static final int UNFOLLOW_SUCCESS = 3;
-    public static final int BLOCK_FAIL = 4;
-    public static final int BLOCK_SUCCESS = 5;
-    public static final int UNBLOCK_FAIL = 6;
-    public static final int UNBLOCK_SUCCESS = 7;
-    public static final int GET_USER_SUCCESS = 8;
-    public static final int GET_USER_FAIL = 9;
-    public static final int GET_USER_MOMENTS_SUCCESS = 10;
-    public static final int GET_USER_MOMENTS_FAIL = 11;
     private static int id;
     private User user;
     private boolean isFollowed = false;
@@ -57,21 +51,21 @@ public class UserHomePageActivity extends AppCompatActivity {
     private Button followButton;
     private Button privateMessageButton;
     private Button blockButton;
-    private RecyclerView userMomentsRecyclerView;
-    private MomentAdapter momentAdapter;
-    private List<Moment> mMomentList;
+
+    private FragmentContainerView fragmentContainerView;
+    public MomentsFragment userMomentsFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_home_page);
-        mMomentList = new ArrayList<>();
-        Services.setUserHomePageHandler(handler);
         //get user id from intent
         id = getIntent().getIntExtra("id", 0);
         // get user info from server
-        Services.getUserById(id);
-        Services.getMomentsByUser(id);
+        Services.getUserById(id, handler);
+        userMomentsFragment = new MomentsFragment(MomentsFragment.TYPE_PERSON, id);
+        fragmentContainerView = findViewById(R.id.fragmentContainerView_home);
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainerView_home, userMomentsFragment).commit();
     }
 
     private void initUserInfo() {
@@ -81,7 +75,12 @@ public class UserHomePageActivity extends AppCompatActivity {
         userBio = findViewById(R.id.user_bio_text);
         userName.setText(user.username);
         userId.setText(String.valueOf(user.id));
-        userBio.setText(user.bio);
+        if (Objects.equals(user.bio, "")) {
+            userBio.setText("这个人很懒，什么都没有留下");
+        }
+        else {
+            userBio.setText(user.bio);
+        }
         followButton = findViewById(R.id.follow_button);
         privateMessageButton = findViewById(R.id.private_message_button);
         blockButton = findViewById(R.id.block_button);
@@ -155,55 +154,9 @@ public class UserHomePageActivity extends AppCompatActivity {
                 case GET_USER_FAIL:
                     getUserFail();
                     break;
-                case GET_USER_MOMENTS_SUCCESS:
-                    try {
-                        getUserMomentsSuccess(msg.obj);
-                    } catch (JSONException e) {
-                        throw new RuntimeException(e);
-                    }
-                    break;
-                case GET_USER_MOMENTS_FAIL:
-                    getUserMomentsFail();
-                    break;
             }
         }
     };
-
-    private void getUserMomentsFail() {
-        Toast.makeText(this, "获取用户动态失败", Toast.LENGTH_SHORT).show();
-    }
-
-    @SuppressLint("NotifyDataSetChanged")
-    private void getUserMomentsSuccess(Object obj) throws JSONException {
-        initMomentsRecyclerView();
-        JSONArray arr = new JSONArray(obj.toString());
-        mMomentList.clear();
-        for (int i = 0; i < arr.length(); i++) {
-            Log.d("moment", arr.getJSONObject(i).toString());
-            mMomentList.add(new Moment(arr.getJSONObject(i)));
-        }
-
-        momentAdapter.setMoments(mMomentList);
-        momentAdapter.notifyDataSetChanged();
-
-    }
-
-    private void initMomentsRecyclerView() {
-        userMomentsRecyclerView = findViewById(R.id.user_moments_recycler_view);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        userMomentsRecyclerView.setLayoutManager(layoutManager);
-        momentAdapter = new MomentAdapter(mMomentList, new MomentAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int position) {
-//                Toast.makeText(getContext(), "clicked: "+position, Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(UserHomePageActivity.this, DetailedActivity.class);
-                intent.putExtra("id", mMomentList.get(position).getId());
-                startActivity(intent);
-                // TODO: adapter.notifyDataSetChanged(); 评论后刷新
-            }
-        });
-        userMomentsRecyclerView.setAdapter(momentAdapter);
-    }
 
     private void getUserFail() {
         Toast.makeText(this, "获取用户信息失败", Toast.LENGTH_SHORT).show();
@@ -222,7 +175,7 @@ public class UserHomePageActivity extends AppCompatActivity {
     }
 
     public void follow(View view) {
-        Services.follow(user.id, isFollowed);
+        Services.follow(user.id, isFollowed, handler);
     }
     private void followSuccess(Object obj) throws JSONException {
         isFollowed = true;
@@ -251,7 +204,7 @@ public class UserHomePageActivity extends AppCompatActivity {
     }
 
     public void block(View view) {
-        Services.block(user.id, isBlocked);
+        Services.block(user.id, isBlocked, handler);
     }
 
     private void blockSuccess(Object obj) throws JSONException {

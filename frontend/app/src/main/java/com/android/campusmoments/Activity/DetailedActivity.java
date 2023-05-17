@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import static com.android.campusmoments.Service.Config.*;
 import com.android.campusmoments.R;
 import com.android.campusmoments.Service.Moment;
 import com.android.campusmoments.Service.Services;
@@ -47,13 +48,13 @@ public class DetailedActivity extends AppCompatActivity {
     private Button sendCommentButton;
     private Moment moment;
 
-    private Handler getUserHandler = new Handler(Looper.getMainLooper()) {
+    private Handler setMomentUserHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(android.os.Message msg) {
-            if(msg.what == 0) {
+            if(msg.what == SET_MOMENT_USER_FAIL) {
                 Toast.makeText(DetailedActivity.this, "网络错误", Toast.LENGTH_SHORT).show();
                 finish();
-            } else if(msg.what == 1) {
+            } else if(msg.what == SET_MOMENT_USER_SUCCESS) {
                 if(moment.getAvatarPath() != null) {
                     Picasso.get().load(Uri.parse(moment.getAvatarPath())).into(avatarImageView);
                 } else {
@@ -86,14 +87,14 @@ public class DetailedActivity extends AppCompatActivity {
     private Handler getMomentHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(android.os.Message msg) {
-            if(msg.what == 0) {
+            if(msg.what == GET_MOMENT_FAIL) {
                 Toast.makeText(DetailedActivity.this, "网络错误", Toast.LENGTH_SHORT).show();
                 finish();
-            } else if(msg.what == 1) {
+            } else if(msg.what == GET_MOMENT_SUCCESS) {
                 try {
                     JSONObject obj = new JSONObject(msg.obj.toString());
                     moment = new Moment(obj);
-                    Services.setMomentUser(moment, getUserHandler);
+                    Services.setMomentUser(moment, setMomentUserHandler);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

@@ -38,7 +38,6 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         username_login = findViewById(R.id.username_login);
         password_login = findViewById(R.id.password_login);
-        Services.setLoginHandler(handler);
 
         sharedPreferences = getSharedPreferences("user_info", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
@@ -72,7 +71,7 @@ public class LoginActivity extends AppCompatActivity {
         } else if (password.length() < 6 || password.length() > 20) {
             // Toast.makeText(LoginActivity.this, "密码长度应为6-20位", Toast.LENGTH_SHORT).show();
         } else {
-            Services.login(username, password);
+            Services.login(username, password, handler);
         }
     }
 

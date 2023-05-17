@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import static com.android.campusmoments.Service.Config.*;
 import com.android.campusmoments.R;
 import com.android.campusmoments.Service.Services;
 
@@ -19,13 +20,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class BioConfigActivity extends AppCompatActivity {
-    public static final int SET_BIO_SUCCESS = 0;
-    public static final int SET_BIO_FAIL = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bio_config);
-        Services.setSetBioHandler(handler);
     }
 
     @SuppressLint("HandlerLeak")
@@ -48,7 +47,7 @@ public class BioConfigActivity extends AppCompatActivity {
     public void setBio(View view) {
         TextView bio_view = findViewById(R.id.user_id_text);
         String bio = bio_view.getText().toString();
-        Services.setBio(bio);
+        Services.setBio(bio, handler);
     }
 
     private void successSetBio(Object obj) throws JSONException {

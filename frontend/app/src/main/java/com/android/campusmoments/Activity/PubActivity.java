@@ -40,6 +40,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import static com.android.campusmoments.Service.Config.*;
 import com.android.campusmoments.R;
 import com.android.campusmoments.Service.Services;
 import com.squareup.picasso.Picasso;
@@ -56,9 +57,6 @@ public class PubActivity extends AppCompatActivity {
 
 
     private static final String TAG = "PubActivity";
-
-    public static final int PUB_MOMENT_FAIL = 0;
-    public static final int PUB_MOMENT_SUCCESS = 1;
 
     private final Handler pubMomentHandler = new Handler(Looper.getMainLooper()){
         @Override
@@ -242,8 +240,11 @@ public class PubActivity extends AppCompatActivity {
         String tag = tagView.getText().toString();
         String title = titleView.getText().toString();
         String content = knife.toHtml();
-        String address = positionTextView.getText().toString();
+        String imagePath = selectedPictureUri == null ? null : getRealPathFromURI(selectedPictureUri);
+        String videoPath = selectedVideoUri == null ? null : getRealPathFromURI(selectedVideoUri);
+        String address = locationView.getText().toString();
         Services.pubMoment(tag, title, content, imagePath, videoPath, address);
+
         finish();
     }
 

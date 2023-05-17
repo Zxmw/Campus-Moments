@@ -2,6 +2,7 @@ package com.android.campusmoments.Activity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import static com.android.campusmoments.Service.Config.*;
 import com.android.campusmoments.R;
 import com.android.campusmoments.Service.Services;
 import com.squareup.picasso.Picasso;
@@ -33,8 +34,6 @@ public class AvatarConfigActivity extends AppCompatActivity {
     private ImageView avatar;
     private boolean edit = false;
     private String avatarPath;
-    public static final int SET_AVATAR_SUCCESS = 0;
-    public static final int SET_AVATAR_FAIL = 1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,10 +62,9 @@ public class AvatarConfigActivity extends AppCompatActivity {
                 Toast.makeText(AvatarConfigActivity.this, "请先选择头像", Toast.LENGTH_SHORT).show();
             }
             else {
-                Services.setAvatar(avatarPath);
+                Services.setAvatar(avatarPath, handler);
             }
         });
-        Services.setSetAvatarHandler(handler);
     }
 
     @SuppressLint("HandlerLeak")
