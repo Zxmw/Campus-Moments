@@ -52,6 +52,22 @@ public class DetailedActivity extends AppCompatActivity {
     private Button sendCommentButton;
     private Moment moment;
 
+    private Handler getUserHandler = new Handler(Looper.getMainLooper()) {
+        @Override
+        public void handleMessage(android.os.Message msg) {
+            if(msg.what == 0) {
+                Toast.makeText(DetailedActivity.this, "网络错误", Toast.LENGTH_SHORT).show();
+                finish();
+            } else if(msg.what == 1) {
+                usernameTextView.setText(moment.getUsername());
+                if(moment.getAvatarPath() != null) {
+                    Picasso.get().load(Uri.parse(moment.getAvatarPath())).into(avatarImageView);
+                } else {
+                    avatarImageView.setImageResource(R.drawable.avatar_1);
+                }
+            }
+        }
+    };
     private Handler handler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(android.os.Message msg) {
@@ -62,6 +78,10 @@ public class DetailedActivity extends AppCompatActivity {
                 try {
                     JSONObject obj = new JSONObject(msg.obj.toString());
                     moment = new Moment(obj);
+                    // TODO : wait for getUserHandler
+
+                    Services.setMomentUser(moment, getUserHandler);
+
                     Log.d(TAG, "handleMessage: " + moment.getAvatarPath());
                     Log.d(TAG, "handleMessage: " + moment.getUsername());
                     usernameTextView.setText(moment.getUsername());

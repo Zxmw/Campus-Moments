@@ -17,6 +17,9 @@ public class Moment {
         return id;
     }
     private int userId;
+    public int getUserId() {
+        return userId;
+    }
     private Uri mAvatar;
     private String avatarPath;
     public String getAvatarPath() {
@@ -60,6 +63,16 @@ public class Moment {
             }
         }
     };
+    public void setUserInfo(JSONObject obj) {
+        try {
+            mUsername = Services.checkStr(obj, "username");
+            avatarPath = Services.checkStr(obj, "avatar");
+            Log.d(TAG, "handleMessage: " + mUsername);
+            Log.d(TAG, "handleMessage: " + avatarPath);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     public Moment(JSONObject obj) {
         try {
             // 返回值不为空时，赋值
@@ -78,6 +91,7 @@ public class Moment {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        // TODO: Wait getUserHandler to finish
         Services.getUser(userId, getUserHandler); // 放在try里面有可能运行不了
     }
 

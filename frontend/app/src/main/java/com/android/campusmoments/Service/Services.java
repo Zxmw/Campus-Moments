@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.FileUtils;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 import android.widget.Adapter;
@@ -661,6 +662,7 @@ public class Services {
             }
         });
     }
+
     // 按照id获取动态
     public static void getDetailedMoment(int id, Handler handler) {
         Request request = new Request.Builder()
@@ -668,6 +670,7 @@ public class Services {
                 .url(GET_MOMENT_URL + id)
                 .get()
                 .build();
+
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(@NonNull okhttp3.Call call, @NonNull java.io.IOException e) {
@@ -725,7 +728,30 @@ public class Services {
             }
         });
     }
-
+    // 从moment中获取user
+    public static void setMomentUser(Moment moment, Handler handler) {
+        getUser(moment.getUserId(), new Handler(Looper.getMainLooper()) {
+            @Override
+            public void handleMessage(@NonNull Message msg) {
+                super.handleMessage(msg);
+                if (msg.what == 1) {
+                    JSONObject obj = null;
+                    try {
+                        obj = new JSONObject(msg.obj.toString());
+                        moment.setUserInfo(obj);
+                        Message message = new Message();
+                        message.what = 1;
+                        message.obj = moment;
+                        handler.sendMessage(message);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    handler.sendMessage(msg);
+                }
+            }
+        });
+    }
 
 
     /* 网络工具 */
