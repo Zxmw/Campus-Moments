@@ -86,7 +86,7 @@ public class UserHomePageActivity extends AppCompatActivity {
         privateMessageButton = findViewById(R.id.private_message_button);
         blockButton = findViewById(R.id.block_button);
         if (user.avatar == null){
-            avatar.setImageResource(R.drawable.avatar_default);
+            avatar.setImageResource(R.drawable.avatar_1);
         }
         else {
             Picasso.get().load(Uri.parse(user.avatar)).into(avatar);
@@ -197,6 +197,7 @@ public class UserHomePageActivity extends AppCompatActivity {
             public void onItemClick(int position) {
 //                Toast.makeText(getContext(), "clicked: "+position, Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(UserHomePageActivity.this, DetailedActivity.class);
+                intent.putExtra("id", mMomentList.get(position).getId());
                 intent.putExtra("position", position);
                 intent.putExtra("avatarUri", mMomentList.get(position).getAvatar());
                 intent.putExtra("username", mMomentList.get(position).getUsername());

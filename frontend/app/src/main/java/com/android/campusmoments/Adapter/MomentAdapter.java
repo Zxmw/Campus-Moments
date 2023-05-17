@@ -81,7 +81,9 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentView
         public void bindData(Moment moment) {
             // 将数据绑定到ViewHolder中的视图中
             if(moment.getAvatarPath() != null) {
+                Log.d(TAG, moment.getAvatarPath());
                 Picasso.get().load(Uri.parse(moment.getAvatarPath())).into(mAvatarImageView);
+
                 mAvatarImageView.setVisibility(View.VISIBLE);
             } else {
                 Log.d(TAG, "bindData: avatarPath is null");

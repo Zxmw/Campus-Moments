@@ -13,9 +13,6 @@ import java.util.Date;
 public class Moment {
     private static final String TAG = "Moment";
     private int id;
-    public int getId() {
-        return id;
-    }
     private int userId;
     private Uri mAvatar;
     private String avatarPath;

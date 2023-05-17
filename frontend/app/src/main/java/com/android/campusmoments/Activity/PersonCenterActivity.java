@@ -46,7 +46,7 @@ public class PersonCenterActivity extends AppCompatActivity {
         Log.d("avatar", Services.mySelf.avatar + "");
         if (Services.mySelf.avatar == null) {
             // use R.drawable.default_avatar
-            userAvatar.setImageResource(R.drawable.avatar_default);
+            userAvatar.setImageResource(R.drawable.avatar_1);
         }
         else {
             Picasso.get().load(Uri.parse(Services.mySelf.avatar)).into(userAvatar);
