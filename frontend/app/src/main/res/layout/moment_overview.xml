@@ -100,12 +100,14 @@
             android:layout_marginTop="5dp"
             android:layout_gravity="start"
             android:src="@drawable/picture_default" />
+
         <ImageView
             android:id="@+id/videoFrameView"
             android:layout_width="200dp"
-            android:layout_height="wrap_content"
+            android:layout_height="200dp"
             android:layout_gravity="start"
-            android:layout_marginTop="5dp"/>
+            android:layout_marginTop="5dp"
+            android:src="@drawable/ic_play_blue"/>
 
         <FrameLayout
             android:id="@+id/videoContainer"

@@ -462,7 +462,7 @@ public class Services {
         }
         return list;
     }
-    public static void pubMoment(String tag, String title, String content, String imagePath, String videoPath, String address, Handler handler) {
+    public static void pubMoment(Handler handler, String tag, String title, String content, String imagePath, String videoPath, String address) {
         MultipartBody.Builder builder = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM);
         builder.addFormDataPart("tag", tag);

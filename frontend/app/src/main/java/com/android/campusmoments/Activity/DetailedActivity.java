@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -20,6 +21,10 @@ import static com.android.campusmoments.Service.Config.*;
 import com.android.campusmoments.R;
 import com.android.campusmoments.Service.Moment;
 import com.android.campusmoments.Service.Services;
+import com.google.android.exoplayer2.ExoPlayer;
+import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.ui.PlayerControlView;
+import com.google.android.exoplayer2.ui.PlayerView;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
@@ -38,6 +43,7 @@ public class DetailedActivity extends AppCompatActivity {
     private KnifeText contentKnifeText;
     private ImageView pictureView;
     private VideoView videoView;
+    private PlayerControlView playerControlView;
     private TextView addressTextView;
     private TextView likeTextView;
     private TextView commentTextView;
@@ -71,6 +77,7 @@ public class DetailedActivity extends AppCompatActivity {
                     pictureView.setVisibility(ImageView.GONE);
                 }
                 if(moment.getVideoPath() != null) {
+                    Log.d(TAG, "handleMessage: " + moment.getVideoPath());
                     videoView.setVideoURI(Uri.parse(moment.getVideoPath()));
                     videoView.setMediaController(new MediaController(DetailedActivity.this));
                     videoView.start();
@@ -116,6 +123,7 @@ public class DetailedActivity extends AppCompatActivity {
         contentKnifeText = findViewById(R.id.content_knifetext);
         pictureView = findViewById(R.id.picture_imageview);
         videoView = findViewById(R.id.videoView);
+        playerControlView = findViewById(R.id.playerControlView);
         addressTextView = findViewById(R.id.address_textview);
         likeTextView = findViewById(R.id.like_textview);
         commentTextView = findViewById(R.id.comment_textview);
@@ -139,5 +147,9 @@ public class DetailedActivity extends AppCompatActivity {
         } else {
             Services.getMomentById(id, getMomentHandler);
         }
+    }
+    private void setPlayerControlView(String videoPath) {
+        
+
     }
 }

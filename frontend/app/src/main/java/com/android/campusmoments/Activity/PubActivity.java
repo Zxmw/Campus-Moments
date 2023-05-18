@@ -3,13 +3,17 @@ package com.android.campusmoments.Activity;
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContract;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -24,6 +28,7 @@ import android.location.LocationManager;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.MediaStore;
@@ -31,6 +36,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -45,6 +51,7 @@ import com.android.campusmoments.R;
 import com.android.campusmoments.Service.Services;
 import com.squareup.picasso.Picasso;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -90,14 +97,18 @@ public class PubActivity extends AppCompatActivity {
     private String imagePath;
 
     private ActivityResultLauncher<Intent> pickPhotoLauncher; // 从相册获取图片
-    private ActivityResultLauncher<Intent> takePhotoLauncher; // 拍照获取图片
+    private Uri imageUri; // 拍摄图片的Uri
+    private ActivityResultLauncher<Uri> cameraLauncher; // 拍照获取图片
 
     // 视频
     private VideoView videoView;
+    private FrameLayout videoLayout;
     private String videoPath;
 
     private ActivityResultLauncher<Intent> pickVideoLauncher; // 从相册获取视频
     private ActivityResultLauncher<Intent> takeVideoLauncher; // 拍摄获取视频
+    private Uri videoUri; // 拍摄视频的Uri
+    private ActivityResultLauncher<Uri> cameraVideoLauncher; // 拍摄获取视频
 
     // 定位
     private TextView positionTextView;
@@ -113,7 +124,7 @@ public class PubActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pub);
 
-        Services.setPubMomentHandler(pubMomentHandler);
+//        Services.setPubMomentHandler(pubMomentHandler);
 
         ImageView avatarView = findViewById(R.id.avatarImageView);
         if(Services.mySelf.avatar != null){
@@ -127,6 +138,7 @@ public class PubActivity extends AppCompatActivity {
         titleView = findViewById(R.id.title_view);
         pictureView = findViewById(R.id.picture_view);
         videoView = findViewById(R.id.video_view);
+        videoLayout = findViewById(R.id.videoLayout);
         // 定位
         positionTextView = findViewById(R.id.positionTextView);
         positionLayout = findViewById(R.id.positionLayout);
@@ -179,24 +191,12 @@ public class PubActivity extends AppCompatActivity {
                         }
                     }
                 });
-
-        // 初始化图片获取 - 拍照获取图片
-        takePhotoLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
-                new ActivityResultCallback<ActivityResult>() {
-                    @Override
-                    public void onActivityResult(ActivityResult result) {
-                        if (result.getResultCode() == RESULT_OK) {
-                            Bundle extras = result.getData().getExtras();
-                            if (extras != null) {
-                                // 获取拍摄的照片
-                                Bitmap bitmap = (Bitmap) extras.get("data");
-                                pictureView.setImageBitmap(bitmap);
-
-                            }
-                        }
-                    }
-                });
-
+        // 初始化图片获取 - 拍摄获取图片
+        cameraLauncher = registerForActivityResult(new ActivityResultContracts.TakePicture(), result -> {
+            if (result) {
+                handleSelectedPicture(imageUri);
+            }
+        });
         // 初始化视频获取 - 从相册获取视频
         pickVideoLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
                 new ActivityResultCallback<ActivityResult>() {
@@ -212,23 +212,22 @@ public class PubActivity extends AppCompatActivity {
                     }
                 });
         // 初始化视频获取 - 拍摄获取视频
-        takeVideoLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
-                new ActivityResultCallback<ActivityResult>() {
-                    @Override
-                    public void onActivityResult(ActivityResult result) {
-                        if (result.getResultCode() == RESULT_OK) {
-                            Intent data = result.getData();
-                            if(data != null) {
-                                Uri uri = data.getData();
-                                videoView.setVideoURI(uri);
-                                videoView.start();  // 开始播放
-                            } else {
-                                Log.e(TAG, "onActivityResult: data is null");
-                            }
-                        }
-                    }
-                });
+        takeVideoLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+            if (result.getResultCode() == RESULT_OK) {
+                // 处理拍摄的视频
+                handleSelectedVideo(videoUri);
+            }
+        });
+        // 初始化视频获取 - 拍摄获取视频
+        cameraVideoLauncher = registerForActivityResult(new ActivityResultContracts.TakeVideo(), result -> {
+            try {
 
+                Log.d(TAG, "cameraVideoLauncher: " + result);
+                handleSelectedVideo(videoUri);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     // 事件处理
@@ -240,10 +239,8 @@ public class PubActivity extends AppCompatActivity {
         String tag = tagView.getText().toString();
         String title = titleView.getText().toString();
         String content = knife.toHtml();
-        String imagePath = selectedPictureUri == null ? null : getRealPathFromURI(selectedPictureUri);
-        String videoPath = selectedVideoUri == null ? null : getRealPathFromURI(selectedVideoUri);
-        String address = locationView.getText().toString();
-        Services.pubMoment(tag, title, content, imagePath, videoPath, address);
+        String address = positionTextView.getText().toString();
+        Services.pubMoment(pubMomentHandler, tag, title, content, imagePath, videoPath, address);
 
         finish();
     }
@@ -254,24 +251,31 @@ public class PubActivity extends AppCompatActivity {
         imagePath = getRealPathFromURI(uri);
     }
     public void handleSelectedVideo(Uri uri) {
-        videoView.setVideoURI(uri);
-        videoView.setVisibility(View.VISIBLE);
-        videoView.start();
         videoPath = getRealPathFromURI(uri);
+
         // 获取视频的宽度和高度
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
         retriever.setDataSource(videoPath);
         String widthString = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH);
         String heightString = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT);
+
         int videoWidth = Integer.parseInt(widthString);
         int videoHeight = Integer.parseInt(heightString);
+        Log.d(TAG, "handleSelectedVideo: videoWidth=" + videoWidth);
+        Log.d(TAG, "handleSelectedVideo: videoHeight=" + videoHeight);
         // 计算视频的宽高比
         float aspectRatio = (float) videoWidth / videoHeight;
         // 根据视频的宽高比，设置视频的宽度和高度
         ViewGroup.LayoutParams layoutParams = videoView.getLayoutParams();
-        layoutParams.width = videoView.getWidth();
+        layoutParams.width = videoLayout.getWidth();
         layoutParams.height = (int) (layoutParams.width / aspectRatio);
+        Log.d(TAG, "handleSelectedVideo: width=" + layoutParams.width);
+        Log.d(TAG, "handleSelectedVideo: height=" + layoutParams.height);
         videoView.setLayoutParams(layoutParams);
+        videoView.setVideoURI(uri);
+        videoView.setVisibility(View.VISIBLE);
+        videoView.start();
+
         // MediaController 播放/暂停/快进/快退
         videoView.setMediaController(new MediaController(this));
     }
@@ -292,6 +296,29 @@ public class PubActivity extends AppCompatActivity {
         Log.d(TAG, "getRealPathFromURI: " + realPath);
         return realPath;
     }
+    // 拍照时，创建一个临时的文件保存图片
+    private Uri createImageUri() {
+        ContentResolver contentResolver = getContentResolver();
+        ContentValues contentValues = new ContentValues();
+        // 生成唯一的文件名
+        String fileName = "temp_image_" + System.currentTimeMillis() + ".jpg";
+        contentValues.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
+        contentValues.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+        return contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
+    }
+    // 录制视频时，创建一个临时的文件保存视频
+    private Uri createVideoUri() {
+        ContentResolver contentResolver = getContentResolver();
+        ContentValues contentValues = new ContentValues();
+        // 生成唯一的文件名
+        String fileName = "temp_video_" + System.currentTimeMillis() + ".mp4";
+//        contentValues.put(MediaStore.Video.Media.RELATIVE_PATH, Environment.DIRECTORY_MOVIES); // 保存到电影目录下
+//        contentValues.put(MediaStore.Video.Media.TITLE, "temp_video");
+        contentValues.put(MediaStore.Video.Media.DISPLAY_NAME, fileName);
+        contentValues.put(MediaStore.Video.Media.MIME_TYPE, "video/mp4");
+
+        return contentResolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, contentValues);
+    }
 
     public void addPhoto(View view) {
         PopupMenu popupMenu = new PopupMenu(PubActivity.this, photoBtn);
@@ -307,8 +334,10 @@ public class PubActivity extends AppCompatActivity {
                     return true;
                 case R.id.take_photo:
                     if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-                        Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                        takePhotoLauncher.launch(takePhotoIntent);
+//                        Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//                        takePhotoLauncher.launch(takePhotoIntent);
+                        imageUri = createImageUri();
+                        cameraLauncher.launch(imageUri);
                     } else {
                         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 1);
                     }
@@ -334,9 +363,13 @@ public class PubActivity extends AppCompatActivity {
                     return true;
                 case R.id.record_video:
                     if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-                        // 已经授权，可以使用相机
+//                        // 已经授权，可以使用相机
+                        // 启动相机应用
+                        videoUri = createVideoUri();
                         Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+                        takeVideoIntent.putExtra(MediaStore.EXTRA_OUTPUT, videoUri);
                         takeVideoLauncher.launch(takeVideoIntent);
+//                        cameraVideoLauncher.launch(videoUri);
                         return true;
                     } else {
                         // 未授权，需要向用户请求相机权限

@@ -129,11 +129,13 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentView
             }
             //TODO: 直接放一个图标表示存在视频，或者放一个视频的第一帧
             if(moment.getVideoPath() != null) {
-                mVideoView.setVideoURI(Uri.parse(moment.getVideoPath()));
-                mVideoView.setVisibility(View.VISIBLE);
-                mVideoView.start();
+//                mVideoView.setVideoURI(Uri.parse(moment.getVideoPath()));
+//                mVideoView.setVisibility(View.VISIBLE);
+//                mVideoView.start();
+                mVideoFrameView.setVisibility(View.VISIBLE);
             } else {
                 mVideoView.setVisibility(View.GONE);
+                mVideoFrameView.setVisibility(View.GONE);
             }
             mAddressTextView.setText(moment.getAddress());
             mLikeTextView.setText(String.valueOf(moment.getLikeCount()));
