@@ -1,6 +1,15 @@
 from rest_framework import serializers
 from moments.models import Moment, Comment
-from users.serializers import UserSerializer
+from users.models import MyUser
+
+
+class ImageUrlField(serializers.RelatedField):
+    def to_representation(self, instance):
+        url = instance.user.avatar.url
+        request = self.context.get('request', None)
+        if request is not None:
+            return request.build_absolute_uri(url)
+        return url
 
 
 class MomentSerializer(serializers.ModelSerializer):
@@ -8,19 +17,38 @@ class MomentSerializer(serializers.ModelSerializer):
     total_stars = serializers.IntegerField(read_only=True)
     total_comments = serializers.IntegerField(read_only=True)
     comments = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    usr_username = serializers.SlugRelatedField(source='user',
+                                                slug_field='username', read_only=True)
+    usr_avatar = serializers.SerializerMethodField('get_usr_avatar')
 
     class Meta:
         model = Moment
         fields = '__all__'
 
+    def get_usr_avatar(self, obj):
+        url = obj.user.avatar.url if obj.user.avatar else ''
+        request = self.context.get('request', None)
+        if request is not None:
+            return request.build_absolute_uri(url) if url else None
+        return url
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    usr_username = serializers.SlugRelatedField(source='user',
+                                                slug_field='username', read_only=True)
+    usr_avatar = serializers.SerializerMethodField('get_usr_avatar')
 
     class Meta:
         model = Comment
         fields = '__all__'
         # depth = 1
+
+    def get_usr_avatar(self, obj):
+        url = obj.user.avatar.url if obj.user.avatar else ''
+        request = self.context.get('request', None)
+        if request is not None:
+            return request.build_absolute_uri(url) if url else None
+        return url
 
 
 class LikeStarSerializer(serializers.Serializer):

@@ -23,7 +23,7 @@ from django.conf.urls.static import static
 
 schema_view = get_schema_view(
     openapi.Info(
-        title="CareForBaby API",
+        title="CampusMoments API",
         default_version='v1',
         description="",
     ),
