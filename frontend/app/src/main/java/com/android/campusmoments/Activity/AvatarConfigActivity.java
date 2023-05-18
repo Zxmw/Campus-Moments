@@ -45,7 +45,7 @@ public class AvatarConfigActivity extends AppCompatActivity {
 //        avatar.setImageURI(Uri.parse(Services.mySelf.avatar));
         if (Services.mySelf.avatar == null) {
             // use R.drawable.default_avatar
-            avatar.setImageResource(R.drawable.avatar_default);
+            avatar.setImageResource(R.drawable.avatar_1);
         }
         else {
             Picasso.get().load(Uri.parse(Services.mySelf.avatar)).into(avatar);

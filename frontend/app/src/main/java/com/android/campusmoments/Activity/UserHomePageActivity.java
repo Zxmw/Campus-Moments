@@ -91,6 +91,16 @@ public class UserHomePageActivity extends AppCompatActivity {
             Picasso.get().load(Uri.parse(user.avatar)).into(avatar);
         }
         Log.d("follow", String.valueOf(Services.mySelf.followList));
+        if (Services.mySelf.id == user.id) {
+            followButton.setVisibility(View.GONE);
+            blockButton.setVisibility(View.GONE);
+            privateMessageButton.setVisibility(View.GONE);
+        }
+        else {
+            followButton.setVisibility(View.VISIBLE);
+            blockButton.setVisibility(View.VISIBLE);
+            privateMessageButton.setVisibility(View.VISIBLE);
+        }
         if (Services.mySelf.followList.contains(user.id)) {
             isFollowed = true;
             followButton.setText("取消关注");

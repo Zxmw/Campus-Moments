@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.android.campusmoments.Fragment.HomeFragment;
 import com.android.campusmoments.Fragment.MomentsFragment;
+import com.android.campusmoments.Fragment.MyFragment;
 import com.android.campusmoments.R;
 import com.android.campusmoments.Service.Services;
 
@@ -28,6 +29,7 @@ public class HomeActivity extends AppCompatActivity {
     private ActivityResultLauncher<Intent> pubLauncher;
 
     HomeFragment homeFragment;
+    MyFragment myFragment;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,6 +39,7 @@ public class HomeActivity extends AppCompatActivity {
         // home page fragment
         FragmentContainerView fragmentContainerView = findViewById(R.id.fragmentContainerView);
         homeFragment = new HomeFragment();
+        myFragment = new MyFragment();
         getSupportFragmentManager().beginTransaction().replace(fragmentContainerView.getId(), homeFragment).commit();
 
         homeButton = findViewById(R.id.homeButton);
@@ -44,14 +47,17 @@ public class HomeActivity extends AppCompatActivity {
         profileButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(HomeActivity.this, PersonCenterActivity.class);
-                startActivity(intent);
+                // switch to myFragment
+                getSupportFragmentManager().beginTransaction().replace(fragmentContainerView.getId(), myFragment).commit();
             }
         });
         homeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // switch to homeFragment
+                getSupportFragmentManager().beginTransaction().replace(fragmentContainerView.getId(), homeFragment).commit();
                 homeFragment.refresh();
+
             }
         });
 

@@ -1,10 +1,8 @@
 package com.android.campusmoments.Adapter;
 import com.android.campusmoments.R;
 import com.android.campusmoments.Service.PrivateMessage;
-import com.squareup.picasso.Picasso;
 
 import android.content.Context;
-import android.net.Uri;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,7 +31,7 @@ public class PrivateMessageAdapter extends RecyclerView.Adapter<PrivateMessageAd
     @NonNull
     @Override
     public MessageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_private_message, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.private_message_item, parent, false);
         return new MessageViewHolder(view);
     }
 

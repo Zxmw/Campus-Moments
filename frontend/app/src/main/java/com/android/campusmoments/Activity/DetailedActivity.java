@@ -106,7 +106,7 @@ public class DetailedActivity extends AppCompatActivity {
                 try {
                     JSONObject obj = new JSONObject(msg.obj.toString());
                     moment = new Moment(obj);
-                    Services.setMomentUser(moment, setMomentUserHandler);
+                    Services.setMomentUser(0, moment, setMomentUserHandler);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

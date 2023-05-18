@@ -654,7 +654,7 @@ public class Services {
         });
     }
     // 为动态设置用户信息
-    public static void setMomentUser(Moment moment, Handler handler) {
+    public static void setMomentUser(int index, Moment moment, Handler handler) {
         getUserById(moment.getUserId(), new Handler(Looper.getMainLooper()) {
             @Override
             public void handleMessage(@NonNull Message msg) {
@@ -666,6 +666,8 @@ public class Services {
                         moment.setUserInfo(obj);
                         Message message = new Message();
                         message.what = SET_MOMENT_USER_SUCCESS;
+                        message.obj = moment;
+                        message.arg1 = index;
                         handler.sendMessage(message);
                     } catch (JSONException e) {
                         e.printStackTrace();

@@ -32,6 +32,7 @@ import java.util.List;
 
 public class MomentsFragment extends Fragment {
     private static final String TAG = "MomentsFragment";
+    private boolean refreshing = false;
     public static final int TYPE_ALL = 0;
     public static final int TYPE_PERSON = 1;
     private int type;
@@ -45,10 +46,13 @@ public class MomentsFragment extends Fragment {
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
             if(msg.what == SET_MOMENT_USER_SUCCESS) {
-                cnt++;
-                if(cnt == mMomentList.size()) {
+                int index = msg.arg1;
+                mMomentList.set(index, (Moment) msg.obj);
+                cnt--;
+                if(cnt == 0) {
                     momentAdapter.setMoments(mMomentList);
                     momentAdapter.notifyDataSetChanged();
+                    refreshing = false;
                 }
             }
         }
@@ -62,10 +66,15 @@ public class MomentsFragment extends Fragment {
                     JSONArray arr = new JSONArray(msg.obj.toString());
                     Log.d(TAG, "onResponse: " + arr.length());
                     mMomentList.clear();
-                    cnt = 0;
+                    mMomentList = new ArrayList<>(arr.length());
+                    // init mMomentList
                     for (int i = 0; i < arr.length(); i++) {
-                        mMomentList.add(new Moment(arr.getJSONObject(i)));
-                        Services.setMomentUser(mMomentList.get(i), setMomentUserHandler);
+                        mMomentList.add(null);
+                    }
+                    cnt = arr.length();
+                    for (int i = 0; i < arr.length(); i++) {
+                        Moment moment = new Moment(arr.getJSONObject(i));
+                        Services.setMomentUser(i, moment, setMomentUserHandler);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -83,6 +92,10 @@ public class MomentsFragment extends Fragment {
         this.type = TYPE_ALL;
     }
     public void refresh() {
+        if (refreshing) {
+            return;
+        }
+        refreshing = true;
         if (type == TYPE_PERSON) {
             Services.getMomentsByUser(userId, getMomentsHandler);
         } else if(type == TYPE_ALL) {
@@ -102,7 +115,7 @@ public class MomentsFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_moments, container, false);
 
-        momentsRecyclerView = view.findViewById(R.id.user_moments_recycler_view);
+        momentsRecyclerView = view.findViewById(R.id.following_view);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         momentsRecyclerView.setLayoutManager(layoutManager);
         momentAdapter = new MomentAdapter(mMomentList, new MomentAdapter.OnItemClickListener() {
