@@ -72,12 +72,6 @@ public class HomeActivity extends AppCompatActivity {
                     public void onActivityResult(ActivityResult result) {
                         if (result.getResultCode() == RESULT_OK) {
                             homeFragment.refresh();
-                            // todo : add moment
-                            Intent data = result.getData();
-                            if (data != null) {
-//                                data.putExtra("username", /*TODO: getUsername*/);
-//                                homeFragment.addMoment(data);
-                            }
                         }
                     }
                 });

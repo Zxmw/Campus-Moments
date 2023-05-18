@@ -26,6 +26,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.media.MediaMetadataRetriever;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -49,6 +50,10 @@ import android.widget.VideoView;
 import static com.android.campusmoments.Service.Config.*;
 import com.android.campusmoments.R;
 import com.android.campusmoments.Service.Services;
+import com.google.android.exoplayer2.ExoPlayer;
+import com.google.android.exoplayer2.MediaItem;
+import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
+import com.google.android.exoplayer2.ui.PlayerView;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -137,7 +142,8 @@ public class PubActivity extends AppCompatActivity {
         tagView = findViewById(R.id.tag_view);
         titleView = findViewById(R.id.title_view);
         pictureView = findViewById(R.id.picture_view);
-        videoView = findViewById(R.id.video_view);
+        videoView = findViewById(R.id.videoView);
+
         videoLayout = findViewById(R.id.videoLayout);
         // 定位
         positionTextView = findViewById(R.id.positionTextView);
@@ -241,7 +247,9 @@ public class PubActivity extends AppCompatActivity {
         String content = knife.toHtml();
         String address = positionTextView.getText().toString();
         Services.pubMoment(pubMomentHandler, tag, title, content, imagePath, videoPath, address);
-
+        // 通知上一个页面刷新
+        Intent intent = new Intent();
+        setResult(RESULT_OK, intent);
         finish();
     }
 
@@ -258,26 +266,23 @@ public class PubActivity extends AppCompatActivity {
         retriever.setDataSource(videoPath);
         String widthString = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH);
         String heightString = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT);
-
         int videoWidth = Integer.parseInt(widthString);
         int videoHeight = Integer.parseInt(heightString);
-        Log.d(TAG, "handleSelectedVideo: videoWidth=" + videoWidth);
-        Log.d(TAG, "handleSelectedVideo: videoHeight=" + videoHeight);
         // 计算视频的宽高比
         float aspectRatio = (float) videoWidth / videoHeight;
         // 根据视频的宽高比，设置视频的宽度和高度
         ViewGroup.LayoutParams layoutParams = videoView.getLayoutParams();
         layoutParams.width = videoLayout.getWidth();
-        layoutParams.height = (int) (layoutParams.width / aspectRatio);
-        Log.d(TAG, "handleSelectedVideo: width=" + layoutParams.width);
-        Log.d(TAG, "handleSelectedVideo: height=" + layoutParams.height);
+        layoutParams.height = (int) (layoutParams.width * aspectRatio);
+        // TODO: 这里的宽和高的处理有问题，有的是横屏的，有的是竖屏的
+//        layoutParams.height = (int) (layoutParams.width / aspectRatio);
         videoView.setLayoutParams(layoutParams);
         videoView.setVideoURI(uri);
         videoView.setVisibility(View.VISIBLE);
         videoView.start();
-
         // MediaController 播放/暂停/快进/快退
         videoView.setMediaController(new MediaController(this));
+
     }
     public String getRealPathFromURI(Uri uri) {
         // 只有从相册中选择的图片才有真实路径，文件管理器中的图片没有真实路径

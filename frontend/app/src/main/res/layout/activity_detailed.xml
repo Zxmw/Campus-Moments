@@ -79,7 +79,6 @@
                 android:focusable="false"
                 android:clickable="false"
                 android:padding="5dp"
-                android:minLines="3"
                 android:hint="内容"
                 android:scrollbars="vertical"
                 android:background="@android:color/transparent"
@@ -101,31 +100,21 @@
                 android:scaleType="centerCrop"
                 android:src="@drawable/picture_default" />
 
-            <com.google.android.exoplayer2.ui.PlayerControlView
-                android:id="@+id/playerControlView"
+            <com.google.android.exoplayer2.ui.PlayerView
+                android:id="@+id/playerView"
                 android:layout_width="200dp"
-                android:layout_height="wrap_content"
+                android:layout_height="400dp"
                 android:layout_marginTop="5dp" />
 
-            <FrameLayout
-                android:layout_width="200dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp">
-                <VideoView
-                    android:id="@+id/videoView"
-                    android:layout_width="match_parent"
-                    android:layout_height="400dp"
-                    android:layout_gravity="center"
-                    android:gravity="center" />
-            </FrameLayout>
-
             <LinearLayout
+                android:id="@+id/locationLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_marginTop="5dp"
                 android:paddingVertical="3dp">
                 <ImageView
+                    android:id="@+id/locationImageView"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:src="@drawable/ic_location_blue" />
