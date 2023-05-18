@@ -47,9 +47,10 @@ public class MomentsFragment extends Fragment {
             super.handleMessage(msg);
             if(msg.what == SET_MOMENT_USER_SUCCESS) {
                 int index = msg.arg1;
-                mMomentList.set(index, (Moment) msg.obj);
+//                mMomentList.set(index, (Moment) msg.obj);
                 cnt--;
                 if(cnt == 0) {
+
                     momentAdapter.setMoments(mMomentList);
                     momentAdapter.notifyDataSetChanged();
                     refreshing = false;
@@ -68,13 +69,13 @@ public class MomentsFragment extends Fragment {
                     mMomentList.clear();
                     mMomentList = new ArrayList<>(arr.length());
                     // init mMomentList
-                    for (int i = 0; i < arr.length(); i++) {
-                        mMomentList.add(null);
-                    }
+//                    for (int i = 0; i < arr.length(); i++) {
+//                        mMomentList.add(null);
+//                    }
                     cnt = arr.length();
                     for (int i = 0; i < arr.length(); i++) {
-                        Moment moment = new Moment(arr.getJSONObject(i));
-                        Services.setMomentUser(i, moment, setMomentUserHandler);
+                        mMomentList.add(new Moment(arr.getJSONObject(i)));
+                        Services.setMomentUser(i, mMomentList.get(i), setMomentUserHandler);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
