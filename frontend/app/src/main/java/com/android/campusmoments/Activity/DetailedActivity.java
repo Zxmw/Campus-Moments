@@ -1,5 +1,6 @@
 package com.android.campusmoments.Activity;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -22,6 +23,7 @@ import com.android.campusmoments.R;
 import com.android.campusmoments.Service.Moment;
 import com.android.campusmoments.Service.Services;
 import com.google.android.exoplayer2.ExoPlayer;
+import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.ui.PlayerControlView;
 import com.google.android.exoplayer2.ui.PlayerView;
@@ -76,11 +78,14 @@ public class DetailedActivity extends AppCompatActivity {
                 } else {
                     pictureView.setVisibility(ImageView.GONE);
                 }
+
                 if(moment.getVideoPath() != null) {
                     Log.d(TAG, "handleMessage: " + moment.getVideoPath());
-                    videoView.setVideoURI(Uri.parse(moment.getVideoPath()));
-                    videoView.setMediaController(new MediaController(DetailedActivity.this));
-                    videoView.start();
+//                    videoView.setVideoURI(Uri.parse(moment.getVideoPath()));
+//                    videoView.setMediaController(new MediaController(DetailedActivity.this));
+//                    videoView.start();
+                    videoView.setVisibility(VideoView.GONE);
+                    setPlayerControlView(moment.getVideoPath());
                 } else {
                     videoView.setVisibility(VideoView.GONE);
                 }
@@ -148,8 +153,16 @@ public class DetailedActivity extends AppCompatActivity {
             Services.getMomentById(id, getMomentHandler);
         }
     }
-    private void setPlayerControlView(String videoPath) {
-        
-
+    private void setPlayerControlView(@NonNull String videoPath) {
+        ExoPlayer player = new ExoPlayer.Builder(this).build();
+        playerControlView.setPlayer(player);
+        // Build the media item.
+        MediaItem mediaItem = MediaItem.fromUri(Uri.parse(videoPath));
+        // Set the media item to be played.
+        player.setMediaItem(mediaItem);
+        // Prepare the player.
+        player.prepare();
+        // Start the playback.
+        player.play();
     }
 }
