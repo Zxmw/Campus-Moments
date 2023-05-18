@@ -153,7 +153,6 @@
                     android:scaleType="centerCrop"
                     android:src="@drawable/picture_default"
                     android:visibility="gone"/>
-
                 <FrameLayout
                     android:id="@+id/videoLayout"
                     android:layout_width="200dp"
@@ -162,12 +161,10 @@
                     android:layout_marginLeft="5dp"
                     android:layout_gravity="left" >
                     <VideoView
-                        android:id="@+id/video_view"
+                        android:id="@+id/videoView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
                 </FrameLayout>
-
-
 
                 <LinearLayout
                     android:id="@+id/positionLayout"

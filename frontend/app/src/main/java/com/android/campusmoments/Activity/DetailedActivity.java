@@ -13,6 +13,7 @@ import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,8 +45,9 @@ public class DetailedActivity extends AppCompatActivity {
     private TextView titleTextView;
     private KnifeText contentKnifeText;
     private ImageView pictureView;
-    private VideoView videoView;
-    private PlayerControlView playerControlView;
+    private PlayerView playerView;
+    private LinearLayout locationLayout;
+    private ImageView locationImageView;
     private TextView addressTextView;
     private TextView likeTextView;
     private TextView commentTextView;
@@ -70,26 +72,30 @@ public class DetailedActivity extends AppCompatActivity {
                 }
                 usernameTextView.setText(moment.getUsername());
                 timeTextView.setText(moment.getTime());
-                tagTextView.setText(moment.getTag());
+                if(moment.getTag()==null || moment.getTag().equals("")) {
+                    tagTextView.setVisibility(TextView.GONE);
+                } else {
+                    tagTextView.setText(moment.getTag());
+                }
                 titleTextView.setText(moment.getTitle());
-                contentKnifeText.fromHtml(moment.getContent());
+                if(moment.getContent().equals("")) {
+                    contentKnifeText.setVisibility(KnifeText.GONE);
+                } else {
+                    contentKnifeText.fromHtml(moment.getContent());
+                }
                 if(moment.getImagePath() != null) {
                     Picasso.get().load(Uri.parse(moment.getImagePath())).into(pictureView);
                 } else {
                     pictureView.setVisibility(ImageView.GONE);
                 }
-
-                if(moment.getVideoPath() != null) {
-                    Log.d(TAG, "handleMessage: " + moment.getVideoPath());
-//                    videoView.setVideoURI(Uri.parse(moment.getVideoPath()));
-//                    videoView.setMediaController(new MediaController(DetailedActivity.this));
-//                    videoView.start();
-                    videoView.setVisibility(VideoView.GONE);
-                    setPlayerControlView(moment.getVideoPath());
+                setPlayerView(moment.getVideoPath());
+                if(moment.getAddress() == null || moment.getAddress().equals("")) {
+                    locationLayout.setVisibility(LinearLayout.GONE);
+                    locationImageView.setVisibility(ImageView.GONE);
+                    addressTextView.setVisibility(TextView.GONE);
                 } else {
-                    videoView.setVisibility(VideoView.GONE);
+                    addressTextView.setText(moment.getAddress());
                 }
-                addressTextView.setText(moment.getAddress());
                 likeTextView.setText(String.valueOf(moment.getLikeCount()));
                 commentTextView.setText(String.valueOf(moment.getCommentCount()));
                 starTextView.setText(String.valueOf(moment.getStarCount()));
@@ -127,8 +133,9 @@ public class DetailedActivity extends AppCompatActivity {
         titleTextView = findViewById(R.id.title_textview);
         contentKnifeText = findViewById(R.id.content_knifetext);
         pictureView = findViewById(R.id.picture_imageview);
-        videoView = findViewById(R.id.videoView);
-        playerControlView = findViewById(R.id.playerControlView);
+        playerView = findViewById(R.id.playerView);
+        locationLayout = findViewById(R.id.locationLayout);
+        locationImageView = findViewById(R.id.locationImageView);
         addressTextView = findViewById(R.id.address_textview);
         likeTextView = findViewById(R.id.like_textview);
         commentTextView = findViewById(R.id.comment_textview);
@@ -153,16 +160,20 @@ public class DetailedActivity extends AppCompatActivity {
             Services.getMomentById(id, getMomentHandler);
         }
     }
-    private void setPlayerControlView(@NonNull String videoPath) {
-        ExoPlayer player = new ExoPlayer.Builder(this).build();
-        playerControlView.setPlayer(player);
-        // Build the media item.
-        MediaItem mediaItem = MediaItem.fromUri(Uri.parse(videoPath));
-        // Set the media item to be played.
-        player.setMediaItem(mediaItem);
-        // Prepare the player.
-        player.prepare();
-        // Start the playback.
-        player.play();
+    // 显示网络视频
+    private void setPlayerView(String videoPath) {
+        // exoplayer: https://developer.android.com/guide/topics/media/exoplayer/hello-world
+        if (videoPath == null) {
+            playerView.setVisibility(VideoView.GONE);
+            return;
+        } else {
+            playerView.setVisibility(VideoView.VISIBLE);
+            ExoPlayer player = new ExoPlayer.Builder(this).build();
+            playerView.setPlayer(player);
+            MediaItem mediaItem = MediaItem.fromUri(Uri.parse(videoPath));
+            player.setMediaItem(mediaItem);
+            player.prepare();
+            player.play();
+        }
     }
 }

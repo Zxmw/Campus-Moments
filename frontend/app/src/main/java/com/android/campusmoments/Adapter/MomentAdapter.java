@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.VideoView;
@@ -64,6 +65,8 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentView
         private ImageView mPictureImageView;
         private ImageView mVideoFrameView;
         private VideoView mVideoView;
+        private LinearLayout posLayout;
+        private ImageView posImageView;
         private TextView mAddressTextView;
         private TextView mLikeTextView;
         private TextView mCommentTextView;
@@ -79,6 +82,8 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentView
             mPictureImageView = itemView.findViewById(R.id.picture_imageview);
             mVideoView = itemView.findViewById(R.id.videoView);
             mVideoFrameView = itemView.findViewById(R.id.videoFrameView);
+            posLayout = itemView.findViewById(R.id.posContainer);
+            posImageView = itemView.findViewById(R.id.posImageView);
             mAddressTextView = itemView.findViewById(R.id.address_textview);
             mLikeTextView = itemView.findViewById(R.id.like_textview);
             mCommentTextView = itemView.findViewById(R.id.comment_textview);
@@ -113,7 +118,12 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentView
                 }
             });
             mTimeTextView.setText(moment.getTime());
-            mTagTextView.setText(moment.getTag());
+            if (moment.getTag() != null && !moment.getTag().equals("")) {
+                mTagTextView.setVisibility(View.VISIBLE);
+                mTagTextView.setText(moment.getTag());
+            } else {
+                mTagTextView.setVisibility(View.GONE);
+            }
             mTitleTextView.setText(moment.getTitle());
             if (moment.getContent() != null && !moment.getContent().equals("")) {
                 mContentKnifeText.setVisibility(View.VISIBLE);
@@ -137,7 +147,16 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentView
                 mVideoView.setVisibility(View.GONE);
                 mVideoFrameView.setVisibility(View.GONE);
             }
-            mAddressTextView.setText(moment.getAddress());
+            if (moment.getAddress() != null && !moment.getAddress().equals("")) {
+                posLayout.setVisibility(View.VISIBLE);
+                posImageView.setVisibility(View.VISIBLE);
+                mAddressTextView.setVisibility(View.VISIBLE);
+                mAddressTextView.setText(moment.getAddress());
+            } else {
+                posLayout.setVisibility(View.GONE);
+                posImageView.setVisibility(View.GONE);
+                mAddressTextView.setVisibility(View.GONE);
+            }
             mLikeTextView.setText(String.valueOf(moment.getLikeCount()));
             mCommentTextView.setText(String.valueOf(moment.getCommentCount()));
             mStarTextView.setText(String.valueOf(moment.getStarCount()));
