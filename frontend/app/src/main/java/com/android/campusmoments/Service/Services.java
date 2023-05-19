@@ -653,34 +653,6 @@ public class Services {
             }
         });
     }
-    // 为动态设置用户信息
-    public static void setMomentUser(int index, Moment moment, Handler handler) {
-        getUserById(moment.getUserId(), new Handler(Looper.getMainLooper()) {
-            @Override
-            public void handleMessage(@NonNull Message msg) {
-                super.handleMessage(msg);
-                if (msg.what == GET_USER_SUCCESS) {
-                    JSONObject obj = null;
-                    try {
-                        obj = new JSONObject(msg.obj.toString());
-                        moment.setUserInfo(obj);
-                        Message message = new Message();
-                        message.what = SET_MOMENT_USER_SUCCESS;
-                        message.obj = moment;
-                        message.arg1 = index;
-                        handler.sendMessage(message);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                } else if (msg.what == GET_USER_FAIL) {
-                    Message message = new Message();
-                    message.what = SET_MOMENT_USER_FAIL;
-                    handler.sendMessage(msg);
-                }
-            }
-        });
-    }
-
 
     /* 网络工具 */
     public static String checkObjStr(JSONObject obj, String name) {

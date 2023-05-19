@@ -21,19 +21,13 @@ public class Moment {
 
     private String[] mComments; // TODO: 评论
 
-    public void setUserInfo(JSONObject obj) {
-        try {
-            mUsername = Services.checkObjStr(obj, "username");
-            avatarPath = Services.checkObjStr(obj, "avatar");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
     public Moment(JSONObject obj) {
         try {
             // 返回值不为空时，赋值
             id = obj.getInt("id");
             userId = obj.getInt("user");
+            mUsername = Services.checkObjStr(obj, "usr_username");
+            avatarPath = Services.checkObjStr(obj, "usr_avatar");
             mTime = Services.checkObjStr(obj, "created_at");
             mTag = Services.checkObjStr(obj, "tag");
             mTitle = Services.checkObjStr(obj, "title");

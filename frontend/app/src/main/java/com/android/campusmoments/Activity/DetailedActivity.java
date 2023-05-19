@@ -58,50 +58,6 @@ public class DetailedActivity extends AppCompatActivity {
     private Button sendCommentButton;
     private Moment moment;
 
-    private Handler setMomentUserHandler = new Handler(Looper.getMainLooper()) {
-        @Override
-        public void handleMessage(android.os.Message msg) {
-            if(msg.what == SET_MOMENT_USER_FAIL) {
-                Toast.makeText(DetailedActivity.this, "网络错误", Toast.LENGTH_SHORT).show();
-                finish();
-            } else if(msg.what == SET_MOMENT_USER_SUCCESS) {
-                if(moment.getAvatarPath() != null) {
-                    Picasso.get().load(Uri.parse(moment.getAvatarPath())).into(avatarImageView);
-                } else {
-                    avatarImageView.setImageResource(R.drawable.avatar_1);
-                }
-                usernameTextView.setText(moment.getUsername());
-                timeTextView.setText(moment.getTime());
-                if(moment.getTag()==null || moment.getTag().equals("")) {
-                    tagTextView.setVisibility(TextView.GONE);
-                } else {
-                    tagTextView.setText(moment.getTag());
-                }
-                titleTextView.setText(moment.getTitle());
-                if(moment.getContent().equals("")) {
-                    contentKnifeText.setVisibility(KnifeText.GONE);
-                } else {
-                    contentKnifeText.fromHtml(moment.getContent());
-                }
-                if(moment.getImagePath() != null) {
-                    Picasso.get().load(Uri.parse(moment.getImagePath())).into(pictureView);
-                } else {
-                    pictureView.setVisibility(ImageView.GONE);
-                }
-                setPlayerView(moment.getVideoPath());
-                if(moment.getAddress() == null || moment.getAddress().equals("")) {
-                    locationLayout.setVisibility(LinearLayout.GONE);
-                    locationImageView.setVisibility(ImageView.GONE);
-                    addressTextView.setVisibility(TextView.GONE);
-                } else {
-                    addressTextView.setText(moment.getAddress());
-                }
-                likeTextView.setText(String.valueOf(moment.getLikeCount()));
-                commentTextView.setText(String.valueOf(moment.getCommentCount()));
-                starTextView.setText(String.valueOf(moment.getStarCount()));
-            }
-        }
-    };
     private Handler getMomentHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(android.os.Message msg) {
@@ -112,7 +68,7 @@ public class DetailedActivity extends AppCompatActivity {
                 try {
                     JSONObject obj = new JSONObject(msg.obj.toString());
                     moment = new Moment(obj);
-                    Services.setMomentUser(0, moment, setMomentUserHandler);
+                    refresh();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -175,5 +131,42 @@ public class DetailedActivity extends AppCompatActivity {
             player.prepare();
             player.play();
         }
+    }
+
+    private void refresh() {
+        if(moment.getAvatarPath() != null) {
+            Picasso.get().load(Uri.parse(moment.getAvatarPath())).into(avatarImageView);
+        } else {
+            avatarImageView.setImageResource(R.drawable.avatar_1);
+        }
+        usernameTextView.setText(moment.getUsername());
+        timeTextView.setText(moment.getTime());
+        if(moment.getTag()==null || moment.getTag().equals("")) {
+            tagTextView.setVisibility(TextView.GONE);
+        } else {
+            tagTextView.setText(moment.getTag());
+        }
+        titleTextView.setText(moment.getTitle());
+        if(moment.getContent().equals("")) {
+            contentKnifeText.setVisibility(KnifeText.GONE);
+        } else {
+            contentKnifeText.fromHtml(moment.getContent());
+        }
+        if(moment.getImagePath() != null) {
+            Picasso.get().load(Uri.parse(moment.getImagePath())).into(pictureView);
+        } else {
+            pictureView.setVisibility(ImageView.GONE);
+        }
+        setPlayerView(moment.getVideoPath());
+        if(moment.getAddress() == null || moment.getAddress().equals("")) {
+            locationLayout.setVisibility(LinearLayout.GONE);
+            locationImageView.setVisibility(ImageView.GONE);
+            addressTextView.setVisibility(TextView.GONE);
+        } else {
+            addressTextView.setText(moment.getAddress());
+        }
+        likeTextView.setText(String.valueOf(moment.getLikeCount()));
+        commentTextView.setText(String.valueOf(moment.getCommentCount()));
+        starTextView.setText(String.valueOf(moment.getStarCount()));
     }
 }

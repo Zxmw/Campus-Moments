@@ -1,5 +1,6 @@
 package com.android.campusmoments.Fragment;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -35,30 +36,14 @@ public class MomentsFragment extends Fragment {
     private boolean refreshing = false;
     public static final int TYPE_ALL = 0;
     public static final int TYPE_PERSON = 1;
-    private int type;
+    private final int type;
     private int userId = -1;
     private List<Moment> mMomentList;
-    private int cnt = 0;
     private RecyclerView momentsRecyclerView;
     private MomentAdapter momentAdapter;
-    private Handler setMomentUserHandler = new Handler(Looper.getMainLooper()) {
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-            super.handleMessage(msg);
-            if(msg.what == SET_MOMENT_USER_SUCCESS) {
-                int index = msg.arg1;
-//                mMomentList.set(index, (Moment) msg.obj);
-                cnt--;
-                if(cnt == 0) {
 
-                    momentAdapter.setMoments(mMomentList);
-                    momentAdapter.notifyDataSetChanged();
-                    refreshing = false;
-                }
-            }
-        }
-    };
-    private Handler getMomentsHandler = new Handler(Looper.getMainLooper()) {
+    private final Handler getMomentsHandler = new Handler(Looper.getMainLooper()) {
+        @SuppressLint("NotifyDataSetChanged")
         @Override
         public void handleMessage(@NonNull android.os.Message msg) {
             super.handleMessage(msg);
@@ -68,15 +53,11 @@ public class MomentsFragment extends Fragment {
                     Log.d(TAG, "onResponse: " + arr.length());
                     mMomentList.clear();
                     mMomentList = new ArrayList<>(arr.length());
-                    // init mMomentList
-//                    for (int i = 0; i < arr.length(); i++) {
-//                        mMomentList.add(null);
-//                    }
-                    cnt = arr.length();
                     for (int i = 0; i < arr.length(); i++) {
                         mMomentList.add(new Moment(arr.getJSONObject(i)));
-                        Services.setMomentUser(i, mMomentList.get(i), setMomentUserHandler);
                     }
+                    momentAdapter.setMoments(mMomentList);
+                    momentAdapter.notifyDataSetChanged();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
