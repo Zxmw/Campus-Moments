@@ -18,22 +18,34 @@ import android.widget.TextView;
 import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentContainerView;
 
 import com.android.campusmoments.Activity.PersonCenterActivity;
+import com.android.campusmoments.Activity.UserListActivity;
 import com.android.campusmoments.R;
 import com.android.campusmoments.Service.Services;
 import com.squareup.picasso.Picasso;
 
 public class MyFragment extends Fragment {
+    public static final int TYPE_ALL = 0;
+    public static final int TYPE_PERSON = 1;
+    private static final int TYPE_FOLLOW = 0;
+    private static final int TYPE_FANS = 1;
+    private static final int TYPE_BLOCK = 2;
     private static int id;
     private ImageButton gotoSettings;
     private ImageView avatar;
     private TextView selfUsername;
     private TextView selfUserId;
     private TextView selfFollowingNum;
-    private LinearLayout followingLayout;
-    private LinearLayout momentLayout;
+    private TextView selfFansNum;
+    private TextView selfBlockNum;
 
+    private LinearLayout followingLayout;
+    private LinearLayout fansLayout;
+    private LinearLayout blockLayout;
+    private FragmentContainerView fragmentContainerView;
+    public MomentsFragment selfMomentsFragment;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -61,15 +73,47 @@ public class MyFragment extends Fragment {
         selfFollowingNum = view.findViewById(R.id.following_number_text);
         selfFollowingNum.setText(String.valueOf(Services.mySelf.followList.size()));
         followingLayout = view.findViewById(R.id.following_layout);
+        followingLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), UserListActivity.class);
+                intent.putExtra("type", TYPE_FOLLOW);
+                startActivity(intent);
+            }
+        });
 
-        
+        selfFansNum = view.findViewById(R.id.fans_number_text);
+        selfFansNum.setText(String.valueOf(Services.mySelf.fansList.size()));
+        fansLayout = view.findViewById(R.id.fans_layout);
+        fansLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), UserListActivity.class);
+                intent.putExtra("type", TYPE_FANS);
+                startActivity(intent);
+            }
+        });
+
+        selfBlockNum = view.findViewById(R.id.block_number_text);
+        selfBlockNum.setText(String.valueOf(Services.mySelf.blockList.size()));
+        blockLayout = view.findViewById(R.id.block_layout);
+        blockLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), UserListActivity.class);
+                intent.putExtra("type", TYPE_BLOCK);
+                startActivity(intent);
+            }
+        });
+        selfMomentsFragment = new MomentsFragment(TYPE_PERSON, Services.mySelf.id);
+        fragmentContainerView = view.findViewById(R.id.fragmentContainerView_my);
+        getChildFragmentManager().beginTransaction().replace(R.id.fragmentContainerView_my, selfMomentsFragment).commit();
         return view;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        Log.d("MyFragment", "onResume: ");
         refresh();
     }
 
@@ -84,5 +128,8 @@ public class MyFragment extends Fragment {
         selfUsername.setText(Services.mySelf.username);
         selfUserId.setText(String.valueOf(Services.mySelf.id));
         selfFollowingNum.setText(String.valueOf(Services.mySelf.followList.size()));
+        selfFansNum.setText(String.valueOf(Services.mySelf.fansList.size()));
+        selfBlockNum.setText(String.valueOf(Services.mySelf.blockList.size()));
+        selfMomentsFragment.refresh();
     }
 }

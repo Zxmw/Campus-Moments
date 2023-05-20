@@ -94,12 +94,11 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentView
             if(moment.getAvatarPath() != null) {
                 Log.d(TAG, moment.getAvatarPath());
                 Picasso.get().load(Uri.parse(moment.getAvatarPath())).into(mAvatarImageView);
-
-                mAvatarImageView.setVisibility(View.VISIBLE);
             } else {
                 Log.d(TAG, "bindData: avatarPath is null");
                 mAvatarImageView.setImageResource(R.drawable.avatar_1); // 默认头像
             }
+            mAvatarImageView.setVisibility(View.VISIBLE);
             mAvatarImageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

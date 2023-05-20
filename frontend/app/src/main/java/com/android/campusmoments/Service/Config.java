@@ -33,10 +33,13 @@ public class Config {
     public static final int GET_MOMENT_SUCCESS = 27;
     public static final int SET_MOMENT_USER_FAIL = 28;
     public static final int SET_MOMENT_USER_SUCCESS = 29;
+    public static final int GET_ALL_USERS_FAIL = 30;
+    public static final int GET_ALL_USERS_SUCCESS = 31;
     public static final String USER_BASE_URL = "http://10.0.2.2:8000/users/api/";
     public static final String LOGIN_URL = USER_BASE_URL + "login";
     public static final String REGISTER_URL = USER_BASE_URL + "register";
     public static final String SELF_URL = USER_BASE_URL + "self";
+    public static final String GET_ALL_USERS_URL = USER_BASE_URL + "users";
     public static final String GET_USER_URL = USER_BASE_URL + "users/";
     public static final String PATCH_USER_URL = USER_BASE_URL + "users/";
     public static final String LOGOUT_URL = USER_BASE_URL + "logout";

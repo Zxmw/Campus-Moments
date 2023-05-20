@@ -14,8 +14,7 @@ public class User {
     public String avatar;
     public List<Integer> followList;
     public List<Integer> blockList;
-
-    public boolean isBlocked = false;
+    public List<Integer> fansList;
 
     public User(JSONObject jsonObject) {
         try {
@@ -28,6 +27,7 @@ public class User {
                 avatar = jsonObject.getString("avatar");
             followList = Services.jsonArrayToList(jsonObject.getJSONArray("follow_list"));
             blockList = Services.jsonArrayToList(jsonObject.getJSONArray("block_list"));
+            fansList = Services.jsonArrayToList(jsonObject.getJSONArray("followers"));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -27,7 +27,7 @@
         android:theme="@style/Theme.CampusMoments"
         tools:targetApi="31">
         <activity
-            android:name=".Activity.FollowingListActivity"
+            android:name=".Activity.UserListActivity"
             android:exported="false" />
         <activity
             android:name=".Activity.PrivateMessageActivity"

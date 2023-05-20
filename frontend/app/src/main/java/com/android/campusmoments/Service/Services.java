@@ -119,7 +119,6 @@ public class Services {
             }
         });
     }
-
     public static void register(String email, String username, String password, Handler handler) {
         String params = "{\"email\":\"" + email + "\",\"username\":\"" + username + "\",\"password\":\"" + password + "\"}";
         Log.d(TAG, "run: " + params);
@@ -181,7 +180,38 @@ public class Services {
             }
         });
     }
+    // 获取所有用户
+    public static void getAllUsers(Handler handler) {
+        Request request = new Request.Builder()
+                .addHeader("Authorization", "Token " + token)
+                .url(GET_ALL_USERS_URL)
+                .get()
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NonNull okhttp3.Call call, @NonNull java.io.IOException e) {
+                Log.d(TAG, "onFailure: " + e.getMessage());
+                Message message = new Message();
+                message.what = GET_ALL_USERS_FAIL;
+                handler.sendMessage(message);
+            }
 
+            @Override
+            public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws java.io.IOException {
+                if (response.code() != 200) {
+                    Message message = new Message();
+                    message.what = GET_ALL_USERS_FAIL;
+                    handler.sendMessage(message);
+                    return;
+                }
+                Message message = new Message();
+                message.what = GET_ALL_USERS_SUCCESS;
+                message.obj = response.body().string();
+                Log.d(TAG, "onResponse: " + message.obj);
+                handler.sendMessage(message);
+            }
+        });
+    }
     public static void setAvatar(String avatarPath, Handler handler) {
         MultipartBody.Builder builder = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM);
@@ -397,6 +427,7 @@ public class Services {
                 else
                     message.what = FOLLOW_SUCCESS;
                 message.obj = response.body().string();
+                message.arg1 = id;
                 Log.d(TAG, "onResponse: " + message.obj);
                 handler.sendMessage(message);
             }
@@ -446,6 +477,7 @@ public class Services {
                 else
                     message.what = BLOCK_SUCCESS;
                 message.obj = response.body().string();
+                message.arg1 = id;
                 Log.d(TAG, "onResponse: " + message.obj);
                 handler.sendMessage(message);
             }
@@ -517,7 +549,6 @@ public class Services {
             }
         });
     }
-
     // 获取所有动态
     public static void getMomentsAll(Handler handler) {
         Request request = new Request.Builder()
@@ -555,7 +586,6 @@ public class Services {
             }
         });
     }
-
     // 获取指定用户的动态
     public static void getMomentsByUser(int id, Handler handler) {
         Request request = new Request.Builder()
@@ -653,7 +683,6 @@ public class Services {
             }
         });
     }
-
     /* 网络工具 */
     public static String checkObjStr(JSONObject obj, String name) {
         try {

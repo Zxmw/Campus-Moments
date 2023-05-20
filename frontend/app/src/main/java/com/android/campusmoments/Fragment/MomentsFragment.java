@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -64,6 +63,7 @@ public class MomentsFragment extends Fragment {
             } else if (msg.what == GET_MOMENTS_FAIL) {
                 Toast.makeText(requireActivity(), "获取动态失败", Toast.LENGTH_SHORT).show();
             }
+            refreshing = false;
         }
     };
     public MomentsFragment(int type, int userId) {
@@ -97,7 +97,7 @@ public class MomentsFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_moments, container, false);
 
-        momentsRecyclerView = view.findViewById(R.id.following_view);
+        momentsRecyclerView = view.findViewById(R.id.user_recycler_view);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         momentsRecyclerView.setLayoutManager(layoutManager);
         momentAdapter = new MomentAdapter(mMomentList, new MomentAdapter.OnItemClickListener() {

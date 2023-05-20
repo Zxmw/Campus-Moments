@@ -4,14 +4,11 @@ package com.android.campusmoments.Activity;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentContainerView;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import static com.android.campusmoments.Service.Config.*;
-import com.android.campusmoments.Adapter.MomentAdapter;
+
 import com.android.campusmoments.Fragment.MomentsFragment;
 import com.android.campusmoments.R;
-import com.android.campusmoments.Service.Moment;
 import com.android.campusmoments.Service.Services;
 import com.android.campusmoments.Service.User;
 
@@ -31,12 +28,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 public class UserHomePageActivity extends AppCompatActivity {
@@ -51,6 +45,7 @@ public class UserHomePageActivity extends AppCompatActivity {
     private Button followButton;
     private Button privateMessageButton;
     private Button blockButton;
+    boolean inited = false;
 
     private FragmentContainerView fragmentContainerView;
     public MomentsFragment userMomentsFragment;
@@ -68,7 +63,7 @@ public class UserHomePageActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainerView_home, userMomentsFragment).commit();
     }
 
-    private void initUserInfo() {
+    private void refresh() {
         avatar = findViewById(R.id.user_avatar);
         userName = findViewById(R.id.username_text);
         userId = findViewById(R.id.user_id_text);
@@ -100,16 +95,24 @@ public class UserHomePageActivity extends AppCompatActivity {
             followButton.setVisibility(View.VISIBLE);
             blockButton.setVisibility(View.VISIBLE);
             privateMessageButton.setVisibility(View.VISIBLE);
-        }
-        if (Services.mySelf.followList.contains(user.id)) {
-            isFollowed = true;
-            followButton.setText("取消关注");
-            blockButton.setVisibility(View.GONE);
-        }
-        if (Services.mySelf.blockList.contains(user.id)) {
-            isBlocked = true;
-            blockButton.setText("取消屏蔽");
-            followButton.setVisibility(View.GONE);
+            if (Services.mySelf.followList.contains(user.id)) {
+                isFollowed = true;
+                followButton.setText("取消关注");
+                blockButton.setVisibility(View.GONE);
+            } else {
+                isFollowed = false;
+                followButton.setText("关注");
+                blockButton.setVisibility(View.VISIBLE);
+            }
+            if (Services.mySelf.blockList.contains(user.id)) {
+                isBlocked = true;
+                blockButton.setText("取消屏蔽");
+                followButton.setVisibility(View.GONE);
+            } else {
+                isBlocked = false;
+                blockButton.setText("屏蔽");
+                followButton.setVisibility(View.VISIBLE);
+            }
         }
     }
     @SuppressLint("HandlerLeak")
@@ -178,7 +181,7 @@ public class UserHomePageActivity extends AppCompatActivity {
         try {
             jsonObject = new JSONObject(obj.toString());
             user = new User(jsonObject);
-            initUserInfo();
+            refresh();
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
@@ -247,6 +250,16 @@ public class UserHomePageActivity extends AppCompatActivity {
         intent.putExtra("id", user.id);
         intent.putExtra("username", user.username);
         startActivity(intent);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (!inited) {
+            inited = true;
+        } else {
+            refresh();
+        }
     }
 
     public void cancel(View view) {
