@@ -6,6 +6,7 @@ from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.decorators import method_decorator
 from knox.models import AuthToken
 from rest_framework import response, status, permissions
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.generics import GenericAPIView, RetrieveAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.parsers import MultiPartParser, FormParser
 
@@ -52,6 +53,9 @@ class UserListAPIView(ListCreateAPIView):
     serializer_class = UserSerializer
     queryset = MyUser.objects.all()
     permission_classes = (permissions.IsAuthenticated,)
+    filter_backends = [DjangoFilterBackend]
+
+    filterset_fields = {'id': ["in", "exact"]}
 
     def perform_create(self, serializer):
         user = serializer.save()

@@ -17,10 +17,14 @@ class UserSerializer(serializers.ModelSerializer):
         many=True,
         read_only=True
     )
+    followers = serializers.PrimaryKeyRelatedField(
+        many=True,
+        read_only=True
+    )
 
     class Meta:
         model = MyUser
-        fields = ['id', 'username', 'avatar', 'bio', 'follow_list', 'block_list', 'email']
+        fields = ['id', 'username', 'avatar', 'bio', 'follow_list', 'block_list', 'email','followers']
 
 
 class RegisterSerializer(serializers.ModelSerializer):
