@@ -18,6 +18,7 @@
             android:layout_width="52dp"
             android:layout_height="52dp"
             android:background="@drawable/bg_circle"
+            android:clipToPadding="false"
             app:cardCornerRadius="30dp">
 
             <ImageView
@@ -25,6 +26,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center_horizontal"
+                android:cropToPadding="false"
+                android:scaleType="centerCrop"
                 android:src="@drawable/avatar_1" />
         </androidx.cardview.widget.CardView>
 

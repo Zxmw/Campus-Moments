@@ -112,7 +112,6 @@ public class PersonCenterActivity extends AppCompatActivity {
 
     public void logout(View view) {
         Services.logout(handler);
-        finish();
     }
 
 }

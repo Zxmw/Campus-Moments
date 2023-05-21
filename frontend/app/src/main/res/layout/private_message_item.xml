@@ -1,17 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/messageLinearLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:padding="16dp">
 
-    <ImageView
-        android:id="@+id/avatarImageView"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_gravity="center_horizontal"
-        android:src="@drawable/avatar_1" />
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardView_private_message_item"
+        android:layout_width="52dp"
+        android:layout_height="52dp"
+        android:background="@drawable/bg_circle"
+        android:clipToPadding="false"
+        app:cardCornerRadius="30dp">
+
+        <ImageView
+            android:id="@+id/avatarImageView_private_message_item"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:cropToPadding="false"
+            android:scaleType="centerCrop"
+            android:src="@drawable/avatar_1" />
+    </androidx.cardview.widget.CardView>
 
     <LinearLayout
         android:id="@+id/textLinearLayout"

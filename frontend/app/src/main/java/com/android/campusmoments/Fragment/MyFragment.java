@@ -118,7 +118,6 @@ public class MyFragment extends Fragment {
     }
 
     public void refresh() {
-        Log.d("MyFragment", "refresh: ");
         if (Services.mySelf.avatar == null){
             avatar.setImageResource(R.drawable.avatar_1);
         }

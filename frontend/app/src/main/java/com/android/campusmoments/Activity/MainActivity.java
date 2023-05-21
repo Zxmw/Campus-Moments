@@ -44,7 +44,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mPreferences = getSharedPreferences("user_info", MODE_PRIVATE);
         String token = mPreferences.getString("token", null);
-        Log.d("token111", token);
         if (token != null) {
             Services.token = token;
             Services.tokenCheck(token, handler);
