@@ -199,10 +199,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginTop="5dp"/>
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/commentRecyclerview"
+
+            <androidx.fragment.app.FragmentContainerView
+                android:id="@+id/commentFragmentContainerView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                tools:layout="@layout/fragment_comments"/>
         </LinearLayout>
     </ScrollView>
 

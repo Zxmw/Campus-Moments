@@ -49,6 +49,9 @@ public class Config {
     public static final String PUB_MOMENT_URL = MOMENTS_BASE_URL + "moments";
     public static final String GET_MOMENTS_URL = MOMENTS_BASE_URL + "moments";
     public static final String GET_MOMENT_URL = MOMENTS_BASE_URL + "moments/";
+
+    public static final String POST_COMMENT_URL = MOMENTS_BASE_URL + "comments";
+    public static final String GET_COMMENT_URL = MOMENTS_BASE_URL + "comments/";
     public static final MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");
     public static final MediaType MEDIA_TYPE_FORM_DATA = MediaType.parse("multipart/form-data; charset=utf-8");
 }

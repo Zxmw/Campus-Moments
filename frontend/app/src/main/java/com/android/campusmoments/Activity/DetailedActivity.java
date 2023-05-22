@@ -2,6 +2,7 @@ package com.android.campusmoments.Activity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentContainerView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
@@ -10,6 +11,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -20,6 +22,8 @@ import android.widget.Toast;
 import android.widget.VideoView;
 
 import static com.android.campusmoments.Service.Config.*;
+
+import com.android.campusmoments.Fragment.CommentsFragment;
 import com.android.campusmoments.R;
 import com.android.campusmoments.Service.Moment;
 import com.android.campusmoments.Service.Services;
@@ -53,7 +57,8 @@ public class DetailedActivity extends AppCompatActivity {
     private TextView commentTextView;
     private TextView starTextView;
 
-    private RecyclerView commentsRecyclerView;
+    private FragmentContainerView commentFragmentContainerView;
+    private CommentsFragment commentsFragment;
     private EditText commentEditText;
     private Button sendCommentButton;
     private Moment moment;
@@ -76,6 +81,18 @@ public class DetailedActivity extends AppCompatActivity {
         }
 
     };
+    private Handler postCommentHandler = new Handler(Looper.getMainLooper()) {
+        @Override
+        public void handleMessage(android.os.Message msg) {
+            if(msg.what == 0) {
+                Toast.makeText(DetailedActivity.this, "发送失败", Toast.LENGTH_SHORT).show();
+            } else if(msg.what == 1) {
+                Toast.makeText(DetailedActivity.this, "评论成功", Toast.LENGTH_SHORT).show();
+                commentEditText.setText("");
+                Services.getMomentById(moment.getId(), getMomentHandler);
+            }
+        }
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -96,16 +113,32 @@ public class DetailedActivity extends AppCompatActivity {
         likeTextView = findViewById(R.id.like_textview);
         commentTextView = findViewById(R.id.comment_textview);
         starTextView = findViewById(R.id.star_textview);
-        commentsRecyclerView = findViewById(R.id.commentRecyclerview);
+        commentFragmentContainerView = findViewById(R.id.commentFragmentContainerView);
         commentEditText = findViewById(R.id.comment_edittext);
         sendCommentButton = findViewById(R.id.sendcomment_button);
 
+        commentsFragment = new CommentsFragment();
+        getSupportFragmentManager().beginTransaction().add(R.id.commentFragmentContainerView, commentsFragment).commit();
+
+        setupCommentBtn();
         setData();
 
-        // TODO: setup sendCommentButton
         // TODO: setup commentsRecyclerView
     }
 
+    private void setupCommentBtn() {
+        sendCommentButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String comment = commentEditText.getText().toString();
+                if(comment.equals("")) {
+                    Toast.makeText(DetailedActivity.this, "评论不能为空", Toast.LENGTH_SHORT).show();
+                } else {
+                    Services.postComment(postCommentHandler, comment, moment.getId());
+                }
+            }
+        });
+    }
     private void setData() { // 从intent中获取id，然后获取moment
         Intent intent = getIntent();
         int id = intent.getIntExtra("id", -1);
@@ -168,5 +201,8 @@ public class DetailedActivity extends AppCompatActivity {
         likeTextView.setText(String.valueOf(moment.getLikeCount()));
         commentTextView.setText(String.valueOf(moment.getCommentCount()));
         starTextView.setText(String.valueOf(moment.getStarCount()));
+
+        // 设置评论
+//        commentsFragment.setCommentIdList(moment.getCommentIds());
     }
 }

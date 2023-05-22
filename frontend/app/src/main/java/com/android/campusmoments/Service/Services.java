@@ -683,6 +683,76 @@ public class Services {
             }
         });
     }
+    // 评论
+    public static void postComment(Handler handler, @NonNull String content, @NonNull int momentId) {
+        MultipartBody.Builder builder = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM);
+        builder.addFormDataPart("content", content);
+        builder.addFormDataPart("by", String.valueOf(mySelf.id));
+        builder.addFormDataPart("moment", String.valueOf(momentId));
+        RequestBody requestBody = builder.build();
+        Request request = new Request.Builder()
+                .addHeader("Authorization", "Token " + token)
+                .url(POST_COMMENT_URL)
+                .post(requestBody)
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NonNull okhttp3.Call call, @NonNull java.io.IOException e) {
+                Log.d(TAG, "postComment-onFailure: " + e.getMessage());
+                Message message = new Message();
+                message.what = 0;
+                handler.sendMessage(message);
+            }
+
+            @Override
+            public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws java.io.IOException {
+                if (response.code() != 500) {
+                    Message message = new Message();
+                    message.what = 0;
+                    handler.sendMessage(message);
+                    return;
+                }
+                Message message = new Message();
+                message.what = 1;
+                message.obj = response.body().string();
+//                Log.d(TAG, "onResponse: " + message.obj);
+                handler.sendMessage(message);
+            }
+        });
+    }
+
+    public static void getCommentById(Handler handler, int id) {
+        Request request = new Request.Builder()
+                .addHeader("Authorization", "Token " + token)
+                .url(GET_COMMENT_URL + id)
+                .get()
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NonNull okhttp3.Call call, @NonNull java.io.IOException e) {
+                Log.d(TAG, "getCommentById-onFailure: " + e.getMessage());
+                Message message = new Message();
+                message.what = 0;
+                handler.sendMessage(message);
+            }
+
+            @Override
+            public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws java.io.IOException {
+                if (response.code() != 500) {
+                    Message message = new Message();
+                    message.what = 0;
+                    handler.sendMessage(message);
+                    return;
+                }
+                Message message = new Message();
+                message.what = 1;
+                message.obj = response.body().string();
+//                Log.d(TAG, "onResponse: " + message.obj);
+                handler.sendMessage(message);
+            }
+        });
+    }
     /* 网络工具 */
     public static String checkObjStr(JSONObject obj, String name) {
         try {

@@ -1,6 +1,9 @@
 package com.android.campusmoments.Service;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.util.List;
 
 
 public class Moment {
@@ -19,7 +22,7 @@ public class Moment {
     private int mCommentCount;
     private int mStarCount;
 
-    private String[] mComments; // TODO: 评论
+    private List<Integer> commentIds; // 评论id - list
 
     public Moment(JSONObject obj) {
         try {
@@ -38,6 +41,9 @@ public class Moment {
             mLikeCount = obj.getInt("total_likes");
             mCommentCount = obj.getInt("total_comments");
             mStarCount = obj.getInt("total_stars");
+
+            JSONArray comments = obj.getJSONArray("comments");
+            commentIds = Services.jsonArrayToList(comments);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -88,5 +94,8 @@ public class Moment {
     }
     public int getStarCount() {
         return mStarCount;
+    }
+    public List<Integer> getCommentIds() {
+        return commentIds;
     }
 }
