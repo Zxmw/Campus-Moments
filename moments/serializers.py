@@ -34,7 +34,7 @@ class MomentSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    usr_username = serializers.SlugRelatedField(source='user',
+    usr_username = serializers.SlugRelatedField(source='by',
                                                 slug_field='username', read_only=True)
     usr_avatar = serializers.SerializerMethodField('get_usr_avatar')
 
@@ -44,7 +44,7 @@ class CommentSerializer(serializers.ModelSerializer):
         # depth = 1
 
     def get_usr_avatar(self, obj):
-        url = obj.user.avatar.url if obj.user.avatar else ''
+        url = obj.by.avatar.url if obj.by.avatar else ''
         request = self.context.get('request', None)
         if request is not None:
             return request.build_absolute_uri(url) if url else None
