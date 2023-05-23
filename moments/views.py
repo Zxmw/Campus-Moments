@@ -72,7 +72,7 @@ class LikeStarAPIView(GenericAPIView):
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
-            moment = Moment.objects.get(id=serializer.validated_data[0])
+            moment = serializer.validated_data[0]
             if serializer.validated_data[1] == 'like':
                 if serializer.validated_data[2] == 'add':
                     moment.liked_by.add(request.user)
