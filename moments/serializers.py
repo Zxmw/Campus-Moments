@@ -58,7 +58,7 @@ class LikeStarSerializer(serializers.Serializer):
 
     def validate(self, data):
         try:
-            moment = Moment.objects.get(pk=data.get('id'))
+            moment = Moment.objects.get(pk=data.get('moment_id'))
             list = data.get('list')
             action = data.get('action')
             return moment, list, action
