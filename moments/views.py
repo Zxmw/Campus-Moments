@@ -79,7 +79,7 @@ class LikeStarAPIView(GenericAPIView):
                 else:
                     moment.liked_by.remove(request.user)
             else:
-                if serializer.validated_data[2] == 'star':
+                if serializer.validated_data[2] == 'add':
                     moment.stared_by.add(request.user)
                 else:
                     moment.stared_by.remove(request.user)
