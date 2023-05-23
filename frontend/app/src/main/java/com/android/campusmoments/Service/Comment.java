@@ -4,7 +4,7 @@ import org.json.JSONObject;
 
 import java.util.List;
 
-public class Comment {
+public class Comment implements Comparable<Comment>{
     private int id;
     private String avatarPath;
     private String username;
@@ -13,6 +13,7 @@ public class Comment {
 
     public Comment(JSONObject obj) {
         try {
+            id = obj.getInt("id");
             username = Services.checkObjStr(obj, "usr_username");
             avatarPath = Services.checkObjStr(obj, "usr_avatar");
             time = Services.checkObjStr(obj, "created_at");
@@ -21,7 +22,13 @@ public class Comment {
             e.printStackTrace();
         }
     }
-
+    @Override
+    public int compareTo(Comment comment) {
+        return this.id - comment.id; // 按照 评论时间（id） 排序
+    }
+    public int getId() {
+        return id;
+    }
     public String getUsername() {
         return username;
     }

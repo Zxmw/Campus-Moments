@@ -224,9 +224,10 @@
             android:textColor="@android:color/black" />
         <Button
             android:id="@+id/sendcomment_button"
-            android:layout_width="wrap_content"
+            android:layout_width="55dp"
             android:layout_height="wrap_content"
+            style="@style/button_green_style"
             android:text="发送"
-            android:textSize="16sp" />
+            android:textSize="14sp" />
     </LinearLayout>
 </LinearLayout>

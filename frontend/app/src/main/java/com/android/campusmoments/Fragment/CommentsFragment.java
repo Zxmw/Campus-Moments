@@ -23,6 +23,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class CommentsFragment extends Fragment {
@@ -38,9 +39,11 @@ public class CommentsFragment extends Fragment {
                 try {
                     JSONObject obj = new JSONObject(msg.obj.toString());
                     Comment comment = new Comment(obj);
-                    Log.d(TAG, "handleMessage: " + comment.getUsername() + " " + comment.getContent() + " " + comment.getTime());
+                    Log.d(TAG, "handleMessage: " + comment.getId() + " " + comment.getUsername() + " " + comment.getContent() + " " + comment.getTime());
                     mCommentList.add(comment);
                     if (mCommentList.size() == commentIdList.size()) {
+                        // 按照 评论时间（id） 排序
+                        Collections.sort(mCommentList);
                         commentAdapter.setComments(mCommentList);
                         commentAdapter.notifyDataSetChanged();
                     }

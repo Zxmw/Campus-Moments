@@ -203,6 +203,6 @@ public class DetailedActivity extends AppCompatActivity {
         starTextView.setText(String.valueOf(moment.getStarCount()));
 
         // 设置评论
-//        commentsFragment.setCommentIdList(moment.getCommentIds());
+        commentsFragment.setCommentIdList(moment.getCommentIds());
     }
 }

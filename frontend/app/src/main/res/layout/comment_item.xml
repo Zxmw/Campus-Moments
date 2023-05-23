@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="10dp">
+    android:layout_marginTop="5dp">
 
     <ImageView
         android:id="@+id/iv_avatar"
@@ -22,7 +22,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="name"
-            android:textColor="@android:color/black"
+            android:textColor="#8938f6"
             android:textSize="14sp" />
         <TextView
             android:id="@+id/tv_content"
@@ -37,6 +37,9 @@
             android:layout_marginRight="10dp"
             android:text="19:40"
             android:textSize="10sp" />
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="match_parent"
+            android:layout_height="1dp" />
     </LinearLayout>
 
 </LinearLayout>

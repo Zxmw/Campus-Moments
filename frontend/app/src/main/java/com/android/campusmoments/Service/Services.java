@@ -707,7 +707,7 @@ public class Services {
 
             @Override
             public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws java.io.IOException {
-                if (response.code() != 500) {
+                if (response.code() != 201) {
                     Message message = new Message();
                     message.what = 0;
                     handler.sendMessage(message);
@@ -739,7 +739,7 @@ public class Services {
 
             @Override
             public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws java.io.IOException {
-                if (response.code() != 500) {
+                if (response.code() != 200) {
                     Message message = new Message();
                     message.what = 0;
                     handler.sendMessage(message);
