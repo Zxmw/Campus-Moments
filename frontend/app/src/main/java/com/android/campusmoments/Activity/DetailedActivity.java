@@ -54,9 +54,12 @@ public class DetailedActivity extends AppCompatActivity {
     private ImageView locationImageView;
     private TextView addressTextView;
     private TextView likeTextView;
+    private ImageView likeImageView;
     private TextView commentTextView;
     private TextView starTextView;
-
+    private ImageView starImageView;
+    private ImageView shareImageView;
+    private ImageView returnImageView; // 返回按钮
     private FragmentContainerView commentFragmentContainerView;
     private CommentsFragment commentsFragment;
     private EditText commentEditText;
@@ -93,12 +96,24 @@ public class DetailedActivity extends AppCompatActivity {
             }
         }
     };
+    private Handler likeStarHandler = new Handler(Looper.getMainLooper()) {
+        @Override
+        public void handleMessage(android.os.Message msg) {
+            if(msg.what == 0) {
+                Toast.makeText(DetailedActivity.this, "网络错误", Toast.LENGTH_SHORT).show();
+            } else if(msg.what == 1) {
+                Toast.makeText(DetailedActivity.this, "成功", Toast.LENGTH_SHORT).show();
+                Services.getMomentById(moment.getId(), getMomentHandler);
+            }
+        }
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detailed);
 
         // 初始化控件
+        returnImageView = findViewById(R.id.returnImageView);
         avatarImageView = findViewById(R.id.avatar_imageview);
         usernameTextView = findViewById(R.id.username_textview);
         timeTextView = findViewById(R.id.time_textview);
@@ -111,8 +126,10 @@ public class DetailedActivity extends AppCompatActivity {
         locationImageView = findViewById(R.id.locationImageView);
         addressTextView = findViewById(R.id.address_textview);
         likeTextView = findViewById(R.id.like_textview);
+        likeImageView = findViewById(R.id.likeImageView);
         commentTextView = findViewById(R.id.comment_textview);
         starTextView = findViewById(R.id.star_textview);
+        starImageView = findViewById(R.id.starImageView);
         commentFragmentContainerView = findViewById(R.id.commentFragmentContainerView);
         commentEditText = findViewById(R.id.comment_edittext);
         sendCommentButton = findViewById(R.id.sendcomment_button);
@@ -120,12 +137,42 @@ public class DetailedActivity extends AppCompatActivity {
         commentsFragment = new CommentsFragment();
         getSupportFragmentManager().beginTransaction().add(R.id.commentFragmentContainerView, commentsFragment).commit();
 
+        setupReturnView();
+        setupLikeView();
+        setupStarView();
         setupCommentBtn();
         setData();
 
-        // TODO: setup commentsRecyclerView
     }
-
+    private void setupReturnView() {
+        returnImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                setResult(RESULT_OK, intent);
+                finish();
+            }
+        });
+    }
+    // 点赞事件
+    private void setupLikeView() {
+        likeImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "onClick: likeImageView");
+                Services.likeOrStar("like",  moment.getId(), !moment.isLikedByMe, likeStarHandler);
+            }
+        });
+    }
+    private void setupStarView() {
+        starImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "onClick: starImageView");
+                Services.likeOrStar("star",  moment.getId(), !moment.isStaredByMe, likeStarHandler);
+            }
+        });
+    }
     private void setupCommentBtn() {
         sendCommentButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -198,9 +245,20 @@ public class DetailedActivity extends AppCompatActivity {
         } else {
             addressTextView.setText(moment.getAddress());
         }
+
         likeTextView.setText(String.valueOf(moment.getLikeCount()));
         commentTextView.setText(String.valueOf(moment.getCommentCount()));
         starTextView.setText(String.valueOf(moment.getStarCount()));
+        if(moment.isLikedByMe){
+            likeImageView.setImageResource(R.drawable.ic_moment_thumbup_red);
+        } else {
+            likeImageView.setImageResource(R.drawable.ic_moment_thumbup);
+        }
+        if(moment.isStaredByMe){
+            starImageView.setImageResource(R.drawable.ic_moment_star_yellow);
+        } else {
+            starImageView.setImageResource(R.drawable.ic_moment_star);
+        }
 
         // 设置评论
         commentsFragment.setCommentIdList(moment.getCommentIds());

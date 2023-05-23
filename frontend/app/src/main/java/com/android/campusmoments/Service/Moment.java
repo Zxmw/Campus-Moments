@@ -22,6 +22,8 @@ public class Moment {
     private int mCommentCount;
     private int mStarCount;
 
+    public boolean isLikedByMe;
+    public boolean isStaredByMe;
     private List<Integer> commentIds; // 评论id - list
 
     public Moment(JSONObject obj) {
@@ -44,13 +46,21 @@ public class Moment {
 
             JSONArray comments = obj.getJSONArray("comments");
             commentIds = Services.jsonArrayToList(comments);
+
+            JSONArray liked_by = obj.getJSONArray("liked_by");
+            isLikedByMe = isByMe(liked_by);
+            JSONArray stared_by = obj.getJSONArray("stared_by");
+            isStaredByMe = isByMe(stared_by);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-
-    // 构造函数
+    // 判断是否被我点赞 / 收藏
+    private boolean isByMe(JSONArray jsonArray) {
+        List<Integer> list = Services.jsonArrayToList(jsonArray);
+        return list.contains(Services.mySelf.id);
+    }
 
     // get-function
     public int getId() {
@@ -89,11 +99,17 @@ public class Moment {
     public int getLikeCount() {
         return mLikeCount;
     }
+    public void setLikeCount(int likeCount) {
+        mLikeCount = likeCount;
+    }
     public int getCommentCount() {
         return mCommentCount;
     }
     public int getStarCount() {
         return mStarCount;
+    }
+    public void setStarCount(int starCount) {
+        mStarCount = starCount;
     }
     public List<Integer> getCommentIds() {
         return commentIds;

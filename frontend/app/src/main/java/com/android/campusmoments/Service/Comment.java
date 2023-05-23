@@ -24,7 +24,7 @@ public class Comment implements Comparable<Comment>{
     }
     @Override
     public int compareTo(Comment comment) {
-        return this.id - comment.id; // 按照 评论时间（id） 排序
+        return this.id - comment.id; // 按照 评论时间（id） 排序, 从小到大
     }
     public int getId() {
         return id;

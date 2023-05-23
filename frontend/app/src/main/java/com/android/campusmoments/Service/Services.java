@@ -753,6 +753,50 @@ public class Services {
             }
         });
     }
+
+    // 点赞 - 收藏
+    public static void likeOrStar(String likeOrStar, int momentId, boolean isLikedOrStared, Handler handler) {
+        FormBody.Builder builder = new FormBody.Builder();
+        builder.add("moment_id", String.valueOf(momentId));
+        builder.add("list", likeOrStar); // like or star
+        if(isLikedOrStared) {
+            builder.add("action", "add");
+        } else {
+            builder.add("action", "remove");
+        }
+        RequestBody requestBody = builder.build();
+        Request request = new Request.Builder()
+                .addHeader("Authorization", "Token " + token)
+                .url(LIKE_STAR_URL)
+                .post(requestBody)
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NonNull okhttp3.Call call, @NonNull java.io.IOException e) {
+                Log.d(TAG, "likeOrStar-onFailure: " + e.getMessage());
+                Message message = new Message();
+                message.what = 0;
+                handler.sendMessage(message);
+            }
+
+            @Override
+            public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws java.io.IOException {
+                if (response.code() != 200) {
+                    Message message = new Message();
+                    message.what = 0;
+                    handler.sendMessage(message);
+                    Log.d(TAG, "onResponse: " + response.body().string());
+                    return;
+                }
+                Message message = new Message();
+                message.what = 1;
+                message.obj = response.body().string();
+                Log.d(TAG, "onResponse: " + message.obj);
+                handler.sendMessage(message);
+            }
+        });
+    }
+
     /* 网络工具 */
     public static String checkObjStr(JSONObject obj, String name) {
         try {
@@ -763,4 +807,5 @@ public class Services {
         }
         return null;
     }
+
 }

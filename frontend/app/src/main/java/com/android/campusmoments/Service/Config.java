@@ -49,7 +49,7 @@ public class Config {
     public static final String PUB_MOMENT_URL = MOMENTS_BASE_URL + "moments";
     public static final String GET_MOMENTS_URL = MOMENTS_BASE_URL + "moments";
     public static final String GET_MOMENT_URL = MOMENTS_BASE_URL + "moments/";
-
+    public static final String LIKE_STAR_URL = MOMENTS_BASE_URL + "like-star";
     public static final String POST_COMMENT_URL = MOMENTS_BASE_URL + "comments";
     public static final String GET_COMMENT_URL = MOMENTS_BASE_URL + "comments/";
     public static final MediaType MEDIA_TYPE_JSON = MediaType.parse("application/json; charset=utf-8");

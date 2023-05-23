@@ -164,6 +164,7 @@
                 android:layout_weight="1" />
 
             <ImageView
+                android:id="@+id/likeImageView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_moment_thumbup" />
@@ -202,6 +203,7 @@
                 android:layout_weight="1" />
 
             <ImageView
+                android:id="@+id/starImageView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_moment_star" />
@@ -221,6 +223,7 @@
                 android:layout_weight="1" />
 
             <ImageView
+                android:id="@+id/shareImageView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_moment_share" />

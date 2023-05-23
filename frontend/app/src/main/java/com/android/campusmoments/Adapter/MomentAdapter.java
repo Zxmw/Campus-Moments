@@ -2,11 +2,6 @@ package com.android.campusmoments.Adapter;
 
 import android.content.Intent;
 import android.content.Context;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
-import android.media.MediaMetadataRetriever;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,12 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.VideoView;
 
-import androidx.annotation.NonNull;
-import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import com.android.campusmoments.Activity.UserHomePageActivity;
 import com.android.campusmoments.R;
@@ -27,14 +19,13 @@ import com.android.campusmoments.Service.Moment;
 import com.android.campusmoments.Service.Services;
 import com.squareup.picasso.Picasso;
 
-import java.util.HashMap;
 import java.util.List;
 import io.github.mthli.knife.KnifeText;
 
 public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentViewHolder> {
     private static final String TAG = "MomentAdapter";
     private List<Moment> mMoments;
-    private OnItemClickListener mOnItemClickListener;
+    private static OnItemClickListener mOnItemClickListener;
     private Context mContext;
     public MomentAdapter(List<Moment> moments, OnItemClickListener onItemClickListener) {
         mMoments = moments;
@@ -48,9 +39,13 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentView
     public void setMoments(List<Moment> moments) {
         mMoments = moments;
     }
-
+    public List<Moment> getMomentsList() {
+        return mMoments;
+    }
     public interface OnItemClickListener {
         void onItemClick(int position);
+        void onLikeClick(int position);
+        void onStarClick(int position);
     }
 
     public static class MomentViewHolder extends RecyclerView.ViewHolder {
@@ -68,8 +63,10 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentView
         private LinearLayout posLayout;
         private ImageView posImageView;
         private TextView mAddressTextView;
+        private ImageView mLikeImageView;
         private TextView mLikeTextView;
         private TextView mCommentTextView;
+        private ImageView mStarImageView;
         private TextView mStarTextView;
         public MomentViewHolder(View itemView) {
             super(itemView);
@@ -85,8 +82,10 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentView
             posLayout = itemView.findViewById(R.id.posContainer);
             posImageView = itemView.findViewById(R.id.posImageView);
             mAddressTextView = itemView.findViewById(R.id.address_textview);
+            mLikeImageView = itemView.findViewById(R.id.likeImageView);
             mLikeTextView = itemView.findViewById(R.id.like_textview);
             mCommentTextView = itemView.findViewById(R.id.comment_textview);
+            mStarImageView = itemView.findViewById(R.id.starImageView);
             mStarTextView = itemView.findViewById(R.id.star_textview);
         }
         public void bindData(Moment moment) {
@@ -156,9 +155,34 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentView
                 posImageView.setVisibility(View.GONE);
                 mAddressTextView.setVisibility(View.GONE);
             }
+            // TODO: 点赞、评论、收藏的点击事件
+            if(moment.isLikedByMe) {
+                mLikeImageView.setImageResource(R.drawable.ic_moment_thumbup_red);
+            } else {
+                mLikeImageView.setImageResource(R.drawable.ic_moment_thumbup);
+            }
+            mLikeImageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    int position = getBindingAdapterPosition(); // getAbsoluteAdapterPosition()
+                    mOnItemClickListener.onLikeClick(position);
+                }
+            });
             mLikeTextView.setText(String.valueOf(moment.getLikeCount()));
             mCommentTextView.setText(String.valueOf(moment.getCommentCount()));
             mStarTextView.setText(String.valueOf(moment.getStarCount()));
+            if(moment.isStaredByMe) {
+                mStarImageView.setImageResource(R.drawable.ic_moment_star_yellow);
+            } else {
+                mStarImageView.setImageResource(R.drawable.ic_moment_star);
+            }
+            mStarImageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    int position = getBindingAdapterPosition(); // getAbsoluteAdapterPosition()
+                    mOnItemClickListener.onStarClick(position);
+                }
+            });
         }
     }
 

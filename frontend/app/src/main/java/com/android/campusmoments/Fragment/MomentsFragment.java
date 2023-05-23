@@ -1,9 +1,15 @@
 package com.android.campusmoments.Fragment;
 
+import static android.app.Activity.RESULT_OK;
+
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -33,6 +39,7 @@ import java.util.List;
 public class MomentsFragment extends Fragment {
     private static final String TAG = "MomentsFragment";
     private boolean refreshing = false;
+
     public static final int TYPE_ALL = 0;
     public static final int TYPE_PERSON = 1;
     private final int type;
@@ -40,7 +47,15 @@ public class MomentsFragment extends Fragment {
     private List<Moment> mMomentList;
     private RecyclerView momentsRecyclerView;
     private MomentAdapter momentAdapter;
-
+    private ActivityResultLauncher<Intent> detailedLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    if (result.getResultCode() == RESULT_OK) {
+                        refresh();
+                    }
+                }
+            });
     private final Handler getMomentsHandler = new Handler(Looper.getMainLooper()) {
         @SuppressLint("NotifyDataSetChanged")
         @Override
@@ -106,7 +121,57 @@ public class MomentsFragment extends Fragment {
 //                Toast.makeText(getContext(), "clicked: "+position, Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(getActivity(), DetailedActivity.class);
                 intent.putExtra("id", mMomentList.get(position).getId());
-                startActivity(intent);
+//                startActivity(intent);
+                detailedLauncher.launch(intent);
+            }
+
+            @Override
+            public void onLikeClick(int position) {
+                Moment clickedMoment = mMomentList.get(position);
+                Services.likeOrStar("like", clickedMoment.getId(), !clickedMoment.isLikedByMe, new Handler(Looper.getMainLooper()){
+                    @Override
+                    public void handleMessage(@NonNull android.os.Message msg) {
+                        super.handleMessage(msg);
+                        if (msg.what == 1) {
+                            clickedMoment.isLikedByMe = !clickedMoment.isLikedByMe;
+                            int likeCount = clickedMoment.getLikeCount();
+                            if(clickedMoment.isLikedByMe) {
+                                clickedMoment.setLikeCount(likeCount + 1);
+                            } else {
+                                clickedMoment.setLikeCount(likeCount - 1);
+                            }
+                            mMomentList.set(position, clickedMoment);
+                            momentAdapter.setMoments(mMomentList);
+                            momentAdapter.notifyItemChanged(position);
+                        } else if (msg.what == 0) {
+                            Toast.makeText(requireActivity(), "点赞失败", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }
+            @Override
+            public void onStarClick(int position) {
+                Moment clickedMoment = mMomentList.get(position);
+                Services.likeOrStar("star", clickedMoment.getId(), !clickedMoment.isStaredByMe, new Handler(Looper.getMainLooper()){
+                    @Override
+                    public void handleMessage(@NonNull android.os.Message msg) {
+                        super.handleMessage(msg);
+                        if (msg.what == 1) {
+                            clickedMoment.isStaredByMe = !clickedMoment.isStaredByMe;
+                            int starCount = clickedMoment.getStarCount();
+                            if(clickedMoment.isStaredByMe) {
+                                clickedMoment.setStarCount(starCount + 1);
+                            } else {
+                                clickedMoment.setStarCount(starCount - 1);
+                            }
+                            mMomentList.set(position, clickedMoment);
+                            momentAdapter.setMoments(mMomentList);
+                            momentAdapter.notifyItemChanged(position);
+                        } else if (msg.what == 0) {
+                            Toast.makeText(requireActivity(), "收藏失败", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
             }
         });
         momentsRecyclerView.setAdapter(momentAdapter);
