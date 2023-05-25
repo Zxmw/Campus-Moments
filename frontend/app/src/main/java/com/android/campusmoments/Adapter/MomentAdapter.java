@@ -31,11 +31,7 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentView
         mMoments = moments;
         mOnItemClickListener = onItemClickListener;
     }
-    public MomentAdapter(Context context, List<Moment> moments, OnItemClickListener onItemClickListener) {
-        mContext = context;
-        mMoments = moments;
-        mOnItemClickListener = onItemClickListener;
-    }
+
     public void setMoments(List<Moment> moments) {
         mMoments = moments;
     }
@@ -43,7 +39,8 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentView
         return mMoments;
     }
     public interface OnItemClickListener {
-        void onItemClick(int position);
+        void onItemClick(View v, int position, int id);
+        void onAvatarClick(View v, int position, int id);
         void onLikeClick(int position);
         void onStarClick(int position);
     }
@@ -89,6 +86,7 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentView
             mStarTextView = itemView.findViewById(R.id.star_textview);
         }
         public void bindData(Moment moment) {
+            int position = getBindingAdapterPosition();
             // 将数据绑定到ViewHolder中的视图中
             if(moment.getAvatarPath() != null) {
                 Log.d(TAG, moment.getAvatarPath());
@@ -101,18 +99,16 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentView
             mAvatarImageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(v.getContext(), UserHomePageActivity.class);
-                    intent.putExtra("id", moment.getUserId());
-                    v.getContext().startActivity(intent);
+                    int id = moment.getUserId();
+                    mOnItemClickListener.onAvatarClick(v, position, id);
                 }
             });
             mUsernameTextView.setText(moment.getUsername());
             mUsernameTextView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(v.getContext(), UserHomePageActivity.class);
-                    intent.putExtra("id", moment.getUserId());
-                    v.getContext().startActivity(intent);
+                    int id = moment.getUserId();
+                    mOnItemClickListener.onAvatarClick(v, position, id);
                 }
             });
             mTimeTextView.setText(moment.getTime());
@@ -164,7 +160,6 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentView
             mLikeImageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    int position = getBindingAdapterPosition(); // getAbsoluteAdapterPosition()
                     mOnItemClickListener.onLikeClick(position);
                 }
             });
@@ -179,7 +174,6 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentView
             mStarImageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    int position = getBindingAdapterPosition(); // getAbsoluteAdapterPosition()
                     mOnItemClickListener.onStarClick(position);
                 }
             });
@@ -195,7 +189,8 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentView
             @Override
             public void onClick(View v) {
                 int position = viewHolder.getAdapterPosition();
-                mOnItemClickListener.onItemClick(position);
+                int id = mMoments.get(position).getId();
+                mOnItemClickListener.onItemClick(v, position, id);
             }
         });
         return viewHolder;

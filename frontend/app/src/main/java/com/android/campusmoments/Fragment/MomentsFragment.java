@@ -3,6 +3,8 @@ package com.android.campusmoments.Fragment;
 import static android.app.Activity.RESULT_OK;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -25,6 +27,8 @@ import android.widget.Toast;
 
 import static com.android.campusmoments.Service.Config.*;
 import com.android.campusmoments.Activity.DetailedActivity;
+import com.android.campusmoments.Activity.HomeActivity;
+import com.android.campusmoments.Activity.UserHomePageActivity;
 import com.android.campusmoments.Adapter.MomentAdapter;
 import com.android.campusmoments.R;
 import com.android.campusmoments.Service.Moment;
@@ -38,8 +42,8 @@ import java.util.List;
 
 public class MomentsFragment extends Fragment {
     private static final String TAG = "MomentsFragment";
+    public Activity mActivity;
     private boolean refreshing = false;
-
     public static final int TYPE_ALL = 0;
     public static final int TYPE_PERSON = 1;
     private final int type;
@@ -64,13 +68,12 @@ public class MomentsFragment extends Fragment {
             if (msg.what == GET_MOMENTS_SUCCESS) {
                 try {
                     JSONArray arr = new JSONArray(msg.obj.toString());
-                    Log.d(TAG, "onResponse: " + arr.length());
                     mMomentList.clear();
-                    mMomentList = new ArrayList<>(arr.length());
                     for (int i = 0; i < arr.length(); i++) {
                         mMomentList.add(new Moment(arr.getJSONObject(i)));
                     }
                     momentAdapter.setMoments(mMomentList);
+                    momentsRecyclerView.setAdapter(momentAdapter);
                     momentAdapter.notifyDataSetChanged();
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -89,6 +92,7 @@ public class MomentsFragment extends Fragment {
         this.type = TYPE_ALL;
     }
     public void refresh() {
+        System.out.println("refreshMomentsFragment");
         if (refreshing) {
             return;
         }
@@ -99,6 +103,11 @@ public class MomentsFragment extends Fragment {
             Services.getMomentsAll(getMomentsHandler);
         }
     }
+    @Override
+    public void onAttach(@NonNull Activity activity) {
+        super.onAttach(activity);
+        mActivity = activity;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -107,22 +116,34 @@ public class MomentsFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        refresh();
+    }
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_moments, container, false);
 
         momentsRecyclerView = view.findViewById(R.id.user_recycler_view);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         momentsRecyclerView.setLayoutManager(layoutManager);
         momentAdapter = new MomentAdapter(mMomentList, new MomentAdapter.OnItemClickListener() {
             @Override
-            public void onItemClick(int position) {
+            public void onItemClick(View v, int position, int id) {
 //                Toast.makeText(getContext(), "clicked: "+position, Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(getActivity(), DetailedActivity.class);
-                intent.putExtra("id", mMomentList.get(position).getId());
+                Intent intent = new Intent(v.getContext(), DetailedActivity.class);
+                intent.putExtra("id", id);
 //                startActivity(intent);
                 detailedLauncher.launch(intent);
+            }
+
+            @Override
+            public void onAvatarClick(View v, int position, int id) {
+                Intent intent = new Intent(v.getContext(), UserHomePageActivity.class);
+                intent.putExtra("id", id);
+                v.getContext().startActivity(intent);
             }
 
             @Override
@@ -175,11 +196,7 @@ public class MomentsFragment extends Fragment {
             }
         });
         momentsRecyclerView.setAdapter(momentAdapter);
-        if (type == TYPE_ALL) {
-            Services.getMomentsAll(getMomentsHandler);
-        } else if(type == TYPE_PERSON) {
-            Services.getMomentsByUser(userId, getMomentsHandler);
-        }
+        refresh();
         return view;
     }
 }

@@ -59,7 +59,7 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserLi
         this.buttonInterface=buttonInterface;
     }
     public interface ButtonInterface{
-        public void onclick(View view,int position, int id);
+        void onclick(View view,int position, int id);
     }
 
     public void setUsers(List<User> users) {
