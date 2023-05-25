@@ -80,5 +80,17 @@ public class HomeActivity extends AppCompatActivity {
             return false;
         });
         // TODO: setOnItemReselectedListener
+        bottomNavigationView.setOnItemReselectedListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.home:
+                    homeFragment.refresh();
+                    break;
+                case R.id.message:
+                    break;
+                case R.id.my:
+                    myFragment.refresh();
+                    break;
+            }
+        });
     }
 }

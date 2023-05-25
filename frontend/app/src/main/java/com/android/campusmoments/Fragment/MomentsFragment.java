@@ -66,7 +66,7 @@ public class MomentsFragment extends Fragment {
             if (msg.what == GET_MOMENTS_SUCCESS) {
                 try {
                     JSONArray arr = new JSONArray(msg.obj.toString());
-                    Log.d(TAG, "onResponse: " + arr.length());
+                    Log.d(TAG, " "+ getContext() + " onResponse: arr.length=" + arr.length());
                     mMomentList.clear();
                     mMomentList = new ArrayList<>(arr.length());
                     for (int i = 0; i < arr.length(); i++) {
@@ -91,9 +91,9 @@ public class MomentsFragment extends Fragment {
         this.type = TYPE_ALL;
     }
     public void refresh() {
-        if (refreshing) {
-            return;
-        }
+//        if (refreshing) {
+//            return;
+//        }
         refreshing = true;
         if (type == TYPE_PERSON) {
             Services.getMomentsByUser(userId, getMomentsHandler);
@@ -125,9 +125,13 @@ public class MomentsFragment extends Fragment {
             public void onItemClick(int position) {
 //                Toast.makeText(getContext(), "clicked: "+position, Toast.LENGTH_SHORT).show();
                 try {
-
+                    Log.d(TAG, "onItemClick: position=" + position);
                     Log.d(TAG, "onItemClick: getContext=" + getContext());
                     Log.d(TAG, "onItemClick: getActivity=" + getActivity());
+                    Log.d(TAG, "onItemClick: size=" + mMomentList.size());
+                    Log.d(TAG, "onItemClick: size=" + momentAdapter.getMomentsList().size());
+                    Log.d(TAG, "onItemClick: id=" + mMomentList.get(position).getId());
+                    Log.d(TAG, "onItemClick: id=" + momentAdapter.getMomentsList().get(position).getId());
                     Intent intent = new Intent(context, DetailedActivity.class);
                     intent.putExtra("id", mMomentList.get(position).getId());
 //                  startActivity(intent);

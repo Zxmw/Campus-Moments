@@ -13,6 +13,8 @@ import android.widget.TextView;
 import android.widget.VideoView;
 
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.android.campusmoments.Activity.DetailedActivity;
 import com.android.campusmoments.Activity.UserHomePageActivity;
 import com.android.campusmoments.R;
 import com.android.campusmoments.Service.Moment;
@@ -190,11 +192,12 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentView
     public MomentViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.moment_overview, parent, false);
-        final MomentViewHolder viewHolder = new MomentViewHolder(view);
+        MomentViewHolder viewHolder = new MomentViewHolder(view);
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int position = viewHolder.getAdapterPosition();
+//                int position = viewHolder.getAdapterPosition();
+                int position = viewHolder.getBindingAdapterPosition(); //
                 mOnItemClickListener.onItemClick(position);
             }
         });
