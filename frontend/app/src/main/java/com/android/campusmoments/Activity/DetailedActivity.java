@@ -137,12 +137,30 @@ public class DetailedActivity extends AppCompatActivity {
         commentsFragment = new CommentsFragment();
         getSupportFragmentManager().beginTransaction().add(R.id.commentFragmentContainerView, commentsFragment).commit();
 
+        setupGoToUserHome();
         setupReturnView();
         setupLikeView();
         setupStarView();
         setupCommentBtn();
         setData();
-
+    }
+    private void setupGoToUserHome() {
+        avatarImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(DetailedActivity.this, UserHomePageActivity.class);
+                intent.putExtra("id", moment.getUserId());
+                startActivity(intent);
+            }
+        });
+        usernameTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(DetailedActivity.this, UserHomePageActivity.class);
+                intent.putExtra("id", moment.getUserId());
+                startActivity(intent);
+            }
+        });
     }
     private void setupReturnView() {
         returnImageView.setOnClickListener(new View.OnClickListener() {
