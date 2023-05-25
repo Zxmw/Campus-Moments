@@ -3,6 +3,7 @@ package com.android.campusmoments.Fragment;
 import static android.app.Activity.RESULT_OK;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -112,6 +113,9 @@ public class MomentsFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_moments, container, false);
+        Log.d(TAG, "onCreateView: getActivity=" + getActivity());
+        Log.d(TAG, "onCreateView: getContext=" + getContext());
+        Context context = getContext();
 
         momentsRecyclerView = view.findViewById(R.id.user_recycler_view);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
@@ -120,10 +124,17 @@ public class MomentsFragment extends Fragment {
             @Override
             public void onItemClick(int position) {
 //                Toast.makeText(getContext(), "clicked: "+position, Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(getActivity(), DetailedActivity.class);
-                intent.putExtra("id", mMomentList.get(position).getId());
-//                startActivity(intent);
-                detailedLauncher.launch(intent);
+                try {
+
+                    Log.d(TAG, "onItemClick: getContext=" + getContext());
+                    Log.d(TAG, "onItemClick: getActivity=" + getActivity());
+                    Intent intent = new Intent(context, DetailedActivity.class);
+                    intent.putExtra("id", mMomentList.get(position).getId());
+//                  startActivity(intent);
+                    detailedLauncher.launch(intent);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override

@@ -56,7 +56,7 @@ public class HomeActivity extends AppCompatActivity {
                 .add(R.id.fragmentContainerView, myFragment)
                 .commit();
 //        fragmentManager.beginTransaction().replace(R.id.fragmentContainerView, homeFragment).commit();
-        fragmentManager.beginTransaction().show(homeFragment).commit();
+        fragmentManager.beginTransaction().show(homeFragment).hide(messageFragment).hide(myFragment).commit();
         currentFragment = homeFragment;
     }
     private void showFragment(Fragment fragment) {
