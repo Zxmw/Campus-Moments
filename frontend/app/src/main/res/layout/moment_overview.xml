@@ -164,13 +164,13 @@
                 android:layout_weight="1" />
 
             <ImageView
-                android:id="@+id/likeImageView"
+                android:id="@+id/likeImageView_overview"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_moment_thumbup" />
 
             <TextView
-                android:id="@+id/like_textview"
+                android:id="@+id/like_textview_overview"
                 android:layout_width="50dp"
                 android:layout_height="wrap_content"
                 android:maxLength="4"
@@ -203,13 +203,13 @@
                 android:layout_weight="1" />
 
             <ImageView
-                android:id="@+id/starImageView"
+                android:id="@+id/starImageView_overview"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_moment_star" />
 
             <TextView
-                android:id="@+id/star_textview"
+                android:id="@+id/star_textview_overview"
                 android:layout_width="50dp"
                 android:layout_height="wrap_content"
                 android:maxLength="4"

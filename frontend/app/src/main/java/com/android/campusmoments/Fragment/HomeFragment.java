@@ -32,9 +32,6 @@ public class HomeFragment extends Fragment {
     public HomeFragment() {
         allMomentsFragment = new MomentsFragment();
     }
-    public void refresh() {
-        allMomentsFragment.refresh();
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

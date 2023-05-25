@@ -6,6 +6,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.activity.result.ActivityResult;
@@ -23,6 +24,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import static com.android.campusmoments.Service.Config.*;
@@ -39,10 +42,12 @@ import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class MomentsFragment extends Fragment {
     private static final String TAG = "MomentsFragment";
     public Activity mActivity;
+    private SharedPreferences mPreferences;
     private boolean refreshing = false;
     public static final int TYPE_ALL = 0;
     public static final int TYPE_PERSON = 1;
@@ -81,6 +86,7 @@ public class MomentsFragment extends Fragment {
             } else if (msg.what == GET_MOMENTS_FAIL) {
                 Toast.makeText(requireActivity(), "获取动态失败", Toast.LENGTH_SHORT).show();
             }
+            momentsRecyclerView.scrollToPosition(mPreferences.getInt("position", 0));
             refreshing = false;
         }
     };
@@ -113,6 +119,7 @@ public class MomentsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mMomentList = new ArrayList<>();
+        mPreferences = mActivity.getSharedPreferences("moment_fragment", Context.MODE_PRIVATE);
     }
 
     @Override
@@ -147,23 +154,26 @@ public class MomentsFragment extends Fragment {
             }
 
             @Override
-            public void onLikeClick(int position) {
-                Moment clickedMoment = mMomentList.get(position);
+            public void onLikeClick(View v, int position, Moment clickedMoment) {
+                ImageView likeImage = v.findViewById(R.id.likeImageView_overview);
+                TextView likeCountText = v.findViewById(R.id.like_textview_overview);
                 Services.likeOrStar("like", clickedMoment.getId(), !clickedMoment.isLikedByMe, new Handler(Looper.getMainLooper()){
                     @Override
                     public void handleMessage(@NonNull android.os.Message msg) {
                         super.handleMessage(msg);
                         if (msg.what == 1) {
+
                             clickedMoment.isLikedByMe = !clickedMoment.isLikedByMe;
                             int likeCount = clickedMoment.getLikeCount();
                             if(clickedMoment.isLikedByMe) {
-                                clickedMoment.setLikeCount(likeCount + 1);
+                                likeCount++;
+                                likeImage.setImageResource(R.drawable.ic_moment_thumbup_red);
                             } else {
-                                clickedMoment.setLikeCount(likeCount - 1);
+                                likeCount--;
+                                likeImage.setImageResource(R.drawable.ic_moment_thumbup);
                             }
-                            mMomentList.set(position, clickedMoment);
-                            momentAdapter.setMoments(mMomentList);
-                            momentAdapter.notifyItemChanged(position);
+                            clickedMoment.setLikeCount(likeCount);
+                            likeCountText.setText(String.valueOf(likeCount));
                         } else if (msg.what == 0) {
                             Toast.makeText(requireActivity(), "点赞失败", Toast.LENGTH_SHORT).show();
                         }
@@ -171,23 +181,25 @@ public class MomentsFragment extends Fragment {
                 });
             }
             @Override
-            public void onStarClick(int position) {
-                Moment clickedMoment = mMomentList.get(position);
+            public void onStarClick(View v, int position, Moment clickedMoment) {
+                ImageView starImage = v.findViewById(R.id.starImageView_overview);
+                TextView starCountText = v.findViewById(R.id.star_textview_overview);
                 Services.likeOrStar("star", clickedMoment.getId(), !clickedMoment.isStaredByMe, new Handler(Looper.getMainLooper()){
                     @Override
                     public void handleMessage(@NonNull android.os.Message msg) {
                         super.handleMessage(msg);
                         if (msg.what == 1) {
+
                             clickedMoment.isStaredByMe = !clickedMoment.isStaredByMe;
                             int starCount = clickedMoment.getStarCount();
                             if(clickedMoment.isStaredByMe) {
                                 clickedMoment.setStarCount(starCount + 1);
+                                starImage.setImageResource(R.drawable.ic_moment_star_yellow);
                             } else {
                                 clickedMoment.setStarCount(starCount - 1);
+                                starImage.setImageResource(R.drawable.ic_moment_star);
                             }
-                            mMomentList.set(position, clickedMoment);
-                            momentAdapter.setMoments(mMomentList);
-                            momentAdapter.notifyItemChanged(position);
+                            starCountText.setText(String.valueOf(clickedMoment.getStarCount()));
                         } else if (msg.what == 0) {
                             Toast.makeText(requireActivity(), "收藏失败", Toast.LENGTH_SHORT).show();
                         }
@@ -196,7 +208,19 @@ public class MomentsFragment extends Fragment {
             }
         });
         momentsRecyclerView.setAdapter(momentAdapter);
-        refresh();
         return view;
     }
+
+    // 在离开页面时保存当前的滚动位置
+    @Override
+    public void onPause() {
+        super.onPause();
+        SharedPreferences.Editor editor = mPreferences.edit();
+        // 找到目前显示的第一个item的position，保存
+        int position = ((LinearLayoutManager) Objects.requireNonNull(momentsRecyclerView.getLayoutManager())).findFirstVisibleItemPosition();
+        Log.d("position", String.valueOf(position));
+        editor.putInt("position", position);
+        editor.apply();
+    }
+
 }

@@ -34,14 +34,18 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentView
     public void setMoments(List<Moment> moments) {
         mMoments = moments;
     }
+    public void updateMoment(int position, Moment moment) {
+        mMoments.set(position, moment);
+        notifyItemChanged(position);
+    }
     public List<Moment> getMomentsList() {
         return mMoments;
     }
     public interface OnItemClickListener {
         void onItemClick(View v, int position, int id);
         void onAvatarClick(View v, int position, int id);
-        void onLikeClick(int position);
-        void onStarClick(int position);
+        void onLikeClick(View v, int position, Moment clickedMoment);
+        void onStarClick(View v, int position, Moment clickedMoment);
     }
 
     public static class MomentViewHolder extends RecyclerView.ViewHolder {
@@ -78,15 +82,15 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentView
             posLayout = itemView.findViewById(R.id.posContainer);
             posImageView = itemView.findViewById(R.id.posImageView);
             mAddressTextView = itemView.findViewById(R.id.address_textview);
-            mLikeImageView = itemView.findViewById(R.id.likeImageView);
-            mLikeTextView = itemView.findViewById(R.id.like_textview);
+            mLikeImageView = itemView.findViewById(R.id.likeImageView_overview);
+            mLikeTextView = itemView.findViewById(R.id.like_textview_overview);
             mCommentTextView = itemView.findViewById(R.id.comment_textview);
-            mStarImageView = itemView.findViewById(R.id.starImageView);
-            mStarTextView = itemView.findViewById(R.id.star_textview);
+            mStarImageView = itemView.findViewById(R.id.starImageView_overview);
+            mStarTextView = itemView.findViewById(R.id.star_textview_overview);
         }
         public void bindData(Moment moment) {
             int position = getBindingAdapterPosition();
-            // 将数据绑定到ViewHolder中的视图中
+            View itemView1 = itemView;
             if(moment.getAvatarPath() != null) {
                 Log.d(TAG, moment.getAvatarPath());
                 Picasso.get().load(Uri.parse(moment.getAvatarPath())).into(mAvatarImageView);
@@ -158,8 +162,8 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentView
             }
             mLikeImageView.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(View view) {
-                    mOnItemClickListener.onLikeClick(position);
+                public void onClick(View v) {
+                    mOnItemClickListener.onLikeClick(itemView1, position, moment);
                 }
             });
             mLikeTextView.setText(String.valueOf(moment.getLikeCount()));
@@ -172,8 +176,8 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentView
             }
             mStarImageView.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onClick(View view) {
-                    mOnItemClickListener.onStarClick(position);
+                public void onClick(View v) {
+                    mOnItemClickListener.onStarClick(itemView1, position, moment);
                 }
             });
         }
