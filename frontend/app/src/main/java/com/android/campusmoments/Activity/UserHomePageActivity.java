@@ -249,6 +249,7 @@ public class UserHomePageActivity extends AppCompatActivity {
         Intent intent = new Intent(this, PrivateMessageActivity.class);
         intent.putExtra("id", user.id);
         intent.putExtra("username", user.username);
+        intent.putExtra("avatar", user.avatar);
         startActivity(intent);
     }
 

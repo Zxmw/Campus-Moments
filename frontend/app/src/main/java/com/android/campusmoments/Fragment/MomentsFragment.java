@@ -86,7 +86,11 @@ public class MomentsFragment extends Fragment {
             } else if (msg.what == GET_MOMENTS_FAIL) {
                 Toast.makeText(requireActivity(), "获取动态失败", Toast.LENGTH_SHORT).show();
             }
-            momentsRecyclerView.scrollToPosition(mPreferences.getInt("position", 0));
+            if (getParentFragment() != null) {
+                LinearLayoutManager layoutManager = (LinearLayoutManager) momentsRecyclerView.getLayoutManager();
+                assert layoutManager != null;
+                layoutManager.scrollToPositionWithOffset(mPreferences.getInt("position" + getParentFragment().getClass().getName(), 0), 0);
+            }
             refreshing = false;
         }
     };
@@ -98,7 +102,6 @@ public class MomentsFragment extends Fragment {
         this.type = TYPE_ALL;
     }
     public void refresh() {
-        System.out.println("refreshMomentsFragment");
         if (refreshing) {
             return;
         }
@@ -120,6 +123,10 @@ public class MomentsFragment extends Fragment {
         super.onCreate(savedInstanceState);
         mMomentList = new ArrayList<>();
         mPreferences = mActivity.getSharedPreferences("moment_fragment", Context.MODE_PRIVATE);
+        // clear
+        SharedPreferences.Editor editor = mPreferences.edit();
+        editor.clear();
+        editor.apply();
     }
 
     @Override
@@ -207,6 +214,7 @@ public class MomentsFragment extends Fragment {
                 });
             }
         });
+        momentAdapter.setStateRestorationPolicy(RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY);
         momentsRecyclerView.setAdapter(momentAdapter);
         return view;
     }
@@ -215,12 +223,14 @@ public class MomentsFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        SharedPreferences.Editor editor = mPreferences.edit();
-        // 找到目前显示的第一个item的position，保存
-        int position = ((LinearLayoutManager) Objects.requireNonNull(momentsRecyclerView.getLayoutManager())).findFirstVisibleItemPosition();
-        Log.d("position", String.valueOf(position));
-        editor.putInt("position", position);
-        editor.apply();
+        if (getParentFragment() != null) {
+            SharedPreferences.Editor editor = mPreferences.edit();
+            LinearLayoutManager layoutManager = (LinearLayoutManager) momentsRecyclerView.getLayoutManager();
+            assert layoutManager != null;
+            int position = layoutManager.findFirstVisibleItemPosition();
+            Log.d("position", String.valueOf(position));
+            editor.putInt("position" + getParentFragment().getClass().getName(), position);
+            editor.apply();
+        }
     }
-
 }

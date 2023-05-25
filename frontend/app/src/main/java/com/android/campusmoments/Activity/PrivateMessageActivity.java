@@ -33,6 +33,8 @@ import java.util.List;
 public class PrivateMessageActivity extends AppCompatActivity {
     private int selfId = Services.mySelf.id;
     private int otherId;
+    private String otherUsername;
+    private String otherAvatar;
     private TextView usernameTextView;
     private FirebaseRecyclerAdapter<PrivateMessage, MessageHolder> privateMessageAdapter;
     private RecyclerView privateMessageRecyclerView;
@@ -43,15 +45,15 @@ public class PrivateMessageActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_private_message);
         usernameTextView = findViewById(R.id.username_private_msg);
-        usernameTextView.setText(getIntent().getStringExtra("username"));
+        otherUsername = getIntent().getStringExtra("username");
+        usernameTextView.setText(otherUsername);
         otherId = getIntent().getIntExtra("id", 0);
+        otherAvatar = getIntent().getStringExtra("avatar");
         buildPrivateMessageAdapter();
         privateMessageRecyclerView = findViewById(R.id.recyclerViewMessages);
         // once privateMessageRecyclerView's height changes, scroll to the bottom
         privateMessageRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         privateMessageRecyclerView.setAdapter(privateMessageAdapter);
-
-
     }
 
     public void send(View view) {
@@ -80,14 +82,9 @@ public class PrivateMessageActivity extends AppCompatActivity {
             }
             @Override
             protected void onBindViewHolder(@NonNull MessageHolder holder, int position, @NonNull PrivateMessage model) {
-                if (model.getAvatar() == null || model.getAvatar().equals("")) {
-                    holder.avatarImageView.setImageResource(R.drawable.avatar_1);
-                } else {
-                    Picasso.get().load(Uri.parse(model.getAvatar())).into(holder.avatarImageView);
-                }
                 holder.timeTextView.setText(DateFormat.format("yyyy-MM-dd HH:mm:ss",
                         model.getTime()));
-                holder.usernameTextView.setText(model.getUsername());
+
                 holder.contentTextView.setText(model.getContent());
                 Context context = holder.contentTextView.getContext();
                 if (model.getSenderId() == selfId) {
@@ -97,11 +94,22 @@ public class PrivateMessageActivity extends AppCompatActivity {
                     holder.messageLinearLayout.removeView(holder.cardView);
                     holder.messageLinearLayout.addView(holder.cardView);
                     holder.textLinearLayout.setGravity(Gravity.END);
-
+                    holder.usernameTextView.setText(Services.mySelf.username);
+                    if (Services.mySelf.avatar == null || Services.mySelf.avatar.equals("")) {
+                        holder.avatarImageView.setImageResource(R.drawable.avatar_1);
+                    } else {
+                        Picasso.get().load(Uri.parse(Services.mySelf.avatar)).into(holder.avatarImageView);
+                    }
                 } else {
                     holder.contentTextView.setBackgroundColor(ContextCompat.getColor(context, R.color.otherPersonMessageBackground));
                     holder.contentTextView.setTextColor(ContextCompat.getColor(context, R.color.otherPersonMessageText));
                     holder.textLinearLayout.setGravity(Gravity.START);
+                    holder.usernameTextView.setText(otherUsername);
+                    if (otherAvatar == null || otherAvatar.equals("")) {
+                        holder.avatarImageView.setImageResource(R.drawable.avatar_1);
+                    } else {
+                        Picasso.get().load(Uri.parse(otherAvatar)).into(holder.avatarImageView);
+                    }
                 }
             }
 
