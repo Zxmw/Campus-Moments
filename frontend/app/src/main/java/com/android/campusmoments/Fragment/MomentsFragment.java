@@ -53,6 +53,7 @@ public class MomentsFragment extends Fragment {
                 public void onActivityResult(ActivityResult result) {
                     if (result.getResultCode() == RESULT_OK) {
                         refresh();
+                        // TODO: 可以只更新某一条动态
                     }
                 }
             });
