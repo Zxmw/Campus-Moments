@@ -12,6 +12,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentContainerView;
+import androidx.viewpager2.widget.ViewPager2;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,17 +22,26 @@ import android.widget.ImageView;
 
 import com.android.campusmoments.Activity.HomeActivity;
 import com.android.campusmoments.Activity.PubActivity;
+import com.android.campusmoments.Adapter.HomePagerAdapter;
 import com.android.campusmoments.R;
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public class HomeFragment extends Fragment {
     private static final String TAG = "HomeFragment";
-    private FragmentContainerView fragmentContainerView;
-    public MomentsFragment allMomentsFragment;
-    private ActivityResultLauncher<Intent> pubLauncher;
+
+
     private ImageView ivPub; // 发布按钮
-    public HomeFragment() {
-        allMomentsFragment = new MomentsFragment();
-    }
+    // 使用ViewPager2
+    private TabLayout mTabLayout;
+    private ViewPager2 mViewPager2;
+    private List<String> mData = new ArrayList<>();
+
+    public HomeFragment() {}
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -43,33 +53,33 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view =  inflater.inflate(R.layout.fragment_home, container, false);
-        fragmentContainerView = view.findViewById(R.id.fragmentContainerView);
-        ivPub = view.findViewById(R.id.iv_add);
-        setupPubLauncher();
-        setupPub();
 
-        getChildFragmentManager().beginTransaction().replace(R.id.fragmentContainerView, allMomentsFragment).commit();
-
+        initData();
+        initView(view);
         return view;
     }
-
-    private void setupPubLauncher() {
-        pubLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
-                new ActivityResultCallback<ActivityResult>() {
-                    @Override
-                    public void onActivityResult(ActivityResult result) {
-                        if (result.getResultCode() == RESULT_OK) {
-                            allMomentsFragment.refresh();
-                        }
-                    }
-                });
+    private void initData() {
+        mData.add("关注");
+        mData.add("推荐");
+        mData.add("热门");
     }
+
+    private void initView(View view) {
+        ivPub = view.findViewById(R.id.iv_add);
+        setupPub();
+        mTabLayout = view.findViewById(R.id.tabLayout);
+        mViewPager2 = view.findViewById(R.id.viewPager2);
+        HomePagerAdapter homePagerAdapter = new HomePagerAdapter(requireActivity(), mData);
+        mViewPager2.setAdapter(homePagerAdapter);
+        new TabLayoutMediator(mTabLayout, mViewPager2, (tab, position) -> tab.setText(mData.get(position))).attach();
+    }
+
     private void setupPub() {
         ivPub.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), PubActivity.class);
-                pubLauncher.launch(intent);
+                startActivity(intent);
             }
         });
     }

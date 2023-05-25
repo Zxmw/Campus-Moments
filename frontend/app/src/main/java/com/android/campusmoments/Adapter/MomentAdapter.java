@@ -3,6 +3,9 @@ package com.android.campusmoments.Adapter;
 import android.content.Intent;
 import android.content.Context;
 import android.net.Uri;
+import android.nfc.cardemulation.HostNfcFService;
+import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,9 +13,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.VideoView;
 
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.android.campusmoments.Activity.DetailedActivity;
 import com.android.campusmoments.Activity.UserHomePageActivity;
 import com.android.campusmoments.R;
 import com.android.campusmoments.Service.Moment;
@@ -20,6 +26,9 @@ import com.android.campusmoments.Service.Services;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
+import java.util.logging.Handler;
+import java.util.logging.LogRecord;
+
 import io.github.mthli.knife.KnifeText;
 
 public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentViewHolder> {
@@ -187,7 +196,7 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentView
     public MomentViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.moment_overview, parent, false);
-        final MomentViewHolder viewHolder = new MomentViewHolder(view);
+        MomentViewHolder viewHolder = new MomentViewHolder(view);
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
