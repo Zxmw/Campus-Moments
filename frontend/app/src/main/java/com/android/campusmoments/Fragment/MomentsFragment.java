@@ -154,16 +154,7 @@ public class MomentsFragment extends Fragment {
                     public void handleMessage(@NonNull android.os.Message msg) {
                         super.handleMessage(msg);
                         if (msg.what == 1) {
-                            clickedMoment.isLikedByMe = !clickedMoment.isLikedByMe;
-                            int likeCount = clickedMoment.getLikeCount();
-                            if(clickedMoment.isLikedByMe) {
-                                clickedMoment.setLikeCount(likeCount + 1);
-                            } else {
-                                clickedMoment.setLikeCount(likeCount - 1);
-                            }
-                            mMomentList.set(position, clickedMoment);
-                            momentAdapter.setMoments(mMomentList);
-                            momentAdapter.notifyItemChanged(position);
+                            Toast.makeText(requireActivity(), "点赞成功", Toast.LENGTH_SHORT).show();
                         } else if (msg.what == 0) {
                             Toast.makeText(requireActivity(), "点赞失败", Toast.LENGTH_SHORT).show();
                         }

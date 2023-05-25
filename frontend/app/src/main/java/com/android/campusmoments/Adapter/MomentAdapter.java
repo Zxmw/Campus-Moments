@@ -3,6 +3,9 @@ package com.android.campusmoments.Adapter;
 import android.content.Intent;
 import android.content.Context;
 import android.net.Uri;
+import android.nfc.cardemulation.HostNfcFService;
+import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.VideoView;
 
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,6 +24,9 @@ import com.android.campusmoments.Service.Services;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
+import java.util.logging.Handler;
+import java.util.logging.LogRecord;
+
 import io.github.mthli.knife.KnifeText;
 
 public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentViewHolder> {
@@ -160,6 +167,14 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentView
                 @Override
                 public void onClick(View view) {
                     mOnItemClickListener.onLikeClick(position);
+                    // 切换点赞图标
+                    if(!moment.isLikedByMe) {
+                        mLikeImageView.setImageResource(R.drawable.ic_moment_thumbup_red);
+                        mLikeTextView.setText(String.valueOf(moment.getLikeCount() + 1));
+                    } else {
+                        mLikeImageView.setImageResource(R.drawable.ic_moment_thumbup);
+                        mLikeTextView.setText(String.valueOf(moment.getLikeCount() - 1));
+                    }
                 }
             });
             mLikeTextView.setText(String.valueOf(moment.getLikeCount()));
