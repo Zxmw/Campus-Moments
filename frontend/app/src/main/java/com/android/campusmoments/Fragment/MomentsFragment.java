@@ -125,7 +125,7 @@ public class MomentsFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_moments, container, false);
-
+        
         momentsRecyclerView = view.findViewById(R.id.user_recycler_view);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         momentsRecyclerView.setLayoutManager(layoutManager);

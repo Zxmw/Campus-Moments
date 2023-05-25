@@ -26,7 +26,6 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentView
     private static final String TAG = "MomentAdapter";
     private List<Moment> mMoments;
     private static OnItemClickListener mOnItemClickListener;
-    private Context mContext;
     public MomentAdapter(List<Moment> moments, OnItemClickListener onItemClickListener) {
         mMoments = moments;
         mOnItemClickListener = onItemClickListener;
