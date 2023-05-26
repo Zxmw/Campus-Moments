@@ -51,6 +51,9 @@ public class MomentsFragment extends Fragment {
     private boolean refreshing = false;
     public static final int TYPE_ALL = 0;
     public static final int TYPE_PERSON = 1;
+    public static final int TYPE_FOLLOW = 2;
+    public static final int TYPE_HOT = 3;
+
     private final int type;
     private int userId = -1;
     private List<Moment> mMomentList;
@@ -75,7 +78,14 @@ public class MomentsFragment extends Fragment {
                     JSONArray arr = new JSONArray(msg.obj.toString());
                     mMomentList.clear();
                     for (int i = 0; i < arr.length(); i++) {
-                        mMomentList.add(new Moment(arr.getJSONObject(i)));
+                        Moment moment = new Moment(arr.getJSONObject(i));
+                        if(moment.isBlockedByMe) // 屏蔽
+                            continue;
+                        if(type == TYPE_FOLLOW && !moment.isFollowedByMe) // 关注
+                            continue;
+                        if(type == TYPE_HOT && moment.getLikeCount()+ moment.getCommentCount()+ moment.getStarCount() < 2) // 热门
+                            continue;
+                        mMomentList.add(moment);
                     }
                     momentAdapter.setMoments(mMomentList);
                     momentsRecyclerView.setAdapter(momentAdapter);
@@ -98,8 +108,9 @@ public class MomentsFragment extends Fragment {
         this.type = type;
         this.userId = userId;
     }
-    public MomentsFragment() {
-        this.type = TYPE_ALL;
+
+    public MomentsFragment(int type) {
+        this.type = type;
     }
     public void refresh() {
         if (refreshing) {
@@ -110,7 +121,12 @@ public class MomentsFragment extends Fragment {
             Services.getMomentsByUser(userId, getMomentsHandler);
         } else if(type == TYPE_ALL) {
             Services.getMomentsAll(getMomentsHandler);
+        } else if(type == TYPE_FOLLOW) {
+            Services.getMomentsAll(getMomentsHandler);
+        } else if(type == TYPE_HOT) {
+            Services.getMomentsAll(getMomentsHandler);
         }
+        // TODO: Services.getMomentsHot/getMomentsFollow
     }
     @Override
     public void onAttach(@NonNull Activity activity) {

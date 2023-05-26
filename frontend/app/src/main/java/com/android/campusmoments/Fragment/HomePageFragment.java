@@ -66,7 +66,15 @@ public class HomePageFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_home_page, container, false);
         FragmentContainerView fragmentContainerView = view.findViewById(R.id.fragmentContainerView);
         // TODO: 根据mParam1的值，加载不同的Fragment
-        getChildFragmentManager().beginTransaction().replace(R.id.fragmentContainerView, new MomentsFragment()).commit();
+        if(mParam1.equals("关注")) {
+            getChildFragmentManager().beginTransaction().replace(R.id.fragmentContainerView, new MomentsFragment(MomentsFragment.TYPE_FOLLOW)).commit();
+        }
+        if(mParam1.equals("推荐")) {
+            getChildFragmentManager().beginTransaction().replace(R.id.fragmentContainerView, new MomentsFragment(MomentsFragment.TYPE_ALL)).commit();
+        }
+        if(mParam1.equals("热门")) {
+            getChildFragmentManager().beginTransaction().replace(R.id.fragmentContainerView, new MomentsFragment(MomentsFragment.TYPE_HOT)).commit();
+        }
         return view;
     }
 }

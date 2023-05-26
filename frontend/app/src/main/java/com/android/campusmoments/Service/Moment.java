@@ -24,6 +24,8 @@ public class Moment {
 
     public boolean isLikedByMe;
     public boolean isStaredByMe;
+    public boolean isFollowedByMe;
+    public boolean isBlockedByMe;
     private List<Integer> commentIds; // 评论id - list
 
     public Moment(JSONObject obj) {
@@ -51,6 +53,14 @@ public class Moment {
             isLikedByMe = isByMe(liked_by);
             JSONArray stared_by = obj.getJSONArray("stared_by");
             isStaredByMe = isByMe(stared_by);
+
+            if(Services.mySelf.followList != null) {
+                isFollowedByMe = Services.mySelf.followList.contains(userId);
+            }
+            if(Services.mySelf.blockList != null) {
+                isBlockedByMe = Services.mySelf.blockList.contains(userId);
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
