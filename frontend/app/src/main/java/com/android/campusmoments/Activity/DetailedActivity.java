@@ -45,6 +45,7 @@ public class DetailedActivity extends AppCompatActivity {
     private ImageView avatarImageView;
     private TextView usernameTextView;
     private TextView timeTextView;
+    private TextView followTextView;
     private TextView tagTextView;
     private TextView titleTextView;
     private KnifeText contentKnifeText;
@@ -118,6 +119,7 @@ public class DetailedActivity extends AppCompatActivity {
         usernameTextView = findViewById(R.id.username_textview);
         timeTextView = findViewById(R.id.time_textview);
         tagTextView = findViewById(R.id.tag_textview);
+        followTextView = findViewById(R.id.follow_textview);
         titleTextView = findViewById(R.id.title_textview);
         contentKnifeText = findViewById(R.id.content_knifetext);
         pictureView = findViewById(R.id.picture_imageview);
@@ -243,6 +245,9 @@ public class DetailedActivity extends AppCompatActivity {
             tagTextView.setVisibility(TextView.GONE);
         } else {
             tagTextView.setText(moment.getTag());
+        }
+        if(!moment.isFollowedByMe) {
+            followTextView.setVisibility(TextView.GONE);
         }
         titleTextView.setText(moment.getTitle());
         if(moment.getContent().equals("")) {

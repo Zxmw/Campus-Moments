@@ -31,7 +31,7 @@
                 android:src="@drawable/avatar_1" />
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:orientation="vertical">
@@ -51,6 +51,18 @@
                     android:text="TimeAt"
                     android:textColor="@android:color/darker_gray" />
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/follow_textview"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="5dp"
+                android:layout_width="65dp"
+                android:textAlignment="center"
+                android:layout_height="wrap_content"
+                android:textColor="#FFFFFF"
+                android:background="@color/purple_200"
+                android:text="已关注" />
+
         </LinearLayout>
 
         <Space

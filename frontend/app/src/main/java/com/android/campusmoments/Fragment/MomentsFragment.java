@@ -53,6 +53,8 @@ public class MomentsFragment extends Fragment {
     public static final int TYPE_PERSON = 1;
     public static final int TYPE_FOLLOW = 2;
     public static final int TYPE_HOT = 3;
+    public static final int TYPE_LIKE = 4;
+    public static final int TYPE_STAR = 5;
 
     private final int type;
     private int userId = -1;
@@ -83,7 +85,11 @@ public class MomentsFragment extends Fragment {
                             continue;
                         if(type == TYPE_FOLLOW && !moment.isFollowedByMe) // 关注
                             continue;
-                        if(type == TYPE_HOT && moment.getLikeCount()+ moment.getCommentCount()+ moment.getStarCount() < 2) // 热门
+                        if(type == TYPE_HOT && !moment.isHot) // 热门
+                            continue;
+                        if(type == TYPE_LIKE && !moment.isLikedByMe) // 点赞
+                            continue;
+                        if(type == TYPE_STAR && !moment.isStaredByMe) // 收藏
                             continue;
                         mMomentList.add(moment);
                     }
@@ -108,7 +114,9 @@ public class MomentsFragment extends Fragment {
         this.type = type;
         this.userId = userId;
     }
-
+    public MomentsFragment() { // 无参构造函数
+        this.type = TYPE_ALL;
+    }
     public MomentsFragment(int type) {
         this.type = type;
     }
@@ -124,6 +132,10 @@ public class MomentsFragment extends Fragment {
         } else if(type == TYPE_FOLLOW) {
             Services.getMomentsAll(getMomentsHandler);
         } else if(type == TYPE_HOT) {
+            Services.getMomentsAll(getMomentsHandler);
+        } else if(type == TYPE_LIKE) {
+            Services.getMomentsAll(getMomentsHandler);
+        } else if(type == TYPE_STAR) {
             Services.getMomentsAll(getMomentsHandler);
         }
         // TODO: Services.getMomentsHot/getMomentsFollow

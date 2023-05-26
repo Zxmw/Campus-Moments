@@ -52,7 +52,11 @@ public class HomePageFragment extends Fragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+        try {
+            super.onCreate(savedInstanceState);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -68,12 +72,16 @@ public class HomePageFragment extends Fragment {
         // TODO: 根据mParam1的值，加载不同的Fragment
         if(mParam1.equals("关注")) {
             getChildFragmentManager().beginTransaction().replace(R.id.fragmentContainerView, new MomentsFragment(MomentsFragment.TYPE_FOLLOW)).commit();
-        }
-        if(mParam1.equals("推荐")) {
+        } else if(mParam1.equals("最新")) {
             getChildFragmentManager().beginTransaction().replace(R.id.fragmentContainerView, new MomentsFragment(MomentsFragment.TYPE_ALL)).commit();
-        }
-        if(mParam1.equals("热门")) {
+        } else if(mParam1.equals("热门")) {
             getChildFragmentManager().beginTransaction().replace(R.id.fragmentContainerView, new MomentsFragment(MomentsFragment.TYPE_HOT)).commit();
+        } else if(mParam1.equals("点赞")) {
+            getChildFragmentManager().beginTransaction().replace(R.id.fragmentContainerView, new MomentsFragment(MomentsFragment.TYPE_LIKE)).commit();
+        } else if(mParam1.equals("收藏")) {
+            getChildFragmentManager().beginTransaction().replace(R.id.fragmentContainerView, new MomentsFragment(MomentsFragment.TYPE_STAR)).commit();
+        } else {
+            getChildFragmentManager().beginTransaction().replace(R.id.fragmentContainerView, new MomentsFragment(MomentsFragment.TYPE_ALL)).commit();
         }
         return view;
     }

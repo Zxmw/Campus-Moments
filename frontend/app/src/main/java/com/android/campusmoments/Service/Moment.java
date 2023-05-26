@@ -26,6 +26,7 @@ public class Moment {
     public boolean isStaredByMe;
     public boolean isFollowedByMe;
     public boolean isBlockedByMe;
+    public boolean isHot;
     private List<Integer> commentIds; // 评论id - list
 
     public Moment(JSONObject obj) {
@@ -59,6 +60,9 @@ public class Moment {
             }
             if(Services.mySelf.blockList != null) {
                 isBlockedByMe = Services.mySelf.blockList.contains(userId);
+            }
+            if(mLikeCount + mCommentCount + mStarCount > 2) {
+                isHot = true;
             }
 
         } catch (Exception e) {

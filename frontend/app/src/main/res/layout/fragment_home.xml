@@ -29,6 +29,7 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="30dp"
+                app:tabMode="scrollable"
                 app:tabGravity="fill" />
 
             <ImageView
@@ -46,21 +47,7 @@
                 android:src="@drawable/menu_add" />
         </LinearLayout>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="gone">
-            <androidx.fragment.app.FragmentContainerView
-                android:id="@+id/fragmentContainerView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:layout="@layout/fragment_moments" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+
 
 
         <androidx.viewpager2.widget.ViewPager2

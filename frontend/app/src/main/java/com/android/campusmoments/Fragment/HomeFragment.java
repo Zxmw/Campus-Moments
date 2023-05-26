@@ -60,8 +60,10 @@ public class HomeFragment extends Fragment {
     }
     private void initData() {
         mData.add("关注");
-        mData.add("推荐");
+        mData.add("最新");
         mData.add("热门");
+        mData.add("点赞");
+        mData.add("收藏");
     }
 
     private void initView(View view) {

@@ -64,6 +64,7 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentView
         private TextView mTimeTextView;
         private TextView mTagTextView;
         private TextView mTitleTextView;
+        private TextView mFollowTextView;
 
         private KnifeText mContentKnifeText;
         private ImageView mPictureImageView;
@@ -84,6 +85,7 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentView
             mTimeTextView = itemView.findViewById(R.id.time_textview);
             mTagTextView = itemView.findViewById(R.id.tag_textview);
             mTitleTextView = itemView.findViewById(R.id.title_textview);
+            mFollowTextView = itemView.findViewById(R.id.follow_textview);
             mContentKnifeText = itemView.findViewById(R.id.content_knifetext);
             mPictureImageView = itemView.findViewById(R.id.picture_imageview);
             mVideoView = itemView.findViewById(R.id.videoView);
@@ -131,6 +133,7 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentView
                 mTagTextView.setVisibility(View.GONE);
             }
             mTitleTextView.setText(moment.getTitle());
+            if(!moment.isFollowedByMe) mFollowTextView.setVisibility(View.GONE);
             if (moment.getContent() != null && !moment.getContent().equals("")) {
                 mContentKnifeText.setVisibility(View.VISIBLE);
                 mContentKnifeText.fromHtml(moment.getContent());
