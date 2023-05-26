@@ -36,6 +36,8 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -43,6 +45,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.MediaController;
 import android.widget.PopupMenu;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
@@ -88,6 +91,7 @@ public class PubActivity extends AppCompatActivity {
     };
 
     private EditText tagView;
+    private Spinner tagSpinner;
     private EditText titleView;
 
 
@@ -140,6 +144,25 @@ public class PubActivity extends AppCompatActivity {
 
         // 初始化控件
         tagView = findViewById(R.id.tag_view);
+        // 标签下拉框
+        tagSpinner = findViewById(R.id.tagSpinner);
+        String[] tagOptions = new String[]{"校园", "生活", "学习", "娱乐", "二手", "其他"};
+        // 创建一个适配器，用于设置下拉框的选项内容
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, tagOptions);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // 将适配器设置给下拉框
+        tagSpinner.setAdapter(adapter);
+        tagSpinner.setOnItemSelectedListener(new Spinner.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                tagView.setText("#" + tagOptions[position]);
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
         titleView = findViewById(R.id.title_view);
         pictureView = findViewById(R.id.picture_view);
         videoView = findViewById(R.id.videoView);

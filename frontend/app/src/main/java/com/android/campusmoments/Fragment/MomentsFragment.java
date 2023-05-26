@@ -24,7 +24,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,6 +44,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -55,12 +59,16 @@ public class MomentsFragment extends Fragment {
     public static final int TYPE_HOT = 3;
     public static final int TYPE_LIKE = 4;
     public static final int TYPE_STAR = 5;
+    private final int type; // 0: 全部动态 1: 个人动态 2: 关注动态 3: 热门动态 4: 点赞动态 5: 收藏动态
 
-    private final int type;
+    private String sort = "时间"; // 排序方式
+    private String tag = "#全部"; // 标签
     private int userId = -1;
     private List<Moment> mMomentList;
     private RecyclerView momentsRecyclerView;
     private MomentAdapter momentAdapter;
+    private Spinner sortSpinner;
+    private Spinner tagSpinner;
     private ActivityResultLauncher<Intent> detailedLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
             new ActivityResultCallback<ActivityResult>() {
                 @Override
@@ -91,7 +99,19 @@ public class MomentsFragment extends Fragment {
                             continue;
                         if(type == TYPE_STAR && !moment.isStaredByMe) // 收藏
                             continue;
+                        // 根据tag筛选
+                        if(!tag.equals("#全部") && !moment.getTag().equals(tag))
+                            continue;
+
                         mMomentList.add(moment);
+                    }
+                    // 根据sort排序
+                    if(sort.equals("时间")){
+                        Collections.sort(mMomentList, Moment.getIdComparator());
+                    } else if(sort.equals("点赞")){
+                        Collections.sort(mMomentList, Moment.getLikeComparator());
+                    } else if(sort.equals("评论")){
+                        Collections.sort(mMomentList, Moment.getCommentComparator());
                     }
                     momentAdapter.setMoments(mMomentList);
                     momentsRecyclerView.setAdapter(momentAdapter);
@@ -167,7 +187,12 @@ public class MomentsFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_moments, container, false);
-        
+
+        tagSpinner = view.findViewById(R.id.tagSpinner);
+        sortSpinner = view.findViewById(R.id.sortSpinner);
+        setupSortSpinner();
+        setupTagSpinner();
+
         momentsRecyclerView = view.findViewById(R.id.user_recycler_view);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         momentsRecyclerView.setLayoutManager(layoutManager);
@@ -260,5 +285,44 @@ public class MomentsFragment extends Fragment {
             editor.putInt("position" + getParentFragment().getClass().getName(), position);
             editor.apply();
         }
+    }
+    private void setupSortSpinner() {
+        String[] sortList = {"时间", "点赞", "评论"};
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireActivity(), android.R.layout.simple_spinner_item, sortList);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        sortSpinner.setAdapter(adapter);
+        sortSpinner.setSelection(0, true);
+        sortSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                sort = sortList[position];
+                refresh();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+    }
+    private void setupTagSpinner() {
+        String[] tagList = {"全部", "校园", "生活", "学习", "娱乐", "二手", "其他"};
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireActivity(), android.R.layout.simple_spinner_item, tagList);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        tagSpinner.setAdapter(adapter);
+        tagSpinner.setSelection(0, true);
+        tagSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                // TODO:refresh();
+                tag = "#" + tagList[position];
+                refresh();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
     }
 }

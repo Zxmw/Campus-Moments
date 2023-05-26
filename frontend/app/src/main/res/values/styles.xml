@@ -3,6 +3,7 @@
 
     <style name="CustomSpinnerStyle" parent="Widget.AppCompat.Spinner">
         <item name="android:paddingRight">2dp</item>
+        <item name="android:paddingLeft">2dp</item>
         <!-- 添加其他样式属性 -->
     </style>
 

@@ -94,16 +94,30 @@
                 android:overScrollMode="always"
                 android:scrollbars="vertical">
 
-                <EditText
-                    android:id="@+id/tag_view"
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:maxLength="15"
-                    android:maxLines="1"
-                    android:textSize="16sp"
-                    android:textColor="@color/blue"
-                    android:textColorHint="@color/blue"
-                    android:hint="标签" />
+                    android:layout_height="wrap_content" >
+                    <EditText
+                        android:id="@+id/tag_view"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:maxLength="15"
+                        android:maxLines="1"
+                        android:textSize="16sp"
+                        android:text="#校园"
+                        android:focusable="false"
+                        android:textColor="@color/blue"
+                        android:textColorHint="@color/blue"
+                        android:hint="标签" />
+
+                    <Spinner
+                        android:id="@+id/tagSpinner"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent" />
+                </LinearLayout>
+
+
 
                 <EditText
                     android:id="@+id/title_view"

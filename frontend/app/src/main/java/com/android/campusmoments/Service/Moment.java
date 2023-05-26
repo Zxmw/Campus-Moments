@@ -3,6 +3,7 @@ package com.android.campusmoments.Service;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -74,6 +75,16 @@ public class Moment {
     private boolean isByMe(JSONArray jsonArray) {
         List<Integer> list = Services.jsonArrayToList(jsonArray);
         return list.contains(Services.mySelf.id);
+    }
+    // 排序比较器
+    public static Comparator<Moment> getIdComparator() {
+        return Comparator.comparingInt(Moment::getId).reversed();
+    }
+    public static Comparator<Moment> getLikeComparator() {
+        return Comparator.comparingInt(Moment::getLikeCount).reversed();
+    }
+    public static Comparator<Moment> getCommentComparator() {
+        return Comparator.comparingInt(Moment::getCommentCount).reversed();
     }
 
     // get-function
