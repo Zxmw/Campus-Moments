@@ -132,6 +132,7 @@ public class DetailedActivity extends AppCompatActivity {
         commentTextView = findViewById(R.id.comment_textview);
         starTextView = findViewById(R.id.star_textview);
         starImageView = findViewById(R.id.starImageView);
+        shareImageView = findViewById(R.id.shareImageView);
         commentFragmentContainerView = findViewById(R.id.commentFragmentContainerView);
         commentEditText = findViewById(R.id.comment_edittext);
         sendCommentButton = findViewById(R.id.sendcomment_button);
@@ -143,6 +144,7 @@ public class DetailedActivity extends AppCompatActivity {
         setupReturnView();
         setupLikeView();
         setupStarView();
+        setupShareView();
         setupCommentBtn();
         setData();
     }
@@ -190,6 +192,21 @@ public class DetailedActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Log.d(TAG, "onClick: starImageView");
                 Services.likeOrStar("star",  moment.getId(), !moment.isStaredByMe, likeStarHandler);
+            }
+        });
+    }
+    private void setupShareView() {
+        shareImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "onClick: shareImageView");
+                // TODO: 权限检查
+                Intent intent = new Intent(Intent.ACTION_SEND);
+                intent.setType("text/plain");
+                intent.putExtra(Intent.EXTRA_SUBJECT, "分享");
+                intent.putExtra(Intent.EXTRA_TEXT, "校园动态: [ "+moment.getTitle()+" ]"); // 分享标题
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(Intent.createChooser(intent, getTitle()));
             }
         });
     }

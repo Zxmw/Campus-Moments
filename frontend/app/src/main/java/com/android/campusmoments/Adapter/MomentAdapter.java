@@ -78,6 +78,7 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentView
         private TextView mCommentTextView;
         private ImageView mStarImageView;
         private TextView mStarTextView;
+        private ImageView mShareImageView;
         public MomentViewHolder(View itemView) {
             super(itemView);
             mAvatarImageView = itemView.findViewById(R.id.avatar_imageview);
@@ -98,6 +99,7 @@ public class MomentAdapter extends RecyclerView.Adapter<MomentAdapter.MomentView
             mCommentTextView = itemView.findViewById(R.id.comment_textview);
             mStarImageView = itemView.findViewById(R.id.starImageView_overview);
             mStarTextView = itemView.findViewById(R.id.star_textview_overview);
+            mShareImageView = itemView.findViewById(R.id.shareImageView);
         }
         public void bindData(Moment moment) {
             int position = getBindingAdapterPosition();
