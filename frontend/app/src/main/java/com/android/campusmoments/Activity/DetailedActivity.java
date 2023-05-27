@@ -26,6 +26,7 @@ import static com.android.campusmoments.Service.Config.*;
 import com.android.campusmoments.Fragment.CommentsFragment;
 import com.android.campusmoments.R;
 import com.android.campusmoments.Service.Moment;
+import com.android.campusmoments.Service.Notification;
 import com.android.campusmoments.Service.Services;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
@@ -91,6 +92,12 @@ public class DetailedActivity extends AppCompatActivity {
             if(msg.what == 0) {
                 Toast.makeText(DetailedActivity.this, "发送失败", Toast.LENGTH_SHORT).show();
             } else if(msg.what == 1) {
+                String shortContent = commentEditText.getText().toString();
+                if(shortContent.length() > 10) {
+                    shortContent = shortContent.substring(0, 10) + "...";
+                }
+                firebaseDatabase.getReference("notifications").child(String.valueOf(moment.getUserId())).push()
+                        .setValue(new Notification(moment.getUserId(), moment.getId(), "发表了评论 " + shortContent, 1));
                 Toast.makeText(DetailedActivity.this, "评论成功", Toast.LENGTH_SHORT).show();
                 commentEditText.setText("");
                 Services.getMomentById(moment.getId(), getMomentHandler);

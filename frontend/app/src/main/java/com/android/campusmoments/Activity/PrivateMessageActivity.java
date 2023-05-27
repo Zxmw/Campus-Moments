@@ -1,5 +1,7 @@
 package com.android.campusmoments.Activity;
 
+import static com.android.campusmoments.Service.Config.firebaseDatabase;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -8,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.campusmoments.Adapter.MessageHolder;
 import com.android.campusmoments.R;
+import com.android.campusmoments.Service.Notification;
 import com.android.campusmoments.Service.PrivateMessage;
 import com.android.campusmoments.Service.Services;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -38,8 +41,6 @@ public class PrivateMessageActivity extends AppCompatActivity {
     private TextView usernameTextView;
     private FirebaseRecyclerAdapter<PrivateMessage, MessageHolder> privateMessageAdapter;
     private RecyclerView privateMessageRecyclerView;
-    private final String FIREBASE_DATABASE_URL = "https://campus-moments-default-rtdb.asia-southeast1.firebasedatabase.app/";
-    private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance(FIREBASE_DATABASE_URL);
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,6 +64,8 @@ public class PrivateMessageActivity extends AppCompatActivity {
             PrivateMessage privateMessage = new PrivateMessage(Services.mySelf.id, otherId, Services.mySelf.avatar, Services.mySelf.username, content);
             String childName = selfId < otherId ? selfId + "-" + otherId : otherId + "-" + selfId;
             firebaseDatabase.getReference("privateMessages").child(childName).push().setValue(privateMessage);
+            firebaseDatabase.getReference("notifications").child(otherId + "").push()
+                    .setValue(new Notification(Services.mySelf.id, "收到来自" + Services.mySelf.username + "的私信", 3));
         }
         messageTextView.setText("");
     }
@@ -116,7 +119,6 @@ public class PrivateMessageActivity extends AppCompatActivity {
             @Override
             public void onDataChanged() {
                 super.onDataChanged();
-                // once privateMessageRecyclerView's height changes, scroll to the bottom
                 privateMessageRecyclerView.scrollToPosition(privateMessageAdapter.getItemCount() - 1);
             }
 

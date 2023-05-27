@@ -20,6 +20,7 @@ import android.widget.Toast;
 import com.android.campusmoments.Fragment.HomeFragment;
 import com.android.campusmoments.Fragment.MomentsFragment;
 import com.android.campusmoments.Fragment.MyFragment;
+import com.android.campusmoments.Fragment.NotificationFragment;
 import com.android.campusmoments.R;
 import com.android.campusmoments.Service.Services;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -31,7 +32,7 @@ public class HomeActivity extends AppCompatActivity {
     private FragmentManager fragmentManager;
     private FragmentContainerView fragmentContainerView;
     private HomeFragment homeFragment;
-    private Fragment messageFragment;  // TODO: 消息
+    private NotificationFragment notificationFragment;
     private MyFragment myFragment;
     private Fragment currentFragment;
     @Override
@@ -46,17 +47,17 @@ public class HomeActivity extends AppCompatActivity {
     }
     private void initFragment() {
         homeFragment = new HomeFragment();
-        messageFragment = new Fragment();
+        notificationFragment = new NotificationFragment();
         myFragment = new MyFragment();
         fragmentManager = getSupportFragmentManager();
         // 默认显示homeFragment
         fragmentManager.beginTransaction()
                 .add(R.id.fragmentContainerView, homeFragment)
-                .add(R.id.fragmentContainerView, messageFragment)
+                .add(R.id.fragmentContainerView, notificationFragment)
                 .add(R.id.fragmentContainerView, myFragment)
                 .commit();
 //        fragmentManager.beginTransaction().replace(R.id.fragmentContainerView, homeFragment).commit();
-        fragmentManager.beginTransaction().show(homeFragment).hide(messageFragment).hide(myFragment).commit();
+        fragmentManager.beginTransaction().show(homeFragment).hide(notificationFragment).hide(myFragment).commit();
         currentFragment = homeFragment;
     }
     private void showFragment(Fragment fragment) {
@@ -71,7 +72,8 @@ public class HomeActivity extends AppCompatActivity {
                     showFragment(homeFragment);
                     return true;
                 case R.id.message:
-                    showFragment(messageFragment);
+                    notificationFragment.refresh();
+                    showFragment(notificationFragment);
                     return true;
                 case R.id.my:
                     showFragment(myFragment);

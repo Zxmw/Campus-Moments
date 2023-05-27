@@ -20,7 +20,7 @@ public class MessageHolder extends RecyclerView.ViewHolder {
     public TextView usernameTextView;
     public TextView contentTextView;
     public CardView cardView;
-    Space space;
+    public Space space;
     public MessageHolder(@NonNull View itemView) {
         super(itemView);
         messageLinearLayout = itemView.findViewById(R.id.messageLinearLayout);

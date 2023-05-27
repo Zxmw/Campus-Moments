@@ -684,6 +684,44 @@ public class Services {
             }
         });
     }
+    public static void getUserByIds(List<Integer> ids, Handler handler) {
+        String q = "";
+        for (int i = 0; i < ids.size(); i++) {
+            q += ids.get(i);
+            if (i != ids.size() - 1) {
+                q += ",";
+            }
+        }
+        Request request = new Request.Builder()
+                .addHeader("Authorization", "Token " + token)
+                .url(GET_ALL_USERS_URL + "?id__in=" + q)
+                .get()
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NonNull okhttp3.Call call, @NonNull java.io.IOException e) {
+                Log.d(TAG, "onFailure: " + e.getMessage());
+                Message message = new Message();
+                message.what = GET_USER_FAIL;
+                handler.sendMessage(message);
+            }
+
+            @Override
+            public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws java.io.IOException {
+                if (response.code() != 200) {
+                    Message message = new Message();
+                    message.what = GET_USER_FAIL;
+                    handler.sendMessage(message);
+                    return;
+                }
+                Message message = new Message();
+                message.what = GET_USER_SUCCESS;
+                message.obj = response.body().string();
+                Log.d(TAG, "onResponse: " + message.obj);
+                handler.sendMessage(message);
+            }
+        });
+    }
     // 评论
     public static void postComment(Handler handler, @NonNull String content, @NonNull int momentId) {
         MultipartBody.Builder builder = new MultipartBody.Builder()

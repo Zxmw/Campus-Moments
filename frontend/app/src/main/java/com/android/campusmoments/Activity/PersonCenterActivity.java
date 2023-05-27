@@ -102,8 +102,8 @@ public class PersonCenterActivity extends AppCompatActivity {
     }
 
     public void gotoNotification(View view) {
-//        Intent intent = new Intent(this, NotificationActivity.class);
-//        startActivity(intent);
+        Intent intent = new Intent(this, NotificationActivity.class);
+        startActivity(intent);
     }
 
     public void cancel(View view){

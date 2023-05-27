@@ -52,12 +52,17 @@ import android.widget.VideoView;
 
 import static com.android.campusmoments.Service.Config.*;
 import com.android.campusmoments.R;
+import com.android.campusmoments.Service.Notification;
 import com.android.campusmoments.Service.Services;
+import com.android.campusmoments.Service.User;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
 import com.google.android.exoplayer2.ui.PlayerView;
 import com.squareup.picasso.Picasso;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -81,8 +86,19 @@ public class PubActivity extends AppCompatActivity {
                     Toast.makeText(PubActivity.this, "发布失败", Toast.LENGTH_SHORT).show();
                     break;
                 case PUB_MOMENT_SUCCESS:
-                    Toast.makeText(PubActivity.this, "发布成功", Toast.LENGTH_SHORT).show();
-                    finish();
+                    // from msg.obj get the moment id
+                    try {
+                        JSONObject jsonObject = new JSONObject((String)msg.obj);
+                        int momentId = jsonObject.getInt("id");
+                        for(Integer followerId : Services.mySelf.fansList){
+                            firebaseDatabase.getReference("notifications").child(followerId.toString()).push()
+                                    .setValue(new Notification(Services.mySelf.id, momentId,"你关注的" + Services.mySelf.username + "发布了新的动态",2));
+                        }
+                        Toast.makeText(PubActivity.this, "发布成功", Toast.LENGTH_SHORT).show();
+                        finish();
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
                     break;
                 default:
                     break;

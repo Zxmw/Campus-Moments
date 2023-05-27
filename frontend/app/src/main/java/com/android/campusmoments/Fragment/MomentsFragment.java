@@ -38,7 +38,9 @@ import com.android.campusmoments.Activity.UserHomePageActivity;
 import com.android.campusmoments.Adapter.MomentAdapter;
 import com.android.campusmoments.R;
 import com.android.campusmoments.Service.Moment;
+import com.android.campusmoments.Service.Notification;
 import com.android.campusmoments.Service.Services;
+import com.android.campusmoments.Service.User;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -215,6 +217,10 @@ public class MomentsFragment extends Fragment {
 
             @Override
             public void onLikeClick(View v, int position, Moment clickedMoment) {
+                if(clickedMoment.getUserId() == Services.mySelf.id) {
+                    Toast.makeText(getContext(), "不能点赞自己的动态", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 ImageView likeImage = v.findViewById(R.id.likeImageView_overview);
                 TextView likeCountText = v.findViewById(R.id.like_textview_overview);
                 Services.likeOrStar("like", clickedMoment.getId(), !clickedMoment.isLikedByMe, new Handler(Looper.getMainLooper()){
@@ -228,6 +234,12 @@ public class MomentsFragment extends Fragment {
                             if(clickedMoment.isLikedByMe) {
                                 likeCount++;
                                 likeImage.setImageResource(R.drawable.ic_moment_thumbup_red);
+                                String shortTitle = clickedMoment.getTitle();
+                                if(shortTitle.length() > 10) {
+                                    shortTitle = shortTitle.substring(0, 10) + "...";
+                                }
+                                firebaseDatabase.getReference("notifications").child(String.valueOf(clickedMoment.getUserId())).push()
+                                        .setValue(new Notification(clickedMoment.getUserId(), clickedMoment.getId(), "点赞了你的动态 " + shortTitle, 0));
                             } else {
                                 likeCount--;
                                 likeImage.setImageResource(R.drawable.ic_moment_thumbup);
