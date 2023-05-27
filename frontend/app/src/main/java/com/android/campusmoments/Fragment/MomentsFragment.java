@@ -59,10 +59,12 @@ public class MomentsFragment extends Fragment {
     public static final int TYPE_HOT = 3;
     public static final int TYPE_LIKE = 4;
     public static final int TYPE_STAR = 5;
+    public static final int TYPE_SEARCH = 6;
     private final int type; // 0: 全部动态 1: 个人动态 2: 关注动态 3: 热门动态 4: 点赞动态 5: 收藏动态
 
     private String sort = "时间"; // 排序方式
     private String tag = "#全部"; // 标签
+    private String[] searchKeys = null; // 搜索关键词
     private int userId = -1;
     private List<Moment> mMomentList;
     private RecyclerView momentsRecyclerView;
@@ -99,6 +101,9 @@ public class MomentsFragment extends Fragment {
                             continue;
                         if(type == TYPE_STAR && !moment.isStaredByMe) // 收藏
                             continue;
+                        if(type == TYPE_SEARCH && !moment.match(searchKeys)) // 搜索
+                            continue;
+
                         // 根据tag筛选
                         if(!tag.equals("#全部") && !moment.getTag().equals(tag))
                             continue;
@@ -140,6 +145,10 @@ public class MomentsFragment extends Fragment {
     public MomentsFragment(int type) {
         this.type = type;
     }
+    public MomentsFragment(int type, @NonNull String[] searchKeys) { // 搜索
+        this.type = type;
+        this.searchKeys = searchKeys;
+    }
     public void refresh() {
         if (refreshing) {
             return;
@@ -157,8 +166,9 @@ public class MomentsFragment extends Fragment {
             Services.getMomentsAll(getMomentsHandler);
         } else if(type == TYPE_STAR) {
             Services.getMomentsAll(getMomentsHandler);
+        } else if(type == TYPE_SEARCH) {
+            Services.getMomentsAll(getMomentsHandler);
         }
-        // TODO: Services.getMomentsHot/getMomentsFollow
     }
     @Override
     public void onAttach(@NonNull Activity activity) {

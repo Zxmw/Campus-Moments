@@ -22,6 +22,7 @@ import android.widget.ImageView;
 
 import com.android.campusmoments.Activity.HomeActivity;
 import com.android.campusmoments.Activity.PubActivity;
+import com.android.campusmoments.Activity.SearchActivity;
 import com.android.campusmoments.Adapter.HomePagerAdapter;
 import com.android.campusmoments.R;
 import com.google.android.material.tabs.TabLayout;
@@ -35,6 +36,7 @@ public class HomeFragment extends Fragment {
     private static final String TAG = "HomeFragment";
 
 
+    private ImageView ivSearch; // 搜索按钮
     private ImageView ivPub; // 发布按钮
     // 使用ViewPager2
     private TabLayout mTabLayout;
@@ -67,6 +69,8 @@ public class HomeFragment extends Fragment {
     }
 
     private void initView(View view) {
+        ivSearch = view.findViewById(R.id.iv_search);
+        setupSearch();
         ivPub = view.findViewById(R.id.iv_add);
         setupPub();
         mTabLayout = view.findViewById(R.id.tabLayout);
@@ -74,6 +78,16 @@ public class HomeFragment extends Fragment {
         HomePagerAdapter homePagerAdapter = new HomePagerAdapter(requireActivity(), mData);
         mViewPager2.setAdapter(homePagerAdapter);
         new TabLayoutMediator(mTabLayout, mViewPager2, (tab, position) -> tab.setText(mData.get(position))).attach();
+    }
+
+    private void setupSearch() {
+        ivSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), SearchActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     private void setupPub() {
@@ -85,4 +99,5 @@ public class HomeFragment extends Fragment {
             }
         });
     }
+
 }
