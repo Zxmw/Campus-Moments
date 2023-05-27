@@ -86,7 +86,34 @@ public class Moment {
     public static Comparator<Moment> getCommentComparator() {
         return Comparator.comparingInt(Moment::getCommentCount).reversed();
     }
+    // 搜索内容: 逻辑与组合
+    public boolean match(String[] keywords) {
+        if(keywords == null || keywords.length == 0) {
+            return true;
+        }
 
+        for(String keyword : keywords) {
+               if(!contains(keyword)) {
+                    return false;
+                }
+        }
+        return true;
+    }
+    private boolean contains(String keyword) {
+        if(mUsername!=null && mUsername.contains(keyword)) {
+            return true;
+        }
+        if(mTag!=null && mTag.contains(keyword)) {
+            return true;
+        }
+        if(mTitle!=null && mTitle.contains(keyword)) {
+            return true;
+        }
+        if(mContent!=null && mContent.contains(keyword)) {
+            return true;
+        }
+        return false;
+    }
     // get-function
     public int getId() {
         return id;

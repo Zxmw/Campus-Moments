@@ -30,6 +30,9 @@
             android:name=".Activity.NotificationActivity"
             android:exported="false" />
         <activity
+            android:name=".Activity.SearchActivity"
+            android:exported="false" />
+        <activity
             android:name=".Activity.UserListActivity"
             android:exported="false" />
         <activity
