@@ -27,6 +27,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -70,6 +71,7 @@ public class MomentsFragment extends Fragment {
     private MomentAdapter momentAdapter;
     private Spinner sortSpinner;
     private Spinner tagSpinner;
+    private ProgressBar progressBar; // 加载动画
     private ActivityResultLauncher<Intent> detailedLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
             new ActivityResultCallback<ActivityResult>() {
                 @Override
@@ -120,6 +122,7 @@ public class MomentsFragment extends Fragment {
                     momentAdapter.setMoments(mMomentList);
                     momentsRecyclerView.setAdapter(momentAdapter);
                     momentAdapter.notifyDataSetChanged();
+                    progressBar.setVisibility(View.GONE); // 隐藏加载动画
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -153,6 +156,9 @@ public class MomentsFragment extends Fragment {
             return;
         }
         refreshing = true;
+
+        progressBar.setVisibility(View.VISIBLE); // 显示加载动画, 可以注释掉,
+
         if (type == TYPE_PERSON) {
             Services.getMomentsByUser(userId, getMomentsHandler);
         } else if(type == TYPE_ALL) {
@@ -197,6 +203,7 @@ public class MomentsFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_moments, container, false);
 
+        progressBar = view.findViewById(R.id.progressBar);
         tagSpinner = view.findViewById(R.id.tagSpinner);
         sortSpinner = view.findViewById(R.id.sortSpinner);
         setupSortSpinner();
