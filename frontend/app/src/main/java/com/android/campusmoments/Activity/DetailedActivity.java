@@ -91,8 +91,10 @@ public class DetailedActivity extends AppCompatActivity {
                 if(shortContent.length() > 10) {
                     shortContent = shortContent.substring(0, 10) + "...";
                 }
-                firebaseDatabase.getReference("notifications").child(String.valueOf(moment.getUserId())).push()
-                        .setValue(new NotificationMessage(moment.getUserId(), moment.getId(), Services.mySelf.username, "发表了评论 " + shortContent, 1));
+                if (moment.getUserId() != Services.mySelf.id) {
+                    firebaseDatabase.getReference("notifications").child(String.valueOf(moment.getUserId())).push()
+                            .setValue(new NotificationMessage(Services.mySelf.id, moment.getId(), Services.mySelf.username, "发表了评论 " + shortContent, 1));
+                }
                 Toast.makeText(DetailedActivity.this, "评论成功", Toast.LENGTH_SHORT).show();
                 commentEditText.setText("");
                 Services.getMomentById(moment.getId(), getMomentHandler);
