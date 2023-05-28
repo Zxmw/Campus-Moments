@@ -33,14 +33,12 @@ import android.widget.Toast;
 
 import static com.android.campusmoments.Service.Config.*;
 import com.android.campusmoments.Activity.DetailedActivity;
-import com.android.campusmoments.Activity.HomeActivity;
 import com.android.campusmoments.Activity.UserHomePageActivity;
 import com.android.campusmoments.Adapter.MomentAdapter;
 import com.android.campusmoments.R;
 import com.android.campusmoments.Service.Moment;
-import com.android.campusmoments.Service.Notification;
+import com.android.campusmoments.Service.NotificationMessage;
 import com.android.campusmoments.Service.Services;
-import com.android.campusmoments.Service.User;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -48,7 +46,6 @@ import org.json.JSONException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 public class MomentsFragment extends Fragment {
     private static final String TAG = "MomentsFragment";
@@ -249,7 +246,7 @@ public class MomentsFragment extends Fragment {
                                     shortTitle = shortTitle.substring(0, 10) + "...";
                                 }
                                 firebaseDatabase.getReference("notifications").child(String.valueOf(clickedMoment.getUserId())).push()
-                                        .setValue(new Notification(clickedMoment.getUserId(), clickedMoment.getId(), "点赞了你的动态 " + shortTitle, 0));
+                                        .setValue(new NotificationMessage(Services.mySelf.id, clickedMoment.getId(), Services.mySelf.username,"点赞了你的动态 " + shortTitle, 0));
                             } else {
                                 likeCount--;
                                 likeImage.setImageResource(R.drawable.ic_moment_thumbup);

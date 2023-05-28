@@ -1,9 +1,12 @@
 package com.android.campusmoments.Adapter;
 
+import static com.android.campusmoments.Service.Config.firebaseDatabase;
+
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,12 +18,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.android.campusmoments.Activity.DetailedActivity;
 import com.android.campusmoments.Activity.PrivateMessageActivity;
 import com.android.campusmoments.R;
-import com.android.campusmoments.Service.Notification;
+import com.android.campusmoments.Service.NotificationMessage;
+import com.android.campusmoments.Service.Services;
 import com.android.campusmoments.Service.User;
 import com.squareup.picasso.Picasso;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -29,19 +35,22 @@ import io.reactivex.rxjava3.annotations.NonNull;
 
 public class NotificationAdapter extends  RecyclerView.Adapter<NotificationAdapter.NotificationHolder> {
     private Context context;
-    private List<Notification> notificationList;
-    private Map<Integer, User> notiUserMap;
+    private List<NotificationMessage> notificationMessageList = new ArrayList<>();
+    private static Map<Integer, User> notiUserMap = new HashMap<>();
+    private List<String> notificationKeyList = new ArrayList<>();
 
-    public NotificationAdapter(Context context, List<Notification> notificationList, Map<Integer, User> notiUserMap) {
+    public NotificationAdapter(Context context, List<NotificationMessage> notificationMessageList, Map<Integer, User> notiUserMap) {
         this.context = context;
-        this.notificationList = notificationList;
+        this.notificationMessageList = notificationMessageList;
         this.notiUserMap = notiUserMap;
     }
 
-    public void setNotificationList(List<Notification> notificationList) {
-        this.notificationList = notificationList;
+    public void setNotificationList(List<NotificationMessage> notificationMessageList) {
+        this.notificationMessageList = notificationMessageList;
     }
-
+    public void setNotificationKeyList(List<String> notificationKeyList) {
+        this.notificationKeyList = notificationKeyList;
+    }
     public void setNotiUserMap(Map<Integer, User> notiUserMap) {
         this.notiUserMap = notiUserMap;
     }
@@ -50,6 +59,7 @@ public class NotificationAdapter extends  RecyclerView.Adapter<NotificationAdapt
         public TextView timeTextView;
         public TextView usernameTextView;
         public TextView contentTextView;
+        public ImageView isReadImageView;
 
         public NotificationHolder(@NonNull View itemView) {
             super(itemView);
@@ -57,18 +67,26 @@ public class NotificationAdapter extends  RecyclerView.Adapter<NotificationAdapt
             timeTextView = itemView.findViewById(R.id.time_noti);
             usernameTextView = itemView.findViewById(R.id.usernameTextView_noti);
             contentTextView = itemView.findViewById(R.id.content_noti);
+            isReadImageView = itemView.findViewById(R.id.isread_noti);
         }
 
-        public void bindData(Notification notification, int position, Map<Integer, User> notiUserMap) {
+        public void bindData(NotificationMessage notificationMessage, int position, Map<Integer, User> notiUserMap) {
             timeTextView.setText(DateFormat.format("yyyy-MM-dd HH:mm:ss",
-                    notification.getTime()));
-            contentTextView.setText(notification.getContent());
-            usernameTextView.setText(Objects.requireNonNull(notiUserMap.get(notification.getSenderId())).username);
-            String avatar = Objects.requireNonNull(notiUserMap.get(notification.getSenderId())).avatar;
+                    notificationMessage.getTime()));
+            contentTextView.setText(notificationMessage.getContent());
+            Log.d("NotificationAdapter", "bindData: " + notificationMessage.getSenderId());
+            Log.d("NotificationAdapter", "bindData: " + notiUserMap);
+            usernameTextView.setText(Objects.requireNonNull(notiUserMap.get(notificationMessage.getSenderId())).username);
+            String avatar = Objects.requireNonNull(notiUserMap.get(notificationMessage.getSenderId())).avatar;
             if (avatar == null || avatar.equals("")) {
                 avatarImageView.setImageResource(R.drawable.avatar_1);
             } else {
                 Picasso.get().load(Uri.parse(avatar)).into(avatarImageView);
+            }
+            if (notificationMessage.getIsRead()) {
+                isReadImageView.setVisibility(View.INVISIBLE);
+            } else {
+                isReadImageView.setVisibility(View.VISIBLE);
             }
         }
     }
@@ -81,27 +99,28 @@ public class NotificationAdapter extends  RecyclerView.Adapter<NotificationAdapt
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //get notification
+                //get notificationMessage
                 int position = holder.getAdapterPosition();
-                Notification notification = notificationList.get(position);
-                int senderId = notification.getSenderId();
-                if (notification.getType() == 3) {
-                    // goto privateMessageActivity
-
+                NotificationMessage notificationMessage = notificationMessageList.get(position);
+                int senderId = notificationMessage.getSenderId();
+                if (notificationMessage.getType() == 3) {
                     String username = Objects.requireNonNull(notiUserMap.get(senderId)).username;
                     String avatar = Objects.requireNonNull(notiUserMap.get(senderId)).avatar;
                     Intent intent = new Intent(context, PrivateMessageActivity.class);
                     intent.putExtra("id", senderId);
                     intent.putExtra("username", username);
                     intent.putExtra("avatar", avatar);
+                    notificationMessage.setIsRead(true);
                     context.startActivity(intent);
                 }
                 else {
-                    // goto momentDetailActivity
                     Intent intent = new Intent(context, DetailedActivity.class);
-                    intent.putExtra("id", notification.getMomentId());
+                    intent.putExtra("id", notificationMessage.getMomentId());
+                    notificationMessage.setIsRead(true);
                     context.startActivity(intent);
                 }
+                firebaseDatabase.getReference("notifications").child(String.valueOf(Services.mySelf.id)).child(notificationKeyList.get(position)).child("isRead").setValue(true);
+
             }
         });
         return holder;
@@ -109,12 +128,12 @@ public class NotificationAdapter extends  RecyclerView.Adapter<NotificationAdapt
 
     @Override
     public void onBindViewHolder(NotificationHolder holder, int position) {
-        Notification notification = notificationList.get(position);
-        holder.bindData(notification, position, notiUserMap);
+        NotificationMessage notificationMessage = notificationMessageList.get(position);
+        holder.bindData(notificationMessage, position, notiUserMap);
     }
 
     @Override
     public int getItemCount() {
-        return notificationList.size();
+        return notificationMessageList.size();
     }
 }

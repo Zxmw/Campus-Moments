@@ -1,12 +1,10 @@
 package com.android.campusmoments.Fragment;
 
-import static com.android.campusmoments.Service.Config.FIREBASE_DATABASE_URL;
 import static com.android.campusmoments.Service.Config.GET_USER_FAIL;
 import static com.android.campusmoments.Service.Config.GET_USER_SUCCESS;
 import static com.android.campusmoments.Service.Config.firebaseDatabase;
 
 import android.annotation.SuppressLint;
-import android.media.Image;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -21,19 +19,18 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.android.campusmoments.Adapter.NotificationAdapter;
 import com.android.campusmoments.R;
-import com.android.campusmoments.Service.Notification;
+import com.android.campusmoments.Service.NotificationMessage;
 import com.android.campusmoments.Service.Services;
 import com.android.campusmoments.Service.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.FirebaseDatabase;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -42,7 +39,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import io.reactivex.rxjava3.annotations.NonNull;
 
@@ -50,9 +46,10 @@ public class NotificationFragment extends Fragment {
     private static final String TAG = "NotificationFragment";
     int where = 0; // 0: HomeActivity, 1: PersonCenterActivity
     private NotificationAdapter notificationAdapter;
-    private final Map<Integer, User> notiUserMap = new HashMap<>();
-    private List<Notification> notificationList = new ArrayList<>();
+    private final static Map<Integer, User> notiUserMap = new HashMap<>();
+    private List<NotificationMessage> notificationMessageList = new ArrayList<>();
     private List<String> notificationKeyList = new ArrayList<>();
+    public int unreadCount = 0;
 
     private final Handler handler = new Handler(Looper.getMainLooper()) {
         @SuppressLint("NotifyDataSetChanged")
@@ -77,15 +74,28 @@ public class NotificationFragment extends Fragment {
     private void getUserSuccess(Object obj) {
         try {
             JSONArray arr = new JSONArray(obj.toString());
-            Log.d(TAG, "onResponse: " + arr.length());
             notiUserMap.clear();
             for (int i = 0; i < arr.length(); i++) {
                 User user = new User(arr.getJSONObject(i));
                 notiUserMap.put(user.id, user);
             }
-            notificationAdapter.setNotificationList(notificationList);
+            notificationAdapter.setNotificationList(notificationMessageList);
             notificationAdapter.setNotiUserMap(notiUserMap);
+            notificationAdapter.setNotificationKeyList(notificationKeyList);
             notificationAdapter.notifyDataSetChanged();
+            for (NotificationMessage notificationMessage : notificationMessageList) {
+                if (!notificationMessage.getIsRead()) {
+                    unreadCount++;
+                }
+            }
+            if(where == 0) {
+                BottomNavigationView bottomNavigationView = requireActivity().findViewById(R.id.bottomNavigationView);
+                if (unreadCount > 0) {
+                    bottomNavigationView.getOrCreateBadge(R.id.message).setNumber(unreadCount);
+                } else {
+                    bottomNavigationView.removeBadge(R.id.message);
+                }
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -95,12 +105,6 @@ public class NotificationFragment extends Fragment {
     }
     public NotificationFragment(int where) {
         this.where = where;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        Log.d(TAG, "onCreate: ");
-        super.onCreate(savedInstanceState);
     }
 
     @Override
@@ -120,7 +124,7 @@ public class NotificationFragment extends Fragment {
         }
         RecyclerView notificationRecyclerView = view.findViewById(R.id.recyclerViewNotifications);
         notificationRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        notificationAdapter = new NotificationAdapter(getContext(), notificationList, notiUserMap);
+        notificationAdapter = new NotificationAdapter(getContext(), notificationMessageList, notiUserMap);
         notificationRecyclerView.setAdapter(notificationAdapter);
         ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
             @Override
@@ -130,54 +134,60 @@ public class NotificationFragment extends Fragment {
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 int position = viewHolder.getAdapterPosition(); // 获取滑动的位置
-                Notification notification = notificationList.get(position);
+                NotificationMessage notificationMessage = notificationMessageList.get(position);
                 firebaseDatabase.getReference("notifications").child(String.valueOf(Services.mySelf.id)).child(notificationKeyList.get(position)).removeValue();
                 refresh();
             }
         };
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
         itemTouchHelper.attachToRecyclerView(notificationRecyclerView);
-
-        refresh();
         return view;
     }
 
 
     public void refresh() {
-        firebaseDatabase.getReference("notifications").child("6").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+        firebaseDatabase.getReference("notifications").child(String.valueOf(Services.mySelf.id)).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> task) {
                 if (!task.isSuccessful()) {
                     Log.e("firebase", "Error getting data", task.getException());
                 }
                 else {
-                    Log.d("firebase", String.valueOf(task.getResult().getValue()));
-                    // get all senderId
                     List<Integer> senderIdList = new ArrayList<>();
-                    notificationList.clear();
+                    notificationMessageList.clear();
                     notificationKeyList.clear();
+                    unreadCount = 0;
                     for (DataSnapshot snapshot : task.getResult().getChildren()) {
-                        Notification notification = snapshot.getValue(Notification.class);
-                        notificationList.add(notification);
+                        NotificationMessage notificationMessage = snapshot.getValue(NotificationMessage.class);
+                        notificationMessageList.add(notificationMessage);
                         // only get the key
                         notificationKeyList.add(snapshot.getKey());
-                        assert notification != null;
-                        senderIdList.add(notification.getSenderId());
+                        assert notificationMessage != null;
+                        senderIdList.add(notificationMessage.getSenderId());
                     }
-                    List<Notification> tmp = new ArrayList<>();
-                    for (int i = notificationList.size() - 1; i >= 0; i--) {
-                        tmp.add(notificationList.get(i));
+                    List<NotificationMessage> tmp = new ArrayList<>();
+                    for (int i = notificationMessageList.size() - 1; i >= 0; i--) {
+                        tmp.add(notificationMessageList.get(i));
                     }
-                    notificationList = tmp;
+                    notificationMessageList = tmp;
                     List<String> tmpKey = new ArrayList<>();
                     for (int i = notificationKeyList.size() - 1; i >= 0; i--) {
                         tmpKey.add(notificationKeyList.get(i));
                     }
                     notificationKeyList = tmpKey;
-                    Log.d(TAG, "onComplete: " + notificationKeyList.toString());
                     Services.getUserByIds(senderIdList, handler);
                 }
             }
         });
+    }
+
+    public User getUserById(int id) {
+        return notiUserMap.get(id);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        refresh();
     }
 }

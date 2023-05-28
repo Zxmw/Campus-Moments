@@ -8,14 +8,13 @@
     <uses-permission android:name="android.permission.CAMERA" />
 
     <uses-feature android:name="android.hardware.camera" />
-
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -75,15 +74,6 @@
             android:name=".Activity.PersonCenterActivity"
             android:exported="false" />
         <activity
-            android:name=".Activity.PublishMomentActivity"
-            android:exported="false" />
-        <activity
-            android:name=".Activity.DetailedMomentActivity"
-            android:exported="false" />
-        <activity
-            android:name=".Activity.MainMomentsActivity"
-            android:exported="false" />
-        <activity
             android:name=".Activity.MainActivity"
             android:exported="true">
             <intent-filter>
@@ -92,6 +82,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
     </application>
 
 </manifest>

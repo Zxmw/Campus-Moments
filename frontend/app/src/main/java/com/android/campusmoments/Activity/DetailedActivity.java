@@ -1,9 +1,7 @@
 package com.android.campusmoments.Activity;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentContainerView;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -16,7 +14,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
@@ -26,12 +23,10 @@ import static com.android.campusmoments.Service.Config.*;
 import com.android.campusmoments.Fragment.CommentsFragment;
 import com.android.campusmoments.R;
 import com.android.campusmoments.Service.Moment;
-import com.android.campusmoments.Service.Notification;
+import com.android.campusmoments.Service.NotificationMessage;
 import com.android.campusmoments.Service.Services;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
-import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.ui.PlayerControlView;
 import com.google.android.exoplayer2.ui.PlayerView;
 import com.squareup.picasso.Picasso;
 
@@ -97,7 +92,7 @@ public class DetailedActivity extends AppCompatActivity {
                     shortContent = shortContent.substring(0, 10) + "...";
                 }
                 firebaseDatabase.getReference("notifications").child(String.valueOf(moment.getUserId())).push()
-                        .setValue(new Notification(moment.getUserId(), moment.getId(), "发表了评论 " + shortContent, 1));
+                        .setValue(new NotificationMessage(moment.getUserId(), moment.getId(), Services.mySelf.username, "发表了评论 " + shortContent, 1));
                 Toast.makeText(DetailedActivity.this, "评论成功", Toast.LENGTH_SHORT).show();
                 commentEditText.setText("");
                 Services.getMomentById(moment.getId(), getMomentHandler);

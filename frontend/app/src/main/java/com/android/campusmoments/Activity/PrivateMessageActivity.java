@@ -10,12 +10,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.campusmoments.Adapter.MessageHolder;
 import com.android.campusmoments.R;
-import com.android.campusmoments.Service.Notification;
+import com.android.campusmoments.Service.NotificationMessage;
 import com.android.campusmoments.Service.PrivateMessage;
 import com.android.campusmoments.Service.Services;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.squareup.picasso.Picasso;
 
@@ -29,9 +28,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class PrivateMessageActivity extends AppCompatActivity {
     private int selfId = Services.mySelf.id;
@@ -65,7 +61,7 @@ public class PrivateMessageActivity extends AppCompatActivity {
             String childName = selfId < otherId ? selfId + "-" + otherId : otherId + "-" + selfId;
             firebaseDatabase.getReference("privateMessages").child(childName).push().setValue(privateMessage);
             firebaseDatabase.getReference("notifications").child(otherId + "").push()
-                    .setValue(new Notification(Services.mySelf.id, "收到来自" + Services.mySelf.username + "的私信", 3));
+                    .setValue(new NotificationMessage(selfId, Services.mySelf.username,"收到来自" + Services.mySelf.username + "的私信", 3));
         }
         messageTextView.setText("");
     }

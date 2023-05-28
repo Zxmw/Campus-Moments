@@ -3,33 +3,25 @@ package com.android.campusmoments.Activity;
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContract;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
 
 import android.Manifest;
-import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.media.MediaMetadataRetriever;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.MediaStore;
@@ -52,22 +44,14 @@ import android.widget.VideoView;
 
 import static com.android.campusmoments.Service.Config.*;
 import com.android.campusmoments.R;
-import com.android.campusmoments.Service.Notification;
+import com.android.campusmoments.Service.NotificationMessage;
 import com.android.campusmoments.Service.Services;
-import com.android.campusmoments.Service.User;
-import com.google.android.exoplayer2.ExoPlayer;
-import com.google.android.exoplayer2.MediaItem;
-import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
-import com.google.android.exoplayer2.ui.PlayerView;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Locale;
 
@@ -86,13 +70,13 @@ public class PubActivity extends AppCompatActivity {
                     Toast.makeText(PubActivity.this, "发布失败", Toast.LENGTH_SHORT).show();
                     break;
                 case PUB_MOMENT_SUCCESS:
-                    // from msg.obj get the moment id
                     try {
                         JSONObject jsonObject = new JSONObject((String)msg.obj);
                         int momentId = jsonObject.getInt("id");
+                        String username = jsonObject.getString("usr_username");
                         for(Integer followerId : Services.mySelf.fansList){
                             firebaseDatabase.getReference("notifications").child(followerId.toString()).push()
-                                    .setValue(new Notification(Services.mySelf.id, momentId,"你关注的" + Services.mySelf.username + "发布了新的动态",2));
+                                    .setValue(new NotificationMessage(Services.mySelf.id, momentId, Services.mySelf.username,"你关注的" + Services.mySelf.username + "发布了新的动态",2));
                         }
                         Toast.makeText(PubActivity.this, "发布成功", Toast.LENGTH_SHORT).show();
                         finish();

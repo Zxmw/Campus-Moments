@@ -7,8 +7,7 @@
     tools:context=".Activity.NotificationActivity">
 
     <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/fragmentContainerView2"
-        android:name="com.android.campusmoments.Fragment.NotificationFragment"
+        android:id="@+id/fragmentContainerView_notification"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"

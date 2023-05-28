@@ -1,15 +1,23 @@
 package com.android.campusmoments.Service;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
-
+import com.android.campusmoments.R;
 import static com.android.campusmoments.Service.Config.*;
 import com.android.campusmoments.Activity.AvatarConfigActivity;
 import com.android.campusmoments.Activity.BioConfigActivity;
+import com.android.campusmoments.Activity.HomeActivity;
 import com.android.campusmoments.Activity.LoginActivity;
 import com.android.campusmoments.Activity.MainActivity;
 import com.android.campusmoments.Activity.PasswordConfigActivity;
@@ -41,7 +49,7 @@ public class Services {
 
     private static final String TAG = "Services";
     public static String token = null;
-
+    private static int notificationId = 0;
     private static final OkHttpClient client = new OkHttpClient.Builder()
             .connectTimeout(5, TimeUnit.SECONDS)
             .readTimeout(5, TimeUnit.SECONDS)
@@ -847,4 +855,21 @@ public class Services {
         return null;
     }
 
+    public static void sendNotification(int senderId, int momentId, String content, String username, Context context) {
+        Log.d(TAG, "sendNotification: " + senderId + " " + momentId + " " + content);
+        Intent intent = new Intent(context, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingIntent =
+                PendingIntent.getActivity(context, notificationId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "default");
+        builder.setSmallIcon(R.drawable.ic_launcher_foreground);
+        builder.setContentTitle(username);
+        builder.setContentText(content);
+        builder.setPriority(NotificationCompat.PRIORITY_DEFAULT);
+        builder.setContentIntent(pendingIntent);
+        builder.setAutoCancel(true);
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
+        notificationManager.notify(notificationId, builder.build());
+        notificationId++;
+    }
 }
