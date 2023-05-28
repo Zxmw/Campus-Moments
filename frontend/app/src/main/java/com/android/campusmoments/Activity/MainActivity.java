@@ -4,6 +4,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
@@ -21,6 +22,7 @@ import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.android.campusmoments.R;
@@ -33,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences mPreferences;
     public static final int TOKEN_VALID = 0;
     public static final int TOKEN_INVALID = 1;
+    private ConstraintLayout progressbarView;
 
     @SuppressLint("HandlerLeak")
     private final Handler handler = new Handler(Looper.getMainLooper()) {
@@ -51,6 +54,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        progressbarView = findViewById(R.id.progressbarview);
+        progressbarView.setVisibility(View.VISIBLE);
+        Button loginButton = findViewById(R.id.button_login);
+        loginButton.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+            startActivity(intent);
+        });
         askNotificationPermission();
         createNotificationChannel();
         mPreferences = getSharedPreferences("user_info", MODE_PRIVATE);
@@ -58,13 +68,9 @@ public class MainActivity extends AppCompatActivity {
         if (token != null) {
             Services.token = token;
             Services.tokenCheck(token, handler);
+        } else {
+            progressbarView.setVisibility(View.GONE);
         }
-        Button loginButton = findViewById(R.id.button_login);
-        loginButton.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-            startActivity(intent);
-        });
-
 //        Intent intent = new Intent(MainActivity.this, PrivateMessageActivity.class);
 //        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
 //        startActivity(intent);
@@ -86,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = mPreferences.edit();
         editor.clear();
         editor.apply();
+        progressbarView.setVisibility(View.GONE);
         Toast.makeText(MainActivity.this, "登录信息已过期，请重新登录", Toast.LENGTH_SHORT).show();
     }
 

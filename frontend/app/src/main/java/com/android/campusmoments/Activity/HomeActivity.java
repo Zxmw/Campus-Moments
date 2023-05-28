@@ -51,13 +51,13 @@ public class HomeActivity extends AppCompatActivity {
     private NotificationFragment notificationFragment;
     private MyFragment myFragment;
     private Fragment currentFragment;
-
+    private int selfId;
     private static ChildEventListener childEventListener;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-
+        selfId = Services.mySelf.id;
         fragmentContainerView = findViewById(R.id.fragmentContainerView);
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         initFragment();
@@ -76,7 +76,7 @@ public class HomeActivity extends AppCompatActivity {
                 boolean isNotified = snapshot.child("isNotified").getValue(Boolean.class);
                 if(isNotified) return;
                 Services.sendNotification(senderId, momentId, content, username, getApplicationContext());
-                firebaseDatabase.getReference("notifications").child(String.valueOf(Services.mySelf.id)).child(Objects.requireNonNull(snapshot.getKey())).child("isNotified").setValue(true);
+                firebaseDatabase.getReference("notifications").child(String.valueOf(selfId)).child(Objects.requireNonNull(snapshot.getKey())).child("isNotified").setValue(true);
             }
             @Override
             public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) { }
@@ -88,7 +88,7 @@ public class HomeActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) { }
         };
 
-        firebaseDatabase.getReference("notifications").child(String.valueOf(Services.mySelf.id)).addChildEventListener(childEventListener);
+        firebaseDatabase.getReference("notifications").child(String.valueOf(selfId)).addChildEventListener(childEventListener);
     }
     private void initFragment() {
         homeFragment = new HomeFragment();
@@ -127,5 +127,11 @@ public class HomeActivity extends AppCompatActivity {
             }
             return false;
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        firebaseDatabase.getReference("notifications").child(String.valueOf(selfId)).removeEventListener(childEventListener);
     }
 }
