@@ -157,6 +157,9 @@ public class MomentsFragment extends Fragment {
             return;
         }
         refreshing = true;
+
+        progressBar.setVisibility(View.VISIBLE); // 显示加载动画, 可以注释掉,
+
         if (type == TYPE_PERSON) {
             Services.getMomentsByUser(userId, getMomentsHandler);
         } else if(type == TYPE_ALL) {
