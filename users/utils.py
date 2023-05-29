@@ -3,7 +3,9 @@ from drf_yasg2.errors import SwaggerGenerationError
 from drf_yasg2.inspectors import SwaggerAutoSchema
 from rest_framework.request import is_form_media_type
 from drf_yasg2.utils import merge_params, swagger_auto_schema
+from django.core.mail import EmailMessage
 
+import threading
 
 token_param_config = openapi.Parameter(
     'Authorization', in_=openapi.IN_HEADER, description='token', type=openapi.TYPE_STRING)
@@ -51,3 +53,21 @@ class TokenAuthSwaggerAutoSchema(SwaggerAutoSchema):
 
 
 token_auth_auto_schema = swagger_auto_schema(auto_schema=TokenAuthSwaggerAutoSchema)
+
+
+class EmailThread(threading.Thread):
+
+    def __init__(self, email):
+        self.email = email
+        threading.Thread.__init__(self)
+
+    def run(self):
+        self.email.send()
+
+
+class Util:
+    @staticmethod
+    def send_email(data):
+        email = EmailMessage(
+            subject=data['email_subject'], body=data['email_body'], to=[data['to_email']])
+        EmailThread(email).start()

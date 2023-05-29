@@ -19,7 +19,7 @@ class MyUserManager(BaseUserManager):
         email = self.normalize_email(email)
         if not email:
             raise ValueError('User should have a email')
-        user = self.model(username=username, **extra_fields)
+        user = self.model(username=username, email=email, **extra_fields)
         user.password = make_password(password)
         user.save(using=self._db)
         return user
@@ -62,7 +62,7 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
             "unique": _("A user with that username already exists."),
         },
     )
-    email = models.EmailField(_("email address"), null=True, blank=True)
+    email = models.EmailField(_("email address"), null=True, blank=True, unique=True)
     avatar = models.ImageField(_("Image"), upload_to='avatars', null=True, blank=True)
     bio = models.TextField(blank=True)
     is_staff = models.BooleanField(
@@ -86,7 +86,7 @@ class MyUser(AbstractBaseUser, PermissionsMixin):
 
     EMAIL_FIELD = "email"
     USERNAME_FIELD = "username"
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ['email']
 
     def __str__(self):
         return str(self.username)

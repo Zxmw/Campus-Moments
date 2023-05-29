@@ -21,6 +21,12 @@ urlpatterns = [
     path('api/users/<int:pk>', UserDetailAPIView.as_view()),
     path('api/follow-block', FollowBlockAPIView.as_view(),
          name='follow-block'),
+    path('request-reset-email/', RequestPasswordResetEmail.as_view(),
+         name="request-reset-email"),
+    path('password-reset/<uidb64>/<token>/',
+         PasswordTokenCheckAPI.as_view(), name='password-reset-confirm'),
+    path('password-reset-complete', SetNewPasswordAPIView.as_view(),
+         name='password-reset-complete')
     #path('api/logout', decorated_logout_view, name="logout"),
 ]
 
