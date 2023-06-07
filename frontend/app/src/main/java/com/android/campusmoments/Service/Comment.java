@@ -6,6 +6,7 @@ import java.util.List;
 
 public class Comment implements Comparable<Comment>{
     private int id;
+    private int by; // 评论者id
     private String avatarPath;
     private String username;
     private String time;
@@ -14,6 +15,7 @@ public class Comment implements Comparable<Comment>{
     public Comment(JSONObject obj) {
         try {
             id = obj.getInt("id");
+            by = obj.getInt("by");
             username = Services.checkObjStr(obj, "usr_username");
             avatarPath = Services.checkObjStr(obj, "usr_avatar");
             time = Services.checkObjStr(obj, "created_at");
@@ -28,6 +30,9 @@ public class Comment implements Comparable<Comment>{
     }
     public int getId() {
         return id;
+    }
+    public int getUserId() {
+        return by;
     }
     public String getUsername() {
         return username;

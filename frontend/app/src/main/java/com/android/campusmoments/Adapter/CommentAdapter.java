@@ -1,5 +1,6 @@
 package com.android.campusmoments.Adapter;
 
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +9,7 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.campusmoments.Activity.UserHomePageActivity;
 import com.android.campusmoments.R;
 import com.android.campusmoments.Service.Comment;
 import com.squareup.picasso.Picasso;
@@ -43,6 +45,26 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.CommentV
             if(comment.getAvatarPath() != null) {
                 Picasso.get().load(comment.getAvatarPath()).into(mAvatarImageView);
             }
+            // 点击头像跳转到用户主页
+            mAvatarImageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(view.getContext(), UserHomePageActivity.class);
+                    int id = comment.getUserId();
+                    intent.putExtra("id", id);
+                    view.getContext().startActivity(intent);
+                }
+            });
+            // 点击用户名跳转到用户主页
+            mUsernameTextView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(view.getContext(), UserHomePageActivity.class);
+                    int id = comment.getUserId();
+                    intent.putExtra("id", id);
+                    view.getContext().startActivity(intent);
+                }
+            });
         }
     }
     @Override
