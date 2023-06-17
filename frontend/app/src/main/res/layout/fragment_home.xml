@@ -19,10 +19,11 @@
 
             <ImageView
                 android:layout_width="36dp"
-                android:layout_marginLeft="5dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:src="@drawable/ic_refresh" />
+                android:layout_marginLeft="5dp"
+                android:src="@drawable/ic_refresh"
+                android:visibility="invisible" />
 
             <com.google.android.material.tabs.TabLayout
                 android:id="@+id/tabLayout"

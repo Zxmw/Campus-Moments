@@ -1,5 +1,7 @@
 package com.android.campusmoments.Fragment;
 
+import static com.android.campusmoments.Service.Config.GET_ALL_USERS_FAIL;
+import static com.android.campusmoments.Service.Config.GET_ALL_USERS_SUCCESS;
 import static com.android.campusmoments.Service.Config.GET_USER_FAIL;
 import static com.android.campusmoments.Service.Config.GET_USER_SUCCESS;
 import static com.android.campusmoments.Service.Config.firebaseDatabase;
@@ -57,10 +59,10 @@ public class NotificationFragment extends Fragment {
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
             switch(msg.what) {
-                case GET_USER_SUCCESS:
+                case GET_ALL_USERS_SUCCESS:
                     getUserSuccess(msg.obj);
                     break;
-                case GET_USER_FAIL:
+                case GET_ALL_USERS_FAIL:
                     getUserFail();
                     break;
             }
@@ -175,7 +177,7 @@ public class NotificationFragment extends Fragment {
                         tmpKey.add(notificationKeyList.get(i));
                     }
                     notificationKeyList = tmpKey;
-                    Services.getUserByIds(senderIdList, handler);
+                    Services.getAllUsers(handler);
                 }
             }
         });

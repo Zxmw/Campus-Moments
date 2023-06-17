@@ -67,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
         String token = mPreferences.getString("token", null);
         if (token != null) {
             Services.token = token;
+            Log.d("MainActivity", "onCreate: " + token);
             Services.tokenCheck(token, handler);
         } else {
             progressbarView.setVisibility(View.GONE);
@@ -89,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loinExpired() {
+        Log.d("MainActivity", "loinExpired: ");
         SharedPreferences.Editor editor = mPreferences.edit();
         editor.clear();
         editor.apply();

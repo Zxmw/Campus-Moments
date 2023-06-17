@@ -40,6 +40,8 @@ public class MyFragment extends Fragment {
     private TextView selfFollowingNum;
     private TextView selfFansNum;
     private TextView selfBlockNum;
+    private TextView selfFollowingNum2;
+    private TextView selfFansNum2;
 
     private LinearLayout followingLayout;
     private LinearLayout fansLayout;
@@ -72,6 +74,8 @@ public class MyFragment extends Fragment {
         selfUserId.setText(String.valueOf(Services.mySelf.id));
         selfFollowingNum = view.findViewById(R.id.following_number_text);
         selfFollowingNum.setText(String.valueOf(Services.mySelf.followList.size()));
+        selfFollowingNum2 = view.findViewById(R.id.following_number_text1);
+        selfFollowingNum2.setText(String.valueOf(Services.mySelf.followList.size()));
         followingLayout = view.findViewById(R.id.following_layout);
         followingLayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -84,6 +88,8 @@ public class MyFragment extends Fragment {
 
         selfFansNum = view.findViewById(R.id.fans_number_text);
         selfFansNum.setText(String.valueOf(Services.mySelf.fansList.size()));
+        selfFansNum2 = view.findViewById(R.id.followed_number_text);
+        selfFansNum2.setText(String.valueOf(Services.mySelf.fansList.size()));
         fansLayout = view.findViewById(R.id.fans_layout);
         fansLayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -127,7 +133,9 @@ public class MyFragment extends Fragment {
         selfUsername.setText(Services.mySelf.username);
         selfUserId.setText(String.valueOf(Services.mySelf.id));
         selfFollowingNum.setText(String.valueOf(Services.mySelf.followList.size()));
+        selfFollowingNum2.setText(String.valueOf(Services.mySelf.followList.size()));
         selfFansNum.setText(String.valueOf(Services.mySelf.fansList.size()));
+        selfFansNum2.setText(String.valueOf(Services.mySelf.fansList.size()));
         selfBlockNum.setText(String.valueOf(Services.mySelf.blockList.size()));
         selfMomentsFragment.refresh();
     }

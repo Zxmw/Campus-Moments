@@ -87,6 +87,7 @@ public class DetailedActivity extends AppCompatActivity {
             if(msg.what == 0) {
                 Toast.makeText(DetailedActivity.this, "发送失败", Toast.LENGTH_SHORT).show();
             } else if(msg.what == 1) {
+                Services.refreshMyself();
                 String shortContent = commentEditText.getText().toString();
                 if(shortContent.length() > 10) {
                     shortContent = shortContent.substring(0, 10) + "...";

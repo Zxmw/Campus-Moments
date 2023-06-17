@@ -242,7 +242,7 @@ public class MomentsFragment extends Fragment {
                     public void handleMessage(@NonNull android.os.Message msg) {
                         super.handleMessage(msg);
                         if (msg.what == 1) {
-
+                            Services.refreshMyself();
                             clickedMoment.isLikedByMe = !clickedMoment.isLikedByMe;
                             int likeCount = clickedMoment.getLikeCount();
                             if(clickedMoment.isLikedByMe) {

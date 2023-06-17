@@ -57,6 +57,7 @@ public class PrivateMessageActivity extends AppCompatActivity {
         TextView messageTextView = findViewById(R.id.editTextMessage);
         String content = messageTextView.getText().toString();
         if (!content.equals("")) {
+            Services.refreshMyself();
             PrivateMessage privateMessage = new PrivateMessage(Services.mySelf.id, otherId, Services.mySelf.avatar, Services.mySelf.username, content);
             String childName = selfId < otherId ? selfId + "-" + otherId : otherId + "-" + selfId;
             firebaseDatabase.getReference("privateMessages").child(childName).push().setValue(privateMessage);
@@ -87,6 +88,7 @@ public class PrivateMessageActivity extends AppCompatActivity {
                 holder.contentTextView.setText(model.getContent());
                 Context context = holder.contentTextView.getContext();
                 if (model.getSenderId() == selfId) {
+                    holder.avatarImageView.setForegroundGravity(Gravity.END);
                     holder.contentTextView.setBackgroundColor(ContextCompat.getColor(context, R.color.myMessageBackground));
                     holder.contentTextView.setTextColor(ContextCompat.getColor(context, R.color.myMessageText));
                     holder.messageLinearLayout.setOrientation(LinearLayout.HORIZONTAL);
@@ -100,6 +102,7 @@ public class PrivateMessageActivity extends AppCompatActivity {
                         Picasso.get().load(Uri.parse(Services.mySelf.avatar)).into(holder.avatarImageView);
                     }
                 } else {
+                    holder.avatarImageView.setForegroundGravity(Gravity.START);
                     holder.contentTextView.setBackgroundColor(ContextCompat.getColor(context, R.color.otherPersonMessageBackground));
                     holder.contentTextView.setTextColor(ContextCompat.getColor(context, R.color.otherPersonMessageText));
                     holder.textLinearLayout.setGravity(Gravity.START);

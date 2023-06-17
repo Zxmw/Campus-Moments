@@ -71,6 +71,7 @@ public class PubActivity extends AppCompatActivity {
                     break;
                 case PUB_MOMENT_SUCCESS:
                     try {
+                        Services.refreshMyself();
                         JSONObject jsonObject = new JSONObject((String)msg.obj);
                         int momentId = jsonObject.getInt("id");
                         String username = jsonObject.getString("usr_username");

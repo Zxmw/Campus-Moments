@@ -73,6 +73,9 @@ public class Services {
             @Override
             public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws java.io.IOException {
                 if (response.code() != 200) {
+                    Message message = new Message();
+                    message.what = MainActivity.TOKEN_INVALID;
+                    handler.sendMessage(message);
                     return;
                 }
                 assert response.body() != null;
@@ -291,15 +294,52 @@ public class Services {
             }
         });
     }
-    public static void setPassword(String password, String new_password, Handler handler) {
-        // 这个不对
+    public static void requestResetPassword(String email, Handler handler) {
         MultipartBody.Builder builder = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM);
-        builder.addFormDataPart("password", password);
+        builder.addFormDataPart("email", email);
         RequestBody requestBody = builder.build();
         Request request = new Request.Builder()
                 .addHeader("Authorization", "Token " + token)
-                .url(PATCH_USER_URL + mySelf.id)
+                .url(REQUEST_RESET_PASSWORD_URL)
+                .post(requestBody)
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NonNull okhttp3.Call call, @NonNull java.io.IOException e) {
+                Log.d(TAG, "onFailure: " + e.getMessage());
+                Message message = new Message();
+                message.what = REQUEST_PASSWORD_FAIL;
+                handler.sendMessage(message);
+            }
+
+            @Override
+            public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws java.io.IOException {
+                if (response.code() != 200) {
+                    Message message = new Message();
+                    message.what = REQUEST_PASSWORD_FAIL;
+                    handler.sendMessage(message);
+                    return;
+                }
+                Message message = new Message();
+                message.what = REQUEST_PASSWORD_SUCCESS;
+                message.obj = response.body().string();
+                Log.d(TAG, "onResponse: " + message.obj);
+                handler.sendMessage(message);
+            }
+        });
+    }
+
+    public static void resetPassword(String password, String token1, String uidb64, Handler handler) {
+        MultipartBody.Builder builder = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM);
+        builder.addFormDataPart("password", password);
+        builder.addFormDataPart("token", token1);
+        builder.addFormDataPart("uidb64", uidb64);
+        RequestBody requestBody = builder.build();
+        Request request = new Request.Builder()
+                .addHeader("Authorization", "Token " + token)
+                .url(RESET_PASSWORD_URL)
                 .patch(requestBody)
                 .build();
         client.newCall(request).enqueue(new Callback() {
@@ -871,5 +911,9 @@ public class Services {
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
         notificationManager.notify(notificationId, builder.build());
         notificationId++;
+    }
+
+    public static void refreshMyself() {
+        getSelf(token);
     }
 }
