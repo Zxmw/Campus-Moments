@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  web:
+    build: Campus-Moments
+    restart: always
+    privileged: true
+    ports:
+      - "8000:8000"
+    command: uwsgi --ini /code/uwsgi.ini
+    volumes:
+      - ./Campus-Moments:/code
+
+  nginx:
+    container_name: nginx-container
+    restart: always
+    depends_on:
+      - web
+    links:
+      - "web:web"
+    build: nginx
+    ports:
+      - "8888:80"
+    volumes:
+      - ./nginx/nginx-app.conf:/etc/nginx/conf.d/default.conf
+      - ./Campus-Moments/media:/code/media
