@@ -29,12 +29,14 @@
 
 前端APP：请直接使用`./frontend/app/release/app-release.apk`。如果需要重新build项目，可以将frontend作为项目在Android Studio打开进行修改、打包等操作。
 
-后端项目：我们提供了docker镜像，可以在backend文件夹下运行一下命令进行部署。
+后端项目：我们提供了docker镜像，可以在backend文件夹下运行以下命令进行部署。
 
 ```
 docker-compose build
 docker-compose up
 ```
+
+如果是第一次使用，可能还需要migrate来初始化数据库。
 
 我们已经将后端部署在我们的服务器上，因此可以直接使用已经部署的后端。
 
