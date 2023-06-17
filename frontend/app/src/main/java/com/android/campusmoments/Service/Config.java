@@ -39,7 +39,7 @@ public class Config {
     public static final int GET_ALL_USERS_SUCCESS = 31;
     public static final int REQUEST_PASSWORD_FAIL = 32;
     public static final int REQUEST_PASSWORD_SUCCESS = 33;
-    public static final String USER_BASE_URL = "http://10.0.2.2:8000/users/api/";
+    public static final String USER_BASE_URL = "http://43.138.33.189:8888/users/api/";
     public static final String LOGIN_URL = USER_BASE_URL + "login";
     public static final String REGISTER_URL = USER_BASE_URL + "register";
     public static final String SELF_URL = USER_BASE_URL + "self";
@@ -49,9 +49,9 @@ public class Config {
     public static final String LOGOUT_URL = USER_BASE_URL + "logout";
     public static final String FOLLOW_BLOCK_URL = USER_BASE_URL + "follow-block";
 
-    public static final String REQUEST_RESET_PASSWORD_URL = "http://10.0.2.2:8000/users/" + "request-reset-email/";
-    public static final String RESET_PASSWORD_URL = "http://10.0.2.2:8000/users/" + "password-reset-complete";
-    public static final String MOMENTS_BASE_URL = "http://10.0.2.2:8000/moments/api/";
+    public static final String REQUEST_RESET_PASSWORD_URL = "http://43.138.33.189:8888/users/" + "request-reset-email/";
+    public static final String RESET_PASSWORD_URL = "http://43.138.33.189:8888/users/" + "password-reset-complete";
+    public static final String MOMENTS_BASE_URL = "http://43.138.33.189:8888/moments/api/";
     public static final String PUB_MOMENT_URL = MOMENTS_BASE_URL + "moments";
     public static final String GET_MOMENTS_URL = MOMENTS_BASE_URL + "moments";
     public static final String GET_MOMENT_URL = MOMENTS_BASE_URL + "moments/";
